@@ -1,0 +1,43 @@
+server:
+  host: 0.0.0.0
+  port: 3000
+  base_url: INFISICAL:/headplane/SERVER_BASE_URL
+  cookie_secret: INFISICAL:/headplane/SERVER_COOKIE_SECRET
+  cookie_secure: true
+  cookie_max_age: 86400
+  data_path: /var/lib/headplane
+  proxy_auth:
+    enabled: true
+    user_header: X-Forwarded-User
+    email_header: X-Forwarded-Email
+    allowed_cidrs:
+    - INFISICAL:/headplane/SERVER_PROXY_AUTH_ALLOWED_CIDRS_0
+headscale:
+  url: INFISICAL:/shared/HEADSCALE_SERVER_URL
+  api_key: INFISICAL:/headplane/HEADSCALE_API_KEY
+  config_path: /etc/headscale/config.yaml
+  config_strict: true
+integration:
+  agent:
+    enabled: false
+    host_name: INFISICAL:/headplane/INTEGRATION_AGENT_HOST_NAME
+  docker:
+    enabled: true
+    container_label: me.tale.headplane.target=headscale
+    socket: unix:///var/run/docker.sock
+  kubernetes:
+    enabled: false
+    validate_manifest: true
+    pod_name: headscale
+  proc:
+    enabled: false
+oidc:
+  enabled: false
+  default_role: member
+  issuer: https://accounts.google.com
+  client_id: INFISICAL:/headplane/OIDC_CLIENT_ID
+  client_secret: INFISICAL:/headplane/OIDC_CLIENT_SECRET
+  use_pkce: true
+  scope: openid email profile
+  disable_api_key_login: true
+  token_endpoint_auth_method: client_secret_post

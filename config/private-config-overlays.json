@@ -1,0 +1,420 @@
+[
+  {
+    "file": "data/headplane/data/config.yaml",
+    "format": "yaml",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "headplane",
+        "SOURCE_FILE": "data/headplane/data/config.yaml",
+        "SOURCE_KEY": "headscale.api_key",
+        "INFISICAL_PATH": "/headplane",
+        "DEST_KEY": "HEADSCALE_API_KEY",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headplane",
+        "SOURCE_FILE": "data/headplane/data/config.yaml",
+        "SOURCE_KEY": "headscale.url",
+        "INFISICAL_PATH": "/shared",
+        "DEST_KEY": "HEADSCALE_SERVER_URL",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headplane",
+        "SOURCE_FILE": "data/headplane/data/config.yaml",
+        "SOURCE_KEY": "integration.agent.host_name",
+        "INFISICAL_PATH": "/headplane",
+        "DEST_KEY": "INTEGRATION_AGENT_HOST_NAME",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headplane",
+        "SOURCE_FILE": "data/headplane/data/config.yaml",
+        "SOURCE_KEY": "oidc.client_id",
+        "INFISICAL_PATH": "/headplane",
+        "DEST_KEY": "OIDC_CLIENT_ID",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headplane",
+        "SOURCE_FILE": "data/headplane/data/config.yaml",
+        "SOURCE_KEY": "oidc.client_secret",
+        "INFISICAL_PATH": "/headplane",
+        "DEST_KEY": "OIDC_CLIENT_SECRET",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headplane",
+        "SOURCE_FILE": "data/headplane/data/config.yaml",
+        "SOURCE_KEY": "server.base_url",
+        "INFISICAL_PATH": "/headplane",
+        "DEST_KEY": "SERVER_BASE_URL",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headplane",
+        "SOURCE_FILE": "data/headplane/data/config.yaml",
+        "SOURCE_KEY": "server.cookie_secret",
+        "INFISICAL_PATH": "/headplane",
+        "DEST_KEY": "SERVER_COOKIE_SECRET",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headplane",
+        "SOURCE_FILE": "data/headplane/data/config.yaml",
+        "SOURCE_KEY": "server.proxy_auth.allowed_cidrs[0]",
+        "INFISICAL_PATH": "/headplane",
+        "DEST_KEY": "SERVER_PROXY_AUTH_ALLOWED_CIDRS_0",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  },
+  {
+    "file": "data/headscale/data/config/config.yaml",
+    "format": "yaml",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "headscale",
+        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
+        "SOURCE_KEY": "derp.server.ipv4",
+        "INFISICAL_PATH": "/headscale",
+        "DEST_KEY": "DERP_SERVER_IPV4",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headscale",
+        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
+        "SOURCE_KEY": "dns.base_domain",
+        "INFISICAL_PATH": "/headscale",
+        "DEST_KEY": "DNS_BASE_DOMAIN",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headscale",
+        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
+        "SOURCE_KEY": "dns.extra_records[0].name",
+        "INFISICAL_PATH": "/headscale",
+        "DEST_KEY": "DNS_EXTRA_RECORDS_0_NAME",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headscale",
+        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
+        "SOURCE_KEY": "dns.extra_records[0].value",
+        "INFISICAL_PATH": "/headscale",
+        "DEST_KEY": "DNS_EXTRA_RECORDS_0_VALUE",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headscale",
+        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
+        "SOURCE_KEY": "dns.nameservers.global[0]",
+        "INFISICAL_PATH": "/headscale",
+        "DEST_KEY": "DNS_NAMESERVERS_GLOBAL_0",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      },
+      {
+        "SERVICE": "headscale",
+        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
+        "SOURCE_KEY": "server_url",
+        "INFISICAL_PATH": "/shared",
+        "DEST_KEY": "HEADSCALE_SERVER_URL",
+        "TRANSFORM": "SCALAR",
+        "COMPOSE_VARIABLE": ""
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  },
+  {
+    "file": "data/jackett/data/Jackett/Indexers/animetosho-xyz.json",
+    "format": "json",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "jackett",
+        "SOURCE_FILE": "data/jackett/data/Jackett/Indexers/animetosho-xyz.json",
+        "SOURCE_KEY": "[3].value",
+        "INFISICAL_PATH": "/jackett",
+        "DEST_KEY": "ANIMETOSHO_XYZ_API_KEY",
+        "TRANSFORM": "SCALAR"
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  },
+  {
+    "file": "data/jackett/data/Jackett/ServerConfig.json",
+    "format": "json",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "jackett",
+        "SOURCE_FILE": "data/jackett/data/Jackett/ServerConfig.json",
+        "SOURCE_KEY": "APIKey",
+        "INFISICAL_PATH": "/shared",
+        "DEST_KEY": "JACKETT_API_KEY",
+        "TRANSFORM": "SCALAR"
+      }
+    ],
+    "omit_runtime_identity_fields": [
+      "InstanceId"
+    ]
+  },
+  {
+    "file": "data/seanime/data/main/config/config.toml",
+    "format": "toml",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "seanime",
+        "SOURCE_FILE": "data/seanime/data/main/config/config.toml",
+        "SOURCE_KEY": "server.password",
+        "INFISICAL_PATH": "/seanime",
+        "DEST_KEY": "SERVER_PASSWORD",
+        "TRANSFORM": "SCALAR"
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  },
+  {
+    "file": "data/seanime/data/main/config/extensions/aq-anikoto.json",
+    "format": "json",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "seanime",
+        "SOURCE_FILE": "data/seanime/data/main/config/extensions/aq-anikoto.json",
+        "SOURCE_KEY": "userConfig.fields[3].default",
+        "INFISICAL_PATH": "/shared",
+        "DEST_KEY": "SEANIME_SOLVER_URL",
+        "TRANSFORM": "SCALAR"
+      },
+      {
+        "SERVICE": "seanime",
+        "SOURCE_FILE": "data/seanime/data/main/config/extensions/aq-anikoto.json",
+        "SOURCE_KEY": "payload",
+        "INFISICAL_PATH": "/shared",
+        "DEST_KEY": "SEANIME_SOLVER_URL",
+        "TRANSFORM": "JS_LITERAL",
+        "source_default": "userConfig.fields[3].default"
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  },
+  {
+    "file": "data/seanime/data/main/config/extensions/aq-animepahe-beta.json",
+    "format": "json",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "seanime",
+        "SOURCE_FILE": "data/seanime/data/main/config/extensions/aq-animepahe-beta.json",
+        "SOURCE_KEY": "userConfig.fields[1].default",
+        "INFISICAL_PATH": "/shared",
+        "DEST_KEY": "SEANIME_SOLVER_URL",
+        "TRANSFORM": "SCALAR"
+      },
+      {
+        "SERVICE": "seanime",
+        "SOURCE_FILE": "data/seanime/data/main/config/extensions/aq-animepahe-beta.json",
+        "SOURCE_KEY": "payload",
+        "INFISICAL_PATH": "/shared",
+        "DEST_KEY": "SEANIME_SOLVER_URL",
+        "TRANSFORM": "JS_LITERAL",
+        "source_default": "userConfig.fields[1].default"
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  },
+  {
+    "file": "data/seanime/data/shared/config/config.toml",
+    "format": "toml",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/config.toml",
+        "SOURCE_KEY": "server.password",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "SERVER_PASSWORD",
+        "TRANSFORM": "SCALAR"
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  },
+  {
+    "file": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
+    "format": "json",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
+        "SOURCE_KEY": "manifestURI",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_ORIGIN",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "origin"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
+        "SOURCE_KEY": "manifestURI",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "uuid"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
+        "SOURCE_KEY": "userConfig.fields[0].default",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_ORIGIN",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "origin"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
+        "SOURCE_KEY": "userConfig.fields[0].default",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "uuid"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
+        "SOURCE_KEY": "website",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_ORIGIN",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "origin"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
+        "SOURCE_KEY": "website",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "uuid"
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  },
+  {
+    "file": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
+    "format": "json",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
+        "SOURCE_KEY": "manifestURI",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_ORIGIN",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "origin"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
+        "SOURCE_KEY": "manifestURI",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "uuid"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
+        "SOURCE_KEY": "userConfig.fields[0].default",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_ORIGIN",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "origin"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
+        "SOURCE_KEY": "userConfig.fields[0].default",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "uuid"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
+        "SOURCE_KEY": "website",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_ORIGIN",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "origin"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
+        "SOURCE_KEY": "website",
+        "INFISICAL_PATH": "/seanime-shared",
+        "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
+        "TRANSFORM": "URI_COMPONENT",
+        "component": "uuid"
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  },
+  {
+    "file": "data/seanime/data/shared/config/extensions/aq-anikoto.json",
+    "format": "json",
+    "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
+    "preserve_existing": true,
+    "updates": [
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aq-anikoto.json",
+        "SOURCE_KEY": "userConfig.fields[3].default",
+        "INFISICAL_PATH": "/shared",
+        "DEST_KEY": "SEANIME_SOLVER_URL",
+        "TRANSFORM": "SCALAR"
+      },
+      {
+        "SERVICE": "seanime-shared",
+        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aq-anikoto.json",
+        "SOURCE_KEY": "payload",
+        "INFISICAL_PATH": "/shared",
+        "DEST_KEY": "SEANIME_SOLVER_URL",
+        "TRANSFORM": "JS_LITERAL",
+        "source_default": "userConfig.fields[3].default"
+      }
+    ],
+    "omit_runtime_identity_fields": []
+  }
+]

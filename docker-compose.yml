@@ -1,0 +1,768 @@
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    env_file:
+    - ./data/tailscale/.env
+    - ./.secrets/tailscale.env
+    volumes:
+    - ./data/tailscale/data/state:/var/lib/tailscale
+    - /dev/net/tun:/dev/net/tun
+    container_name: tailscale
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - --spider
+      - -q
+      - http://127.0.0.1:9002/healthz
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    devices:
+    - /dev/net/tun:/dev/net/tun
+    cap_add:
+    - net_admin
+    - net_raw
+    restart: unless-stopped
+    network_mode: host
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - headscale
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    volumes:
+    - portainer-data:/data
+    - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+    - ./data/portainer/.env
+    ports:
+    - 9443:9443
+    - 9000:9000
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_PORTAINER_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  dnscrypt-proxy:
+    image: klutchell/dnscrypt-proxy:latest
+    container_name: dnscrypt-proxy
+    restart: unless-stopped
+    volumes:
+    - ./data/dnscrypt-proxy/data:/config
+    env_file:
+    - ./data/dnscrypt-proxy/.env
+    healthcheck:
+      test:
+      - CMD
+      - dnscrypt-proxy
+      - --version
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_DNSCRYPT_PROXY_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Agent render required}
+    ports:
+    - 5353:5353/tcp
+    - 5353:5353/udp
+    - 8280:8280
+    - 3335:3335
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - headscale
+  headscale:
+    image: headscale/headscale:stable
+    container_name: headscale
+    volumes:
+    - ./data/headscale/data/config:/etc/headscale
+    - ./data/headscale/data/lib:/var/lib/headscale
+    - ./data/headscale/data/run:/var/run/headscale
+    ports:
+    - 8080:8080
+    command: serve
+    healthcheck:
+      test:
+      - CMD
+      - headscale
+      - health
+    restart: unless-stopped
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_HEADSCALE_NETWORK_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - me.tale.headplane.target=headscale
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - headscale
+  headplane:
+    image: ghcr.io/tale/headplane:latest
+    container_name: headplane
+    ports:
+    - 3000:3000
+    restart: unless-stopped
+    healthcheck:
+      test:
+      - CMD
+      - /bin/hp_healthcheck
+      interval: 30s
+      timeout: 5s
+      start_period: 5s
+      retries: 3
+    volumes:
+    - ./data/headplane/data/config.yaml:/etc/headplane/config.yaml
+    - ./data/headplane/data:/var/lib/headplane
+    - ./data/headscale/data/config/config.yaml:/etc/headscale/config.yaml
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      headscale:
+        condition: service_healthy
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_HEADPLANE_NETWORK_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - headscale
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+    - 80:80
+    - 81:81
+    - 443:443
+    env_file:
+    - ./data/npm/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+      - CMD
+      - /usr/bin/check-health
+    volumes:
+    - ./data/npm/data:/data
+    - ./data/npm/data/letsencrypt:/etc/letsencrypt
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_NPM_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+      vpn-net:
+        ipv4_address: ${INFISICAL_NPM_NETWORK_VPN_NET_IPV4_ADDRESS:?Infisical Wave B env required}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  cloudflare-ddns:
+    image: favonia/cloudflare-ddns:latest
+    container_name: cloudflare-ddns
+    restart: unless-stopped
+    user: 1000:1000
+    read_only: true
+    cap_drop:
+    - all
+    security_opt:
+    - no-new-privileges:true
+    env_file:
+    - ./data/cloudflare-ddns/.env
+    - ./.secrets/cloudflare-ddns.env
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_CLOUDFLARE_DDNS_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  aiometadata:
+    image: ghcr.io/cedya77/aiometadata:latest
+    container_name: aiometadata
+    restart: unless-stopped
+    ports:
+    - 1337:1337
+    env_file:
+    - ./data/aiometadata/.env
+    - ./.secrets/aiometadata.env
+    volumes:
+    - ./data/aiometadata/data:/app/addon/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_AIOMETADATA_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+      vpn-net:
+        ipv4_address: ${INFISICAL_STACK_AIOMETADATA_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  mediaflow-proxy-light:
+    image: ghcr.io/mhdzumair/mediaflow-proxy-light:latest
+    container_name: mediaflow-proxy-light
+    restart: unless-stopped
+    env_file:
+    - ./data/mediaflow-proxy-light/.env
+    - ./.secrets/mediaflow-proxy-light.env
+    ports:
+    - 8888:8888
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+      vpn-net:
+        ipv4_address: ${INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  aiostreams:
+    image: ghcr.io/viren070/aiostreams:nightly
+    container_name: aiostreams
+    restart: unless-stopped
+    ports:
+    - 4444:4444
+    env_file:
+    - ./data/aiostreams/.env
+    - ./.secrets/aiostreams.env
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    volumes:
+    - ./data/aiostreams/data:/app/data
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_AIOSTREAMS_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+      vpn-net:
+        ipv4_address: ${INFISICAL_STACK_AIOSTREAMS_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  pgbouncer:
+    container_name: pgbouncer
+    image: edoburu/pgbouncer:latest
+    restart: unless-stopped
+    env_file:
+    - ./data/pgbouncer/.env
+    - ./.secrets/pgbouncer.env
+    volumes:
+    - ./data/pgbouncer/data/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+    - ./.generated/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - -h
+      - postgres
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_PGBOUNCER_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+      vpn-net:
+        ipv4_address: ${INFISICAL_STACK_PGBOUNCER_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+    - db
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    restart: unless-stopped
+    shm_size: 2G
+    env_file:
+    - ./data/postgres/.env
+    - ./.secrets/postgres.env
+    volumes:
+    - ./data/postgres/init:/docker-entrypoint-initdb.d
+    - pgdata:/var/lib/postgresql/data
+    - ./data/postgres/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U postgres
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_POSTGRES_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+      vpn-net:
+        ipv4_address: ${INFISICAL_STACK_POSTGRES_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+    - db
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+    - redis-data:/data
+    command: redis-server --appendonly yes --save 60 1
+    restart: unless-stopped
+    healthcheck:
+      test:
+      - CMD
+      - echo
+      - ok
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_REDIS_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+      vpn-net:
+        ipv4_address: ${INFISICAL_REDIS_NETWORK_VPN_NET_IPV4_ADDRESS:?Infisical Wave B env required}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+    - db
+  watchtower:
+    image: nickfedor/watchtower:latest
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./.generated/watchtower/config.json:/config.json:ro
+    env_file:
+    - ./data/watchtower/.env
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_WATCHTOWER_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  honey:
+    image: ghcr.io/dani3l0/honey:latest
+    container_name: honey
+    restart: unless-stopped
+    volumes:
+    - ./data/honey/data/config:/app/dist/config
+    ports:
+    - 4173:4173
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_HONEY_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Agent render required}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  teamspeak:
+    image: teamspeaksystems/teamspeak6-server:latest
+    container_name: teamspeak
+    user: 9987:9987
+    restart: unless-stopped
+    ports:
+    - 9987:9987/udp
+    - 30033:30033/tcp
+    env_file:
+    - ./data/teamspeak/.env
+    volumes:
+    - teamspeak-data:/var/tsserver
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_TEAMSPEAK_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  microwarp:
+    image: ghcr.io/ccbkkb/microwarp:latest
+    container_name: warp
+    environment:
+    - ALLOW_NO_AUTH=1
+    restart: always
+    cap_add:
+    - NET_ADMIN
+    - SYS_MODULE
+    sysctls:
+    - net.ipv4.conf.all.src_valid_mark=1
+    - net.ipv6.conf.all.disable_ipv6=0
+    - net.ipv6.conf.default.disable_ipv6=0
+    - net.ipv6.conf.all.forwarding=1
+    volumes:
+    - warp-data:/etc/wireguard
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_MICROWARP_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  gost:
+    image: gogost/gost:latest
+    container_name: gost
+    restart: unless-stopped
+    command:
+    - -L=http://:8082
+    - ${INFISICAL_GOST_COMMAND_ARG_1:?Infisical Wave B env required}
+    depends_on:
+    - microwarp
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_GOST_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+      vpn-net:
+        ipv4_address: ${INFISICAL_GOST_NETWORK_VPN_NET_IPV4_ADDRESS:?Infisical Wave B env required}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:latest
+    container_name: oauth2-proxy
+    restart: unless-stopped
+    env_file:
+    - ./data/oauth2-proxy/.env
+    - ./.secrets/oauth2-proxy.env
+    volumes:
+    - ./data/oauth2-proxy/allowed-emails.txt:/etc/oauth2-proxy/allowed-emails.txt:ro
+    depends_on:
+    - headplane
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_OAUTH2_PROXY_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - headscale
+  easyproxy:
+    image: ghcr.io/realbestia1/easyproxy:latest
+    container_name: easyproxy
+    restart: unless-stopped
+    ports:
+    - 8760:8760
+    env_file:
+    - ./data/easyproxy/.env
+    - ./.secrets/easyproxy.env
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    volumes:
+    - ./data/easyproxy/data:/data
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_EASYPROXY_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+      vpn-net:
+        ipv4_address: ${INFISICAL_STACK_EASYPROXY_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+    profiles:
+    - all
+  streamvix:
+    image: qwertyuiop8899/streamvix:latest
+    container_name: streamvix
+    ports:
+    - 7860:7860
+    env_file:
+    - ./data/streamvix/.env
+    - ./.secrets/streamvix.env
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_STREAMVIX_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+      vpn-net:
+        ipv4_address: ${INFISICAL_STACK_STREAMVIX_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+  tvvoo:
+    image: qwertyuiop8899/tvvoo:latest
+    container_name: tvvoo
+    ports:
+    - 5000:5000
+    env_file:
+    - ./data/tvvoo/.env
+    - ./.secrets/tvvoo.env
+    restart: unless-stopped
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_TVVOO_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+      vpn-net:
+        ipv4_address: ${INFISICAL_STACK_TVVOO_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+  aiomanager:
+    image: ghcr.io/sonicx161/aiomanager:beta
+    container_name: aiomanager
+    restart: unless-stopped
+    env_file:
+    - ./data/aiomanager/.env
+    - ./.secrets/aiomanager.env
+    ports:
+    - 1610:1610
+    volumes:
+    - ./data/aiomanager/data:/app/data
+    healthcheck:
+      test:
+      - CMD
+      - /nodejs/bin/node
+      - server/healthcheck.js
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    networks:
+      default:
+        ipv4_address: ${INFISICAL_STACK_AIOMANAGER_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - headscale
+  deunhealth:
+    image: qmcgaw/deunhealth:latest
+    container_name: deunhealth
+    network_mode: none
+    env_file:
+    - ./data/deunhealth/.env
+    restart: always
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    ports:
+    - 2020:2020
+    - 9090:9090
+    - 9117:9117
+    healthcheck:
+      test:
+      - CMD
+      - /gluetun-entrypoint
+      - healthcheck
+      interval: 5s
+      timeout: 5s
+      retries: 1
+      start_period: 40s
+    restart: always
+    env_file:
+    - ./data/gluetun/.env
+    - ./.secrets/gluetun.env
+    cap_add:
+    - NET_ADMIN
+    devices:
+    - /dev/net/tun:/dev/net/tun
+    networks:
+      vpn-net:
+        ipv4_address: ${INFISICAL_STACK_GLUETUN_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+    profiles:
+    - all
+    - gluetun
+    labels:
+    - com.centurylinklabs.watchtower.enable=false
+  comet:
+    image: g0ldyy/comet:latest
+    container_name: comet
+    restart: unless-stopped
+    init: true
+    read_only: true
+    security_opt:
+    - no-new-privileges:true
+    user: 1000:1000
+    cap_drop:
+    - ALL
+    tmpfs:
+    - /tmp:size=64m,mode=1777
+    volumes:
+    - ./data/comet/data:/app/data
+    env_file:
+    - ./data/comet/.env
+    - ./.secrets/comet.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      gluetun:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+    network_mode: service:gluetun
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+  cometnet:
+    image: g0ldyy/comet:latest
+    container_name: cometnet
+    restart: unless-stopped
+    init: true
+    read_only: true
+    security_opt:
+    - no-new-privileges:true
+    user: 1000:1000
+    cap_drop:
+    - ALL
+    tmpfs:
+    - /tmp:size=64m,mode=1777
+    entrypoint:
+    - python
+    - -m
+    - comet.cometnet.standalone
+    network_mode: service:gluetun
+    env_file:
+    - ./data/cometnet/.env
+    - ./.secrets/cometnet.env
+    volumes:
+    - ./data/comet/data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      comet:
+        condition: service_healthy
+      gluetun:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import http.client; c=http.client.HTTPConnection('127.0.0.1',8766,timeout=5); c.request('GET','/health'); raise SystemExit(0 if c.getresponse().status == 200 else 1)
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+  stremthru:
+    image: muniftanjim/stremthru:latest
+    container_name: stremthru
+    restart: unless-stopped
+    env_file:
+    - ./data/stremthru/.env
+    - ./.secrets/stremthru.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      gluetun:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      pgbouncer:
+        condition: service_healthy
+    network_mode: service:gluetun
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+  jackett:
+    image: lscr.io/linuxserver/jackett:latest
+    container_name: jackett
+    restart: unless-stopped
+    env_file:
+    - ./data/jackett/.env
+    volumes:
+    - ./data/jackett/data:/config
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    network_mode: service:gluetun
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+  seanime:
+    image: umagistr/seanime:latest
+    container_name: seanime
+    volumes:
+    - ./data/seanime/data/main/anime:/anime
+    - ./data/seanime/data/main/downloads:/downloads
+    - ./data/seanime/data/main:/mnt
+    - ./data/seanime/data/main/config:/root/.config/Seanime
+    restart: unless-stopped
+    healthcheck:
+      test: wget -qO- http://127.0.0.1:43211/api/v1/status
+      interval: 5m
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    network_mode: service:gluetun
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+  seanime-shared:
+    image: umagistr/seanime:latest
+    container_name: seanime-shared
+    volumes:
+    - ./data/seanime/data/shared/anime:/anime
+    - ./data/seanime/data/shared/downloads:/downloads
+    - ./data/seanime/data/shared:/mnt
+    - ./data/seanime/data/shared/config:/root/.config/Seanime
+    restart: unless-stopped
+    healthcheck:
+      test: wget -qO- http://127.0.0.1:43311/api/v1/status
+      interval: 5m
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    depends_on:
+      gluetun:
+        condition: service_healthy
+    network_mode: service:gluetun
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    profiles:
+    - all
+    - gluetun
+volumes:
+  portainer-data: null
+  pgdata: null
+  redis-data: null
+  teamspeak-data: null
+  warp-data: null
+networks:
+  default:
+    name: net
+    driver: bridge
+    ipam:
+      config:
+      - subnet: ${INFISICAL_STACK_DEFAULT_SUBNET:?Required private configuration}
+  vpn-net:
+    name: vpn-net
+    driver: bridge
+    ipam:
+      config:
+      - subnet: ${INFISICAL_STACK_VPN_NET_SUBNET:?Required private configuration}
