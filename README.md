@@ -4,6 +4,13 @@ Docker Compose declarations and sanitized public environment templates.
 Private configuration is supplied by Infisical; persistent application state
 is managed separately and is never included in this repository.
 
+To keep reviewed public configuration in sync with the live stack, see
+[automatic public stack export](docs/PUBLIC-STACK-SYNC.md). Its separate worker
+reads `/home/pi/streams-aio`, masks private fields and publishes only classified
+changes after verification. A timer checks about every fifteen minutes; unknown
+changes stop publication for review. Encrypted runtime backups retain their
+separate weekly schedule.
+
 ## Private configuration
 
 Infisical supplies deployment credentials and private configuration. The root
@@ -56,3 +63,4 @@ Cloudflare DNS-01. AIO application DB backups are optional; their logical export
 DR payloads held separately, with stable identity bindings from Infisical. Existing publication
 audits do not establish deployment completeness. Do not run fresh-host
 provisioning tools against an initialized deployment.
+
