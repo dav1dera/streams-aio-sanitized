@@ -32,6 +32,12 @@ files are never traversed or uploaded. The tool does not read Infisical auth
 files, resolve Compose private interpolation, execute app code, start/recreate
 containers or modify Infisical.
 
+Honey's UI `name`, `desc` and `icon` retain their reviewed public defaults,
+just like its generic service labels. Live branding can contain private text or
+URLs and is never exported. These fields must remain strings; new keys or changed
+structure still block publication. The reviewed UI boolean switches continue to
+follow the live configuration.
+
 New services, keys, mounts, string settings, extension implementation changes,
 and unclassified runtime fields require an explicit public template/mapping
 review. They stop publication with a reviewed file/pointer and a status code,

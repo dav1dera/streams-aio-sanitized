@@ -136,6 +136,7 @@ def approved_scalar(old, new, location, path=()):
 def sanitize_tree(old, new, name, path=(), omit=(), preserved=()):
     location = name + ":" + pointer(path)
     if path in preserved:
+        require(isinstance(old, str) and isinstance(new, str), "GENERIC_FIELD_TYPE_CHANGED", location)
         return copy.deepcopy(old)
     if isinstance(old, dict):
         require(isinstance(new, dict), "STRUCTURE_CHANGED", location)
@@ -342,6 +343,7 @@ def render(source, baseline, image_reader=docker_locks):
                 preserved += tuple(("services", i, key) for i, row in enumerate(old["services"])
                                    for key in ("href", "icon") if row.get(key) in ("#", ""))
                 preserved += (("services", 8, "icon"),)
+                preserved += tuple(("ui", key) for key in ("name", "desc", "icon") if key in old["ui"])
             new = yaml_load(live) if destination.endswith((".yaml", ".yml")) else loads(live)
             safe = sanitize_tree(old, new, name, omit=omit, preserved=preserved)
             outputs[name] = data if safe == old else (json.dumps(safe, indent=2, ensure_ascii=False) + "\n").encode()
