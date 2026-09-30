@@ -170,6 +170,30 @@ def normalize_indexer_runtime(old, new, name):
     return result
 
 
+def normalize_animetosho_mirror(old, new, name):
+    # The existing DR contract uses the author's feed for this legacy shared
+    # provider. Admit only the documented mirror substitution, never new code.
+    canonical = "https://feed.animetosho.net/feed/json"
+    legacy = "https://feed.animetosho.xyz/feed/json"
+    require(old["userConfig"]["fields"][0] == {"type": "text", "name": "jsonURL",
+            "label": "Feed URL", "default": canonical}
+            and isinstance(old["payload"], str) and old["payload"].count(canonical) == 1,
+            "PROVIDER_BASELINE_REVIEW_REQUIRED", name)
+    require(isinstance(new, dict) and isinstance(new.get("userConfig"), dict)
+            and isinstance(new["userConfig"].get("fields"), list)
+            and len(new["userConfig"]["fields"]) == len(old["userConfig"]["fields"])
+            and isinstance(new["userConfig"]["fields"][0], dict), "STRUCTURE_REVIEW_REQUIRED", name)
+    require(new["userConfig"]["fields"][0].get("default") in (canonical, legacy),
+            "PROVIDER_FEED_REVIEW_REQUIRED", name + ":/userConfig/fields/0/default")
+    require(isinstance(new.get("payload"), str)
+            and new["payload"].replace(legacy, canonical) == old["payload"],
+            "PROVIDER_CODE_REVIEW_REQUIRED", name + ":/payload")
+    result = copy.deepcopy(new)
+    result["userConfig"]["fields"][0]["default"] = canonical
+    result["payload"] = old["payload"]
+    return result
+
+
 def env_values(data):
     result = {}
     for line in data.decode("utf-8").splitlines():
@@ -330,6 +354,38 @@ def docker_locks(source, compose, old_locks):
     return result
 
 
+def render_template(item, data, live, plan, overlays):
+    name, destination = item["template"], item["destination"]
+    omit = tuple((field,) for field in overlays.get(destination, {}).get("omit_runtime_identity_fields", []))
+    omit += tuple((field,) for field in plan.get("runtime_fields", {}).get(destination, []) if item["format"] == "json")
+    if item["format"] == "json":
+        old = loads(data)
+        # Several reviewed Honey fields intentionally expose generic defaults.
+        preserved = ()
+        if destination == "data/honey/data/config/config.json":
+            preserved = tuple(("services", i, key) for i, row in enumerate(old["services"])
+                              for key in ("name", "desc") if key in row)
+            preserved += tuple(("services", i, key) for i, row in enumerate(old["services"])
+                               for key in ("href", "icon") if row.get(key) in ("#", ""))
+            preserved += (("services", 8, "icon"),)
+            preserved += tuple(("ui", key) for key in ("name", "desc", "icon") if key in old["ui"])
+        new = yaml_load(live) if destination.endswith((".yaml", ".yml")) else loads(live)
+        if re.fullmatch(r"data/jackett/data/Jackett/Indexers/[a-z0-9-]+\.json", destination):
+            new = normalize_indexer_runtime(old, new, name)
+        if destination == "data/seanime/data/shared/config/extensions/animetosho-new.json":
+            new = normalize_animetosho_mirror(old, new, name)
+        safe = sanitize_tree(old, new, name, omit=omit, preserved=preserved)
+        return data if safe == old else (json.dumps(safe, indent=2, ensure_ascii=False) + "\n").encode()
+    if item["format"] == "toml":
+        old, new = tomllib.loads(data.decode()), tomllib.loads(live.decode())
+        safe = sanitize_tree(old, new, name)
+        return data if safe == old else toml_dump(safe)
+    if item["format"] in ("text", "ini-token"):
+        # Text/INI requires an exact public skeleton; bindings are masked.
+        return approved_scalar(data.decode(), live.decode(), name).encode()
+    raise Refused("TEMPLATE_FORMAT_REVIEW_REQUIRED")
+
+
 def render(source, baseline, image_reader=docker_locks):
     inputs = {}
     def read(name):
@@ -347,39 +403,21 @@ def render(source, baseline, image_reader=docker_locks):
         if re.fullmatch(r"data/[a-z0-9-]+/\.env", name):
             outputs[name] = public_env(data, read(name), private_keys, name)
     overlays = {item["file"]: item for item in loads(baseline["config/private-config-overlays.json"])}
+    template_errors = []
     for item in plan["files"]:
         if "template" not in item:
             continue
         name, destination = item["template"], item["destination"]
-        data, live = baseline[name], read(destination)
-        omit = tuple((field,) for field in overlays.get(destination, {}).get("omit_runtime_identity_fields", []))
-        omit += tuple((field,) for field in plan.get("runtime_fields", {}).get(destination, []) if item["format"] == "json")
-        if item["format"] == "json":
-            old = loads(data)
-            # Several reviewed Honey fields intentionally expose generic defaults.
-            preserved = ()
-            if destination == "data/honey/data/config/config.json":
-                preserved = tuple(("services", i, key) for i, row in enumerate(old["services"])
-                                  for key in ("name", "desc") if key in row)
-                preserved += tuple(("services", i, key) for i, row in enumerate(old["services"])
-                                   for key in ("href", "icon") if row.get(key) in ("#", ""))
-                preserved += (("services", 8, "icon"),)
-                preserved += tuple(("ui", key) for key in ("name", "desc", "icon") if key in old["ui"])
-            new = yaml_load(live) if destination.endswith((".yaml", ".yml")) else loads(live)
-            if re.fullmatch(r"data/jackett/data/Jackett/Indexers/[a-z0-9-]+\.json", destination):
-                new = normalize_indexer_runtime(old, new, name)
-            safe = sanitize_tree(old, new, name, omit=omit, preserved=preserved)
-            outputs[name] = data if safe == old else (json.dumps(safe, indent=2, ensure_ascii=False) + "\n").encode()
-        elif item["format"] == "toml":
-            old, new = tomllib.loads(data.decode()), tomllib.loads(live.decode())
-            safe = sanitize_tree(old, new, name)
-            outputs[name] = data if safe == old else toml_dump(safe)
-        elif item["format"] in ("text", "ini-token"):
-            # Text/INI requires an exact public skeleton; bindings are masked.
-            safe = approved_scalar(data.decode(), live.decode(), name)
-            outputs[name] = safe.encode()
-        else:
-            raise Refused("TEMPLATE_FORMAT_REVIEW_REQUIRED")
+        try:
+            outputs[name] = render_template(item, baseline[name], read(destination), plan, overlays)
+        except Refused as error:
+            template_errors.append(str(error))
+        except Exception:
+            # Never expose parser messages, which can contain private values.
+            template_errors.append("TEMPLATE_INPUT_CHECK_FAILED " + name)
+    if template_errors:
+        raise Refused("TEMPLATE_CHECKS_FAILED count=" + str(len(template_errors))
+                      + "\n" + "\n".join(template_errors))
     public_conf = "data/postgres/postgresql.conf"
     require(read(public_conf) == baseline[public_conf], "POSTGRES_CONFIGURATION_REVIEW_REQUIRED", public_conf)
     outputs[public_conf] = baseline[public_conf]
