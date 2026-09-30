@@ -190,6 +190,86 @@ class PublicSyncTests(unittest.TestCase):
             self.render()
         self.assertNotIn(SECRET, str(error.exception))
 
+    def test_shared_animetosho_legacy_mirror_keeps_the_reviewed_author_feed(self):
+        name = "config/dr-templates/seanime/data/shared/config/extensions/animetosho-new.json.template"
+        path = self.source / "data/seanime/data/shared/config/extensions/animetosho-new.json"
+        canonical = "https://feed.animetosho.net/feed/json"
+        legacy = "https://feed.animetosho.xyz/feed/json"
+        old = sync.loads(self.public[name])
+        before = self.render()
+        value = sync.loads(path.read_bytes())
+        value["userConfig"]["fields"][0]["default"] = legacy
+        value["payload"] = value["payload"].replace(canonical, legacy)
+        path.write_text(json.dumps(value), encoding="utf-8")
+        self.assertEqual(self.render(), before)
+        value["userConfig"]["requiresConfig"] = True
+        path.write_text(json.dumps(value), encoding="utf-8")
+        result = sync.loads(self.render()[name])
+        self.assertIs(result["userConfig"]["requiresConfig"], True)
+        self.assertEqual(result["userConfig"]["fields"][0]["default"], canonical)
+        self.assertEqual(result["payload"], old["payload"])
+        self.assertNotIn(SECRET, json.dumps(result))
+
+    def test_provider_mirror_rule_refuses_private_urls_new_code_and_other_metadata(self):
+        path = self.source / "data/seanime/data/shared/config/extensions/animetosho-new.json"
+        original = sync.loads(path.read_bytes())
+        candidates = []
+        for url in ("https://feed.animetosho.xyz/feed/json?apikey=" + SECRET,
+                    "https://feed.animetosho.net/feed/json#" + SECRET,
+                    "https://" + SECRET + "@feed.animetosho.xyz/feed/json", None):
+            value = copy.deepcopy(original)
+            value["userConfig"]["fields"][0]["default"] = url
+            candidates.append(value)
+        for key, new in (("payload", original["payload"] + "// " + SECRET),
+                         ("payload", {SECRET: SECRET}), (SECRET, SECRET)):
+            value = copy.deepcopy(original)
+            value[key] = new
+            candidates.append(value)
+        value = copy.deepcopy(original)
+        value["userConfig"]["fields"][0]["name"] = SECRET
+        candidates.append(value)
+        for value in candidates:
+            path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaises(sync.Refused) as error:
+                self.render()
+            self.assertNotIn(SECRET, str(error.exception))
+        # The mirror exception is confined to the documented shared template.
+        path.write_text(json.dumps(original), encoding="utf-8")
+        main = self.source / "data/seanime/data/main/config/extensions/animetosho-new.json"
+        value = sync.loads(main.read_bytes())
+        value["payload"] = value["payload"].replace("https://feed.animetosho.net/feed/json",
+                                                  "https://feed.animetosho.xyz/feed/json")
+        main.write_text(json.dumps(value), encoding="utf-8")
+        with self.assertRaises(sync.Refused):
+            self.render()
+
+    def test_template_failures_are_collected_without_parser_values_or_partial_publication(self):
+        path = self.source / "data/easyproxy/data/config.json"
+        value = sync.loads(path.read_bytes())
+        value[SECRET] = SECRET
+        path.write_text(json.dumps(value), encoding="utf-8")
+        path = self.source / "data/seanime/data/shared/config/extensions/animetosho-new.json"
+        value = sync.loads(path.read_bytes())
+        value["payload"] += "// " + SECRET
+        path.write_text(json.dumps(value), encoding="utf-8")
+        path = self.source / "data/jackett/data/Jackett/Indexers/knaben.json"
+        path.write_text('{"' + SECRET, encoding="utf-8")
+        github = mock.Mock()
+        github.head.return_value = BASE
+        github.baseline.return_value = self.public
+        args = sync.argparse.Namespace(source=self.source, state=self.root / "state", publish=True)
+        with mock.patch.object(sync, "GitHub", return_value=github), mock.patch.object(sync, "publish") as publish:
+            with self.assertRaises(sync.Refused) as error:
+                sync.execute(args)
+            publish.assert_not_called()
+        text = str(error.exception)
+        self.assertIn("TEMPLATE_CHECKS_FAILED count=3", text)
+        self.assertIn("easyproxy/data/config.json.template", text)
+        self.assertIn("PROVIDER_CODE_REVIEW_REQUIRED", text)
+        self.assertIn("TEMPLATE_INPUT_CHECK_FAILED config/dr-templates/jackett/data/Jackett/Indexers/knaben.json.template", text)
+        self.assertNotIn(SECRET, text)
+        self.assertFalse((args.state / "pending.json").exists())
+
     def test_all_jackett_indexer_cookies_and_null_errors_stay_out_of_public_exports(self):
         before = self.render()
         names = [n for n in self.public if n.startswith("config/dr-templates/jackett/data/Jackett/Indexers/")]

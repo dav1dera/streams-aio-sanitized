@@ -47,6 +47,23 @@ schema checks. Container values, extra rows and new fields still block. The API
 key binding and reviewed boolean options continue through their existing rules.
 See [Jackett's configuration model](https://github.com/Jackett/Jackett/blob/d72fd263a7d6268e737c636d5f229caa140ca5aa/src/Jackett.Common/Models/IndexerConfig/ConfigurationData.cs).
 
+The existing fresh-host contract for the shared Seanime AnimeTosho provider
+retains the author's public feed instead of its legacy mirror. The exporter
+accepts that exact known mirror substitution in `jsonURL` and the single feed
+literal in the otherwise identical reviewed payload, and keeps the public
+author feed in both places. This exception applies only to the existing shared
+template, leaves the live provider unchanged, and does not capture the legacy
+mirror choice for recovery. Query strings, URL credentials, unknown endpoints,
+metadata changes and any other code changes still stop publication. This follows
+the existing [template security review](DISASTER-RECOVERY.md).
+
+The worker collects independent template validation failures before stopping,
+so one check can identify the affected files together. It logs reviewed paths
+and safe status codes, never parser messages or source values. A single failed
+template prevents publication of every candidate file; no partial export is
+committed. Compose/env validation and image/read-back checks keep their existing
+fail-closed behavior.
+
 New services, keys, mounts, string settings, extension implementation changes,
 and unclassified runtime fields require an explicit public template/mapping
 review. They stop publication with a reviewed file/pointer and a status code,
