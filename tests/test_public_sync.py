@@ -190,6 +190,67 @@ class PublicSyncTests(unittest.TestCase):
             self.render()
         self.assertNotIn(SECRET, str(error.exception))
 
+    def test_all_jackett_indexer_cookies_and_null_errors_stay_out_of_public_exports(self):
+        before = self.render()
+        names = [n for n in self.public if n.startswith("config/dr-templates/jackett/data/Jackett/Indexers/")]
+        self.assertEqual(len(names), 5)
+        for name in names:
+            path = self.source / ("data/" + name.removeprefix("config/dr-templates/").removesuffix(".template"))
+            value = sync.loads(path.read_bytes())
+            for row in value:
+                if row["id"] == "cookieheader":
+                    row["value"] = SECRET
+                if row["id"] == "lasterror":
+                    row["value"] = None
+            path.write_text(json.dumps(value), encoding="utf-8")
+        # Runtime changes alone do not create public revisions.
+        self.assertEqual(self.render(), before)
+        name = "config/dr-templates/jackett/data/Jackett/Indexers/animetosho-xyz.json.template"
+        path = self.source / "data/jackett/data/Jackett/Indexers/animetosho-xyz.json"
+        value = sync.loads(path.read_bytes())
+        next(row for row in value if row["type"] == "inputbool")["value"] = True
+        path.write_text(json.dumps(value), encoding="utf-8")
+        changes = self.render()
+        result = sync.loads(changes[name])
+        self.assertTrue(any(row["value"] is True for row in result if row["type"] == "inputbool"))
+        self.assertEqual(next(row["value"] for row in result if row["id"] == "cookieheader"), "")
+        self.assertEqual(next(row["value"] for row in result if row["id"] == "lasterror"), "")
+        self.assertEqual(next(row["value"] for row in result if row["id"] == "apikey"),
+                         "@@INFISICAL:/jackett/ANIMETOSHO_XYZ_API_KEY@@")
+        self.assertNotIn(SECRET.encode(), changes[name])
+
+    def test_jackett_runtime_normalization_refuses_unknown_shapes_and_wrong_types(self):
+        path = self.source / "data/jackett/data/Jackett/Indexers/animetosho-xyz.json"
+        original = sync.loads(path.read_bytes())
+        candidates = []
+        for key, new in (("id", SECRET), ("type", SECRET), (SECRET, SECRET),
+                         ("value", {SECRET: SECRET}), ("value", [SECRET]), ("value", True)):
+            value = copy.deepcopy(original)
+            value[2][key] = new
+            candidates.append(value)
+        value = copy.deepcopy(original)
+        value[1], value[2] = value[2], value[1]
+        candidates += [value, original[:-1], original + [{SECRET: SECRET}]]
+        value = copy.deepcopy(original)
+        del value[2]["value"]
+        candidates.append(value)
+        for value in candidates:
+            path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaises(sync.Refused) as error:
+                self.render()
+            self.assertNotIn(SECRET, str(error.exception))
+
+    def test_jackett_nullable_runtime_policy_does_not_relax_other_fields(self):
+        path = self.source / "data/jackett/data/Jackett/Indexers/animetosho-xyz.json"
+        original = sync.loads(path.read_bytes())
+        for index, new in ((0, SECRET), (0, None), (3, None), (5, 1)):
+            value = copy.deepcopy(original)
+            value[index]["value"] = new
+            path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaises(sync.Refused) as error:
+                self.render()
+            self.assertNotIn(SECRET, str(error.exception))
+
     def test_new_private_config_field_blocks(self):
         path = self.source / "data/headplane/data/config.yaml"
         value = sync.loads(path.read_bytes())
