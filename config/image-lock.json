@@ -1,126 +1,157 @@
 {
   "tailscale": {
     "image": "tailscale/tailscale@sha256:c507f3a2a6ab1cabd8d809b98edeb41edbd5c3fb6ad9632ffd098b4c7d0b4065",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "tailscale/tailscale:latest"
   },
   "portainer": {
     "image": "portainer/portainer-ce@sha256:4d616db18cfeb5dd41a69c0958bc825c84483ea9cde1106eb82a5d26f3bd8b0e",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "portainer/portainer-ce:latest"
   },
   "dnscrypt-proxy": {
     "image": "klutchell/dnscrypt-proxy@sha256:a98e8d13314fa8b75620026441b1d6581e2b55189509a794500c5c86064df810",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "klutchell/dnscrypt-proxy:latest"
   },
   "headscale": {
     "image": "headscale/headscale@sha256:8833f828b414c0907b7e5c71da76473216fe17cce0818a166b536ec552c0903f",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "headscale/headscale:stable"
   },
   "headplane": {
     "image": "ghcr.io/tale/headplane@sha256:394483fd2336ce6b15df360c3e118ddfd45eb8140fe21df9f2611077f5d79d22",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/tale/headplane:latest"
   },
   "npm": {
     "image": "jc21/nginx-proxy-manager@sha256:4393e642e233e5efd5adeb7f10918d4aaea71c9ed875b94190273fc8e87f9594",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "jc21/nginx-proxy-manager:latest"
   },
   "cloudflare-ddns": {
     "image": "favonia/cloudflare-ddns@sha256:5e61736b982b87d84a1120b4767c4deff0f2cc55ca3ee9dcb1dc58623039b5cb",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "favonia/cloudflare-ddns:latest"
   },
   "aiometadata": {
-    "image": "ghcr.io/cedya77/aiometadata@sha256:3a300d0fec80e8619b5d544c9997490d2e07e629b6e24e120334cf80ae29cede",
-    "platform": "linux/amd64"
+    "image": "ghcr.io/cedya77/aiometadata@sha256:6d6567eda528811c98e33badf9e017f23f61d254a8388ce8744c6e1b08e3dfdb",
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/cedya77/aiometadata:latest"
   },
   "mediaflow-proxy-light": {
     "image": "ghcr.io/mhdzumair/mediaflow-proxy-light@sha256:44e10959417a2de569a998af28bd59ac14ab34225795de8326f60699717fbb5b",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:97524d74be81931f30f3adf9f346a716639372132debea15579b215eb12bc228",
-    "platform": "linux/amd64"
+    "image": "ghcr.io/viren070/aiostreams@sha256:2cc2d6de0d5ce336dc01af01b237e323e51f49b80eddd9f03998bbdbce25e3b8",
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
   "pgbouncer": {
     "image": "edoburu/pgbouncer@sha256:4c1ca296ef525f108f5d3552cc337c0c09587cf8dae7f0067fd93349e47dc1cd",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "edoburu/pgbouncer:latest"
   },
   "postgres": {
     "image": "postgres@sha256:650d7a867dc5336eff67802a1417fcc801821d73d824c608e80afbde792fe6e1",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "postgres:18-alpine"
   },
   "redis": {
     "image": "redis@sha256:718f745deb7dfefeac6eed7041fc7ec9476b50e61b247932682457c41adafa0e",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "redis:latest"
   },
   "watchtower": {
     "image": "nickfedor/watchtower@sha256:2f8f2a9bd21a195b3b650409532a20f6aada8ef5834f00d0d7a999dee0779a81",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "nickfedor/watchtower:latest"
   },
   "honey": {
     "image": "ghcr.io/dani3l0/honey@sha256:fe6ce43acf93a211ab63cf247e4ce573cb63a41608092f0bffb1b3bf72527ac5",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/dani3l0/honey:latest"
   },
   "teamspeak": {
     "image": "teamspeaksystems/teamspeak6-server@sha256:d845f803aecf842c2df034c959c23ff2462357bacafb3807500885c5ec170fa1",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "teamspeaksystems/teamspeak6-server:latest"
   },
   "microwarp": {
     "image": "ghcr.io/ccbkkb/microwarp@sha256:d5b709efd49dbec3a965c617eb263b46cdf1449e65776d1b9a351927439b2b17",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/ccbkkb/microwarp:latest"
   },
   "gost": {
     "image": "gogost/gost@sha256:e1ff429eb07d5f820ed08b2593599f63d03b9f670631d9394b7bf5e068fb9e4c",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "gogost/gost:latest"
   },
   "oauth2-proxy": {
     "image": "quay.io/oauth2-proxy/oauth2-proxy@sha256:b1b2021fe8f4004573e8d690dec6c7bb29cc44364572cf8510a05bf3a0ae2ded",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
     "image": "ghcr.io/realbestia1/easyproxy@sha256:d99e71bded5035a143d8d056fcb0fe010db018cfb0f217098cf6c0ddd35e8d45",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
   "streamvix": {
     "image": "qwertyuiop8899/streamvix@sha256:192a23280b4cbdcc46f592eab2cb3997d19bf45c08f32475e52867717a845ccd",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "qwertyuiop8899/streamvix:latest"
   },
   "tvvoo": {
-    "image": "qwertyuiop8899/tvvoo@sha256:531e0a83c1f4dbce306383080207019f7744b97e9800f1561b402a4bef4d7e0a",
-    "platform": "linux/amd64"
+    "image": "qwertyuiop8899/tvvoo@sha256:8eb3936d38f55314b62b74475394afc910507a65121b3b45551b48251b3d4be1",
+    "platform": "linux/amd64",
+    "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
     "image": "ghcr.io/sonicx161/aiomanager@sha256:d054c8b5795e93ce828098eddd7e0f1a07da2d6e31c91c8d1c3412256ec3c7ac",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
   "deunhealth": {
     "image": "qmcgaw/deunhealth@sha256:db1e4fcd3aceeb0da34a83f7a8a5432df586e6d0388ddb6ad8dd7b479e4aa25d",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "qmcgaw/deunhealth:latest"
   },
   "gluetun": {
     "image": "qmcgaw/gluetun@sha256:12df8b20528d4cd5e9b6e827d40f2886cf78e53e7e9afc750050648c31183793",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "qmcgaw/gluetun:latest"
   },
   "comet": {
     "image": "g0ldyy/comet@sha256:dca62133336e02784d02aaad861381820674d1c8e3e98a03797610b81ee4defe",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "g0ldyy/comet:latest"
   },
   "cometnet": {
     "image": "g0ldyy/comet@sha256:dca62133336e02784d02aaad861381820674d1c8e3e98a03797610b81ee4defe",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "g0ldyy/comet:latest"
   },
   "stremthru": {
     "image": "muniftanjim/stremthru@sha256:5d03766cd9b5a72e784b51f7ec36cd048ab6b308d5b9906d86e353c13cf736db",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "muniftanjim/stremthru:latest"
   },
   "jackett": {
     "image": "lscr.io/linuxserver/jackett@sha256:7b19f4f6ac33d855ca9226600ecbd096ee678f66da28b13a7c09980b035ff583",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "lscr.io/linuxserver/jackett:latest"
   },
   "seanime": {
     "image": "umagistr/seanime@sha256:d74dcac9d5c29f74d980cccf5311a2212fe202b85308032d8665a15469824363",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "umagistr/seanime:latest"
   },
   "seanime-shared": {
     "image": "umagistr/seanime@sha256:d74dcac9d5c29f74d980cccf5311a2212fe202b85308032d8665a15469824363",
-    "platform": "linux/amd64"
+    "platform": "linux/amd64",
+    "configured_image": "umagistr/seanime:latest"
   }
 }

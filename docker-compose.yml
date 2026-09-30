@@ -45,7 +45,8 @@ services:
     - 9000:9000
     networks:
       default:
-        ipv4_address: ${INFISICAL_PORTAINER_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+        ipv4_address: ${INFISICAL_PORTAINER_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical
+          Wave B env required}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -68,7 +69,8 @@ services:
       retries: 3
     networks:
       default:
-        ipv4_address: ${INFISICAL_DNSCRYPT_PROXY_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Agent render required}
+        ipv4_address: ${INFISICAL_DNSCRYPT_PROXY_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical
+          Agent render required}
     ports:
     - 5353:5353/tcp
     - 5353:5353/udp
@@ -97,7 +99,8 @@ services:
     restart: unless-stopped
     networks:
       default:
-        ipv4_address: ${INFISICAL_HEADSCALE_NETWORK_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_HEADSCALE_NETWORK_DEFAULT_IPV4_ADDRESS:?Required
+          private configuration}
     labels:
     - me.tale.headplane.target=headscale
     - deunhealth.restart.on.unhealthy=true
@@ -128,7 +131,8 @@ services:
         condition: service_healthy
     networks:
       default:
-        ipv4_address: ${INFISICAL_HEADPLANE_NETWORK_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_HEADPLANE_NETWORK_DEFAULT_IPV4_ADDRESS:?Required
+          private configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -156,9 +160,11 @@ services:
     - ./data/npm/data/letsencrypt:/etc/letsencrypt
     networks:
       default:
-        ipv4_address: ${INFISICAL_NPM_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+        ipv4_address: ${INFISICAL_NPM_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave
+          B env required}
       vpn-net:
-        ipv4_address: ${INFISICAL_NPM_NETWORK_VPN_NET_IPV4_ADDRESS:?Infisical Wave B env required}
+        ipv4_address: ${INFISICAL_NPM_NETWORK_VPN_NET_IPV4_ADDRESS:?Infisical Wave
+          B env required}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -178,7 +184,8 @@ services:
     - ./.secrets/cloudflare-ddns.env
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_CLOUDFLARE_DDNS_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_CLOUDFLARE_DDNS_DEFAULT_IPV4_ADDRESS:?Required
+          private configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -199,9 +206,11 @@ services:
         condition: service_healthy
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_AIOMETADATA_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_AIOMETADATA_DEFAULT_IPV4_ADDRESS:?Required
+          private configuration}
       vpn-net:
-        ipv4_address: ${INFISICAL_STACK_AIOMETADATA_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_AIOMETADATA_VPN_NET_IPV4_ADDRESS:?Required
+          private configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -217,9 +226,11 @@ services:
     - 8888:8888
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_DEFAULT_IPV4_ADDRESS:?Required
+          private configuration}
       vpn-net:
-        ipv4_address: ${INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_VPN_NET_IPV4_ADDRESS:?Required
+          private configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -240,9 +251,11 @@ services:
     - ./data/aiostreams/data:/app/data
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_AIOSTREAMS_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_AIOSTREAMS_DEFAULT_IPV4_ADDRESS:?Required
+          private configuration}
       vpn-net:
-        ipv4_address: ${INFISICAL_STACK_AIOSTREAMS_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_AIOSTREAMS_VPN_NET_IPV4_ADDRESS:?Required
+          private configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -268,9 +281,11 @@ services:
       - postgres
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_PGBOUNCER_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_PGBOUNCER_DEFAULT_IPV4_ADDRESS:?Required private
+          configuration}
       vpn-net:
-        ipv4_address: ${INFISICAL_STACK_PGBOUNCER_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_PGBOUNCER_VPN_NET_IPV4_ADDRESS:?Required private
+          configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -298,9 +313,11 @@ services:
       retries: 5
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_POSTGRES_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_POSTGRES_DEFAULT_IPV4_ADDRESS:?Required private
+          configuration}
       vpn-net:
-        ipv4_address: ${INFISICAL_STACK_POSTGRES_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_POSTGRES_VPN_NET_IPV4_ADDRESS:?Required private
+          configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -329,9 +346,11 @@ services:
         max-file: '3'
     networks:
       default:
-        ipv4_address: ${INFISICAL_REDIS_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+        ipv4_address: ${INFISICAL_REDIS_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave
+          B env required}
       vpn-net:
-        ipv4_address: ${INFISICAL_REDIS_NETWORK_VPN_NET_IPV4_ADDRESS:?Infisical Wave B env required}
+        ipv4_address: ${INFISICAL_REDIS_NETWORK_VPN_NET_IPV4_ADDRESS:?Infisical Wave
+          B env required}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -349,7 +368,8 @@ services:
     - ./data/watchtower/.env
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_WATCHTOWER_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_WATCHTOWER_DEFAULT_IPV4_ADDRESS:?Required
+          private configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -364,7 +384,8 @@ services:
     - 4173:4173
     networks:
       default:
-        ipv4_address: ${INFISICAL_HONEY_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Agent render required}
+        ipv4_address: ${INFISICAL_HONEY_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Agent
+          render required}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -383,7 +404,8 @@ services:
     - teamspeak-data:/var/tsserver
     networks:
       default:
-        ipv4_address: ${INFISICAL_TEAMSPEAK_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+        ipv4_address: ${INFISICAL_TEAMSPEAK_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical
+          Wave B env required}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -406,7 +428,8 @@ services:
     - warp-data:/etc/wireguard
     networks:
       default:
-        ipv4_address: ${INFISICAL_MICROWARP_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+        ipv4_address: ${INFISICAL_MICROWARP_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical
+          Wave B env required}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -422,9 +445,11 @@ services:
     - microwarp
     networks:
       default:
-        ipv4_address: ${INFISICAL_GOST_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave B env required}
+        ipv4_address: ${INFISICAL_GOST_NETWORK_DEFAULT_IPV4_ADDRESS:?Infisical Wave
+          B env required}
       vpn-net:
-        ipv4_address: ${INFISICAL_GOST_NETWORK_VPN_NET_IPV4_ADDRESS:?Infisical Wave B env required}
+        ipv4_address: ${INFISICAL_GOST_NETWORK_VPN_NET_IPV4_ADDRESS:?Infisical Wave
+          B env required}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -442,7 +467,8 @@ services:
     - headplane
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_OAUTH2_PROXY_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_OAUTH2_PROXY_DEFAULT_IPV4_ADDRESS:?Required
+          private configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -464,9 +490,11 @@ services:
     - ./data/easyproxy/data:/data
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_EASYPROXY_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_EASYPROXY_DEFAULT_IPV4_ADDRESS:?Required private
+          configuration}
       vpn-net:
-        ipv4_address: ${INFISICAL_STACK_EASYPROXY_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_EASYPROXY_VPN_NET_IPV4_ADDRESS:?Required private
+          configuration}
     profiles:
     - all
   streamvix:
@@ -483,9 +511,11 @@ services:
     restart: unless-stopped
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_STREAMVIX_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_STREAMVIX_DEFAULT_IPV4_ADDRESS:?Required private
+          configuration}
       vpn-net:
-        ipv4_address: ${INFISICAL_STACK_STREAMVIX_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_STREAMVIX_VPN_NET_IPV4_ADDRESS:?Required private
+          configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -505,9 +535,11 @@ services:
         condition: service_healthy
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_TVVOO_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_TVVOO_DEFAULT_IPV4_ADDRESS:?Required private
+          configuration}
       vpn-net:
-        ipv4_address: ${INFISICAL_STACK_TVVOO_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_TVVOO_VPN_NET_IPV4_ADDRESS:?Required private
+          configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -535,7 +567,8 @@ services:
       start_period: 15s
     networks:
       default:
-        ipv4_address: ${INFISICAL_STACK_AIOMANAGER_DEFAULT_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_AIOMANAGER_DEFAULT_IPV4_ADDRESS:?Required
+          private configuration}
     labels:
     - deunhealth.restart.on.unhealthy=true
     profiles:
@@ -576,7 +609,8 @@ services:
     - /dev/net/tun:/dev/net/tun
     networks:
       vpn-net:
-        ipv4_address: ${INFISICAL_STACK_GLUETUN_VPN_NET_IPV4_ADDRESS:?Required private configuration}
+        ipv4_address: ${INFISICAL_STACK_GLUETUN_VPN_NET_IPV4_ADDRESS:?Required private
+          configuration}
     profiles:
     - all
     - gluetun
@@ -650,7 +684,9 @@ services:
       - CMD
       - python
       - -c
-      - import http.client; c=http.client.HTTPConnection('127.0.0.1',8766,timeout=5); c.request('GET','/health'); raise SystemExit(0 if c.getresponse().status == 200 else 1)
+      - import http.client; c=http.client.HTTPConnection('127.0.0.1',8766,timeout=5);
+        c.request('GET','/health'); raise SystemExit(0 if c.getresponse().status ==
+        200 else 1)
       interval: 30s
       timeout: 5s
       retries: 3
