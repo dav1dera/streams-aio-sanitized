@@ -38,6 +38,15 @@ URLs and is never exported. These fields must remain strings; new keys or change
 structure still block publication. The reviewed UI boolean switches continue to
 follow the live configuration.
 
+For the reviewed Jackett indexer templates, only the `value` fields of the
+`cookieheader` and `lasterror` rows declared as `hiddendata` are normalized to
+their empty public defaults. Jackett stores these as nullable strings; live
+cookies and error messages are never exported and their churn does not create
+public commits. List order, row IDs/types/names and all other keys retain exact
+schema checks. Container values, extra rows and new fields still block. The API
+key binding and reviewed boolean options continue through their existing rules.
+See [Jackett's configuration model](https://github.com/Jackett/Jackett/blob/d72fd263a7d6268e737c636d5f229caa140ca5aa/src/Jackett.Common/Models/IndexerConfig/ConfigurationData.cs).
+
 New services, keys, mounts, string settings, extension implementation changes,
 and unclassified runtime fields require an explicit public template/mapping
 review. They stop publication with a reviewed file/pointer and a status code,

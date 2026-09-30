@@ -149,6 +149,27 @@ def sanitize_tree(old, new, name, path=(), omit=(), preserved=()):
     return approved_scalar(old, new, location, path)
 
 
+def normalize_indexer_runtime(old, new, name):
+    # Jackett saves hidden CookieHeader/LastError as nullable strings in its
+    # positional config list. Neither session cookies nor error text is public.
+    require(isinstance(old, list) and isinstance(new, list) and len(new) == len(old),
+            "LIST_STRUCTURE_REVIEW_REQUIRED", name + ":/")
+    result = copy.deepcopy(new)
+    for index, row in enumerate(old):
+        if row.get("type") != "hiddendata" or row.get("id") not in ("cookieheader", "lasterror"):
+            continue
+        location = name + ":" + pointer((index, "value"))
+        require(row.get("value") == "", "INVALID_INDEXER_RUNTIME_DEFAULT", location)
+        actual = result[index]
+        require(isinstance(actual, dict) and set(actual) == set(row)
+                and actual.get("id") == row["id"] and actual.get("type") == row["type"],
+                "INDEXER_RUNTIME_STRUCTURE_REVIEW_REQUIRED", location)
+        require(actual["value"] is None or isinstance(actual["value"], str),
+                "INDEXER_RUNTIME_TYPE_CHANGED", location)
+        actual["value"] = ""
+    return result
+
+
 def env_values(data):
     result = {}
     for line in data.decode("utf-8").splitlines():
@@ -345,6 +366,8 @@ def render(source, baseline, image_reader=docker_locks):
                 preserved += (("services", 8, "icon"),)
                 preserved += tuple(("ui", key) for key in ("name", "desc", "icon") if key in old["ui"])
             new = yaml_load(live) if destination.endswith((".yaml", ".yml")) else loads(live)
+            if re.fullmatch(r"data/jackett/data/Jackett/Indexers/[a-z0-9-]+\.json", destination):
+                new = normalize_indexer_runtime(old, new, name)
             safe = sanitize_tree(old, new, name, omit=omit, preserved=preserved)
             outputs[name] = data if safe == old else (json.dumps(safe, indent=2, ensure_ascii=False) + "\n").encode()
         elif item["format"] == "toml":
