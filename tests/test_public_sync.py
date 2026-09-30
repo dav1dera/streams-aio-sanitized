@@ -234,6 +234,48 @@ class PublicSyncTests(unittest.TestCase):
                 self.render()
             self.assertNotIn(SECRET, str(error.exception))
 
+    def test_honey_branding_stays_generic_while_public_ui_switches_follow_live(self):
+        name = "config/dr-templates/honey/data/config/config.json.template"
+        old = sync.loads(self.public[name])
+        path = self.source / "data/honey/data/config/config.json"
+        value = sync.loads(path.read_bytes())
+        for key in ("name", "desc", "icon"):
+            value["ui"][key] = SECRET
+        for row in value["services"]:
+            row["name"] = SECRET
+            row["desc"] = SECRET
+        value["ui"]["open_new_tab"] = not old["ui"]["open_new_tab"]
+        path.write_text(json.dumps(value), encoding="utf-8")
+        changes = self.render()
+        result = sync.loads(changes[name])
+        for key in ("name", "desc", "icon"):
+            self.assertEqual(result["ui"][key], old["ui"][key])
+        self.assertNotEqual(result["ui"]["open_new_tab"], old["ui"]["open_new_tab"])
+        self.assertNotIn(SECRET.encode(), changes[name])
+        for name in changes:
+            self.assertNotIn(SECRET.encode(), changes[name])
+
+    def test_honey_generic_fields_require_strings_and_other_fields_still_block(self):
+        path = self.source / "data/honey/data/config/config.json"
+        original = sync.loads(path.read_bytes())
+        mutations = [("desc", {SECRET: SECRET}), ("icon", [SECRET]),
+                     (SECRET, SECRET), ("wallpaper", SECRET)]
+        for key, new in mutations:
+            value = copy.deepcopy(original)
+            value["ui"][key] = new
+            path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaises(sync.Refused) as error:
+                self.render()
+            self.assertNotIn(SECRET, str(error.exception))
+        for key in ("name", "desc"):
+            value = copy.deepcopy(original)
+            value["services"][0][key] = {SECRET: SECRET}
+            path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaises(sync.Refused) as error:
+                self.render()
+            self.assertIn("GENERIC_FIELD_TYPE_CHANGED", str(error.exception))
+            self.assertNotIn(SECRET, str(error.exception))
+
     def test_image_lock_and_recovery_override_move_together(self):
         def images(source, compose, locks):
             result = copy.deepcopy(locks)
