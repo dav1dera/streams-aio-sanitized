@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Infisical /dr/AIO_PROFILE_BINDINGS (private value, not payload)",
+  "type": "object",
+  "required": [
+    "aiostreams",
+    "aiometadata"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "aiostreams": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "uuid",
+          "password"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "uuid": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "required": [
+                  "ref"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                  }
+                }
+              }
+            ]
+          },
+          "password": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "required": [
+                  "ref"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                  }
+                }
+              }
+            ]
+          },
+          "profile": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "owner",
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "ref"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "ref": {
+                        "type": "string",
+                        "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                      }
+                    }
+                  }
+                ]
+              },
+              "owner": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "ref"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "ref": {
+                        "type": "string",
+                        "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                      }
+                    }
+                  }
+                ]
+              },
+              "label": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "ref"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "ref": {
+                        "type": "string",
+                        "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                      }
+                    }
+                  }
+                ]
+              },
+              "alias": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "ref"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "ref": {
+                        "type": "string",
+                        "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "aiometadata": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "uuid",
+          "password"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "uuid": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "required": [
+                  "ref"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                  }
+                }
+              }
+            ]
+          },
+          "password": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "required": [
+                  "ref"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                  }
+                }
+              }
+            ]
+          },
+          "trusted": {
+            "type": "boolean"
+          },
+          "alias": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "required": [
+                  "ref"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

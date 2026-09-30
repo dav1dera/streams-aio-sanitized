@@ -1,0 +1,487 @@
+{
+  "id": "subtitle-engine",
+  "name": "Subtitle Engine",
+  "version": "1.1.2",
+  "manifestURI": "https://raw.githubusercontent.com/Thekingcrusher/seanime-plugins/refs/heads/main/subtitle-engine/manifest.json",
+  "language": "typescript",
+  "type": "plugin",
+  "description": "Add subtitles of your preferred language and format scraped from multiple different sources to your current session.",
+  "author": "Thekingcrusher",
+  "icon": "https://raw.githubusercontent.com/Thekingcrusher/seanime-plugins/refs/heads/main/subtitle-engine/icon.png",
+  "website": "",
+  "readme": "",
+  "lang": "multi",
+  "userConfig": {
+    "version": 2,
+    "requiresConfig": false,
+    "fields": [
+      {
+        "type": "select",
+        "name": "autoSelect",
+        "label": "Auto Select",
+        "options": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "auto",
+            "label": "Auto Select"
+          },
+          {
+            "value": "smart",
+            "label": "Smart Select"
+          }
+        ],
+        "default": "none"
+      },
+      {
+        "type": "select",
+        "name": "source",
+        "label": "Source",
+        "options": [
+          {
+            "value": "animetoshoSource",
+            "label": "AnimeTosho (Integrated)"
+          },
+          {
+            "value": "jimakuSource",
+            "label": "Jimaku (Integrated)"
+          },
+          {
+            "value": "animetosho",
+            "label": "AnimeTosho"
+          },
+          {
+            "value": "jimaku",
+            "label": "Jimaku"
+          },
+          {
+            "value": "kitsunekko",
+            "label": "Kitsunekko"
+          },
+          {
+            "value": "subdl",
+            "label": "SubDL"
+          },
+          {
+            "value": "subf2m",
+            "label": "Subf2m"
+          },
+          {
+            "value": "opensubtitles",
+            "label": "OpenSubtitles"
+          },
+          {
+            "value": "podnapisi",
+            "label": "Podnapisi"
+          },
+          {
+            "value": "gestdown",
+            "label": "Gestdown"
+          },
+          {
+            "value": "yify",
+            "label": "YIFY"
+          },
+          {
+            "value": "ajatttools",
+            "label": "Ajatt Tools"
+          }
+        ],
+        "default": "animetoshoSource"
+      },
+      {
+        "type": "select",
+        "name": "language",
+        "label": "Language",
+        "options": [
+          {
+            "value": "all",
+            "label": "All"
+          },
+          {
+            "value": "en",
+            "label": "English"
+          },
+          {
+            "value": "es",
+            "label": "Spanish (ES)"
+          },
+          {
+            "value": "ea",
+            "label": "Spanish (LA)"
+          },
+          {
+            "value": "fr",
+            "label": "French"
+          },
+          {
+            "value": "de",
+            "label": "German"
+          },
+          {
+            "value": "it",
+            "label": "Italian"
+          },
+          {
+            "value": "pt",
+            "label": "Portuguese (PT)"
+          },
+          {
+            "value": "pb",
+            "label": "Portuguese (BR)"
+          },
+          {
+            "value": "ja",
+            "label": "Japanese"
+          },
+          {
+            "value": "ko",
+            "label": "Korean"
+          },
+          {
+            "value": "zh",
+            "label": "Chinese (Simplified)"
+          },
+          {
+            "value": "zt",
+            "label": "Chinese (Traditional)"
+          },
+          {
+            "value": "ru",
+            "label": "Russian"
+          },
+          {
+            "value": "ar",
+            "label": "Arabic"
+          },
+          {
+            "value": "tr",
+            "label": "Turkish"
+          },
+          {
+            "value": "id",
+            "label": "Indonesian"
+          },
+          {
+            "value": "vi",
+            "label": "Vietnamese"
+          },
+          {
+            "value": "th",
+            "label": "Thai"
+          },
+          {
+            "value": "hi",
+            "label": "Hindi"
+          },
+          {
+            "value": "bn",
+            "label": "Bengali"
+          },
+          {
+            "value": "ms",
+            "label": "Malay"
+          },
+          {
+            "value": "tl",
+            "label": "Tagalog"
+          },
+          {
+            "value": "fa",
+            "label": "Persian"
+          },
+          {
+            "value": "he",
+            "label": "Hebrew"
+          },
+          {
+            "value": "pl",
+            "label": "Polish"
+          },
+          {
+            "value": "nl",
+            "label": "Dutch"
+          },
+          {
+            "value": "el",
+            "label": "Greek"
+          },
+          {
+            "value": "cs",
+            "label": "Czech"
+          },
+          {
+            "value": "hu",
+            "label": "Hungarian"
+          },
+          {
+            "value": "ro",
+            "label": "Romanian"
+          },
+          {
+            "value": "sv",
+            "label": "Swedish"
+          },
+          {
+            "value": "da",
+            "label": "Danish"
+          },
+          {
+            "value": "fi",
+            "label": "Finnish"
+          },
+          {
+            "value": "no",
+            "label": "Norwegian"
+          },
+          {
+            "value": "uk",
+            "label": "Ukrainian"
+          },
+          {
+            "value": "bg",
+            "label": "Bulgarian"
+          },
+          {
+            "value": "sk",
+            "label": "Slovak"
+          },
+          {
+            "value": "hr",
+            "label": "Croatian"
+          },
+          {
+            "value": "sr",
+            "label": "Serbian"
+          },
+          {
+            "value": "sl",
+            "label": "Slovenian"
+          },
+          {
+            "value": "lt",
+            "label": "Lithuanian"
+          },
+          {
+            "value": "lv",
+            "label": "Latvian"
+          },
+          {
+            "value": "et",
+            "label": "Estonian"
+          },
+          {
+            "value": "is",
+            "label": "Icelandic"
+          },
+          {
+            "value": "sq",
+            "label": "Albanian"
+          },
+          {
+            "value": "hy",
+            "label": "Armenian"
+          },
+          {
+            "value": "az",
+            "label": "Azerbaijani"
+          },
+          {
+            "value": "eu",
+            "label": "Basque"
+          },
+          {
+            "value": "be",
+            "label": "Belarusian"
+          },
+          {
+            "value": "bs",
+            "label": "Bosnian"
+          },
+          {
+            "value": "ca",
+            "label": "Catalan"
+          },
+          {
+            "value": "gl",
+            "label": "Galician"
+          },
+          {
+            "value": "ka",
+            "label": "Georgian"
+          },
+          {
+            "value": "gu",
+            "label": "Gujarati"
+          },
+          {
+            "value": "kk",
+            "label": "Kazakh"
+          },
+          {
+            "value": "km",
+            "label": "Khmer"
+          },
+          {
+            "value": "mk",
+            "label": "Macedonian"
+          },
+          {
+            "value": "ml",
+            "label": "Malayalam"
+          },
+          {
+            "value": "mr",
+            "label": "Marathi"
+          },
+          {
+            "value": "mn",
+            "label": "Mongolian"
+          },
+          {
+            "value": "ne",
+            "label": "Nepali"
+          },
+          {
+            "value": "pa",
+            "label": "Punjabi"
+          },
+          {
+            "value": "si",
+            "label": "Sinhala"
+          },
+          {
+            "value": "ta",
+            "label": "Tamil"
+          },
+          {
+            "value": "te",
+            "label": "Telugu"
+          },
+          {
+            "value": "ur",
+            "label": "Urdu"
+          },
+          {
+            "value": "uz",
+            "label": "Uzbek"
+          },
+          {
+            "value": "cy",
+            "label": "Welsh"
+          }
+        ],
+        "default": "all"
+      },
+      {
+        "type": "select",
+        "name": "format",
+        "label": "Format",
+        "options": [
+          {
+            "value": "all",
+            "label": "All"
+          },
+          {
+            "value": "ass",
+            "label": "ASS"
+          },
+          {
+            "value": "ssa",
+            "label": "SSA"
+          },
+          {
+            "value": "srt",
+            "label": "SRT"
+          },
+          {
+            "value": "vtt",
+            "label": "VTT"
+          }
+        ],
+        "default": "all"
+      },
+      {
+        "type": "switch",
+        "name": "hi",
+        "label": "Closed Caption (CC)",
+        "default": "false"
+      },
+      {
+        "type": "switch",
+        "name": "signSong",
+        "label": "Sign/Song (Integrated Source)",
+        "default": "false"
+      },
+      {
+        "type": "switch",
+        "name": "honorifics",
+        "label": "Honorifics (Integrated Source)",
+        "default": "false"
+      },
+      {
+        "type": "select",
+        "name": "speed",
+        "label": "Prioritize Speed (AnimeTosho Integrated)",
+        "options": [
+          {
+            "value": "veryfast",
+            "label": "Veryfast"
+          },
+          {
+            "value": "fast",
+            "label": "Fast"
+          },
+          {
+            "value": "medium",
+            "label": "Medium"
+          }
+        ],
+        "default": "fast"
+      },
+      {
+        "type": "text",
+        "name": "jimakuKey",
+        "label": "Jimaku API Key"
+      },
+      {
+        "type": "select",
+        "name": "method",
+        "label": "ID Mapping Method (Fallback)",
+        "options": [
+          {
+            "value": "1",
+            "label": "Method 1 (Github)"
+          },
+          {
+            "value": "2",
+            "label": "Method 2 (Third Party Site)"
+          }
+        ],
+        "default": "1"
+      }
+    ]
+  },
+  "payload": "/// <reference path=\"../../core.d.ts\" />\n/// <reference path=\"../../plugin.d.ts\" />\n/// <reference path=\"../../app.d.ts\" />\n/// <reference path=\"../../system.d.ts\" />\n\n//@ts-ignore\nfunction init() {\n    $ui.register((ctx) => {\n        const tray = ctx.newTray({\n            iconUrl: \"https://raw.githubusercontent.com/Thekingcrusher/seanime-plugins/refs/heads/main/subtitle-engine/icon.png\",\n            withContent: true,\n            width: \"600px\"\n        })\n\n        const key = \"wyzie-3cc67631d62d18cc4dcaf071626f1d59\";\n\n        // --- States & Refs ---\n        const imdbId = ctx.state<string>(\"\")\n        const seasonNumber = ctx.state<string>(\"\")\n        const episodeNumber = ctx.state<string>(\"\")\n        const subtitleResults = ctx.state<any[]>([])\n        const filteredSubtitleResults = ctx.state<any[]>([])\n        const isSearching = ctx.state<boolean>(false)\n        const lastSearchedKey = ctx.state<string>(\"\")\n        const selectedSubUrls = ctx.state<string[]>([])\n        const activeSession = ctx.state<boolean>(false)\n        const autoSelected = ctx.state<string>(\"\")\n\n        const imdbRef = ctx.fieldRef()\n        const seasonRef = ctx.fieldRef()\n        const episodeRef = ctx.fieldRef()\n        const langRef = ctx.fieldRef<string>($getUserPreference(\"language\"))\n        const sourceRef = ctx.fieldRef<string>($getUserPreference(\"source\"))\n        const formatRef = ctx.fieldRef<string>($getUserPreference(\"format\"))\n        \n        const hiRef = ctx.fieldRef<boolean>(false)\n        const savedHi = $getUserPreference(\"hi\")\n        hiRef.setValue(savedHi === \"true\")\n        const signRef = ctx.fieldRef<boolean>(false)\n        const savedSign = $getUserPreference(\"signSong\")\n        signRef.setValue(savedSign === \"true\")\n        const honorRef = ctx.fieldRef<boolean>(false)\n        const savedHonor = $getUserPreference(\"honorifics\")\n        honorRef.setValue(savedHonor === \"true\")\n\n        async function injectSubtitle(sub: any) {\n            try {\n                const data = $habari.parse(sub.media);\n                const label = `${data.release_group ? `[${data.release_group}] ` : ``}${sub.display}${sub.isHearingImpaired ? \" [CC]\" : \"\"}${sub.isSignSong ? \" [Sign/Song]\" : \"\"}${sub.isHonorifics ? \" [Honorifics]\" : \"\"} (${sub.format.toUpperCase()})`\n\n                await ctx.videoCore.addExternalSubtitleTrack({\n                    src: sub.url,\n                    label,\n                    language: sub.language,\n                    type: sub.format.toLowerCase(),\n                });\n                \n                selectedSubUrls.set([...selectedSubUrls.get(), sub.url]);\n            } catch (err) {\n                ctx.toast.error(\"Failed to inject subtitle\", err);\n                console.log(err)\n            }\n        }\n\n        async function loadMediaData(anilistId: number) {\n            try {\n                const metadata = await ctx.anime.getAnimeMetadata(\"anilist\", anilistId)\n                const info = await ctx.videoCore.getCurrentPlaybackInfo();\n                const mappingImdb = metadata.mappings?.imdbId?.toString();\n                const mappingTmdb = metadata.mappings?.themoviedbId?.toString();\n                const currentSeason = metadata.episodes[\"1\"]?.seasonNumber?.toString();\n                const currentEpisode = info.episode?.episodeNumber?.toString();\n                const absoluteEpisode = info.episode?.absoluteEpisodeNumber?.toString();\n                const totalEpisodes = info.media?.episodes?.toString();\n                const eid = metadata.episodes[currentEpisode]?.anidbId?.toString();\n                const currentFormat = info.media?.format?.toUpperCase();\n\n                if (sourceRef.current === \"animetoshoSource\" || sourceRef.current === \"jimakuSource\") {\n                    if (sourceRef.current === \"animetoshoSource\") await fetchAnimeTosho(eid);\n                    if (sourceRef.current === \"jimakuSource\") await fetchJimaku(anilistId, currentEpisode, absoluteEpisode, totalEpisodes);\n                    let results = filteredSubtitleResults.get();\n                  \n                    if (results.length === 0 && formatRef.current !== \"all\" && $getUserPreference(\"autoSelect\") === \"smart\" && !autoSelected.get()) {\n                        formatRef.setValue(\"all\");\n                        applyFilters();\n                        results = filteredSubtitleResults.get();\n                    }\n                    if (results.length === 0 && hiRef.current && $getUserPreference(\"autoSelect\") === \"smart\" && !autoSelected.get()) {\n                        hiRef.setValue(false);\n                        applyFilters();\n                        results = filteredSubtitleResults.get();\n                    }\n                    if (results.length === 0 && signRef.current && $getUserPreference(\"autoSelect\") === \"smart\" && !autoSelected.get()) {\n                        signRef.setValue(false);\n                        applyFilters();\n                        results = filteredSubtitleResults.get();\n                    }\n                    if (results.length === 0 && honorRef.current && $getUserPreference(\"autoSelect\") === \"smart\" && !autoSelected.get()) {\n                        honorRef.setValue(false);\n                        applyFilters();\n                        results = filteredSubtitleResults.get();\n                    }\n                    if ($getUserPreference(\"autoSelect\") !== \"none\" && autoSelected.get() !== currentEpisode) {\n                        if (results.length > 0) {\n                            await injectSubtitle(results[0]);\n                            autoSelected.set(currentEpisode);\n                        } else {\n                            const type = $getUserPreference(\"autoSelect\") === \"auto\" ? \"Auto\" : \"Smart\";\n                            ctx.toast.warning(`${type} Select could not find any subtitles`);\n                            autoSelected.set(currentEpisode);\n                        }\n                    }\n                    return\n                }\n\n                const bestId = mappingTmdb || mappingImdb;\n                const fallback = !bestId || !currentSeason;\n                const method = $getUserPreference(\"method\");\n    \n                if (bestId) {\n                    imdbId.set(bestId);\n                    imdbRef.setValue(bestId);\n                }\n\n                if (currentSeason !== \"0\") {\n                  seasonNumber.set(currentSeason);\n                  seasonRef.setValue(currentSeason);\n                  episodeNumber.set(currentEpisode);\n                  episodeRef.setValue(currentEpisode);\n                }\n        \n                if (fallback && currentFormat !== \"MOVIE\") {\n                    console.log(`Metadata missing IDs, falling back to ID mapping method ${method}.`);\n                    \n                    if (method === \"1\") {\n                        const anidbId = metadata.mappings.anidbId;\n                        const res = await fetch(\"https://raw.githubusercontent.com/Anime-Lists/anime-lists/refs/heads/master/anime-list-full.xml\");\n                        const xmlText = await res.text();\n                        const $ = LoadDoc(xmlText);\n                        const animeNode = $(`anime[anidbid=\"${anidbId}\"]`);\n    \n                        if (animeNode.length) {\n                            const tmdbId = animeNode.attr(\"tmdbtv\");\n                            const tmdbSeason = animeNode.attr(\"defaulttvdbseason\");\n                            if (tmdbId) { imdbId.set(tmdbId); imdbRef.setValue(tmdbId); }\n                            if (tmdbSeason !== \"0\") { seasonNumber.set(tmdbSeason); seasonRef.setValue(tmdbSeason); episodeNumber.set(currentEpisode); episodeRef.setValue(currentEpisode); }\n                        }\n                    } else if (method === \"2\") {\n                        const res = await fetch(`https://ramregar97-idmapper.hf.space/api/mapper?anilist_id=${anilistId}`);\n                        const data = await res.json();\n                        imdbId.set(data.tmdb_show_id?.toString() || data.themoviedb_id?.toString() || data.imdb_id?.toString());\n                        imdbRef.setValue(data.tmdb_show_id?.toString() || data.themoviedb_id?.toString() || data.imdb_id?.toString());\n                        const keys = data.tvdb_mappings ? Object.keys(data.tvdb_mappings) : [];\n                        if (keys.length > 0) {\n                            const sNum = keys[0].replace(\"s\", \"\");\n                            if (sNum !== \"0\") {\n                                seasonNumber.set(sNum);\n                                seasonRef.setValue(sNum);\n                                episodeNumber.set(currentEpisode);\n                                episodeRef.setValue(currentEpisode);\n                            }\n                        }\n                    }\n                }\n\n                if (!bestId && currentFormat === \"MOVIE\") {\n                    console.log(`Metadata missing IDs, falling back to ID mapping movie method ${method}.`);\n                    \n                    if (method === \"1\") {\n                        const anidbId = metadata.mappings.anidbId;\n                        const res = await fetch(\"https://raw.githubusercontent.com/Anime-Lists/anime-lists/refs/heads/master/anime-list-full.xml\");\n                        const xmlText = await res.text();\n                        const $ = LoadDoc(xmlText);\n                        const animeNode = $(`anime[anidbid=\"${anidbId}\"]`);\n    \n                        if (animeNode.length) {\n                            const tmdbId = animeNode.attr(\"tmdbid\");\n                            const imdbid = animeNode.attr(\"imdbid\");\n                            const tmdbSeason = animeNode.attr(\"defaulttvdbseason\");\n                            imdbId.set(tmdbId || imdbid);\n                            imdbRef.setValue(tmdbId || imdbid);\n                            if (tmdbSeason !== \"0\") { seasonNumber.set(tmdbSeason); seasonRef.setValue(tmdbSeason); episodeNumber.set(currentEpisode); episodeRef.setValue(currentEpisode); }\n                        }\n                    } else if (method === \"2\") {\n                        const res = await fetch(`https://ramregar97-idmapper.hf.space/api/mapper?anilist_id=${anilistId}`);\n                        const data = await res.json();\n                        imdbId.set(data.tmdb_movie_id?.toString() || data.themoviedb_id?.toString() || data.imdb_id?.toString());\n                        imdbRef.setValue(data.tmdb_movie_id?.toString() || data.themoviedb_id?.toString() || data.imdb_id?.toString());\n                        const keys = data.tvdb_mappings ? Object.keys(data.tvdb_mappings) : [];\n                        if (keys.length > 0) {\n                            const sNum = keys[0].replace(\"s\", \"\");\n                            if (sNum !== \"0\") {\n                                seasonNumber.set(sNum);\n                                seasonRef.setValue(sNum);\n                                episodeNumber.set(currentEpisode);\n                                episodeRef.setValue(currentEpisode); \n                            }\n                        }\n                    }\n                }\n\n                tray.update();\n                  \n                if (imdbRef.current) {\n                    await fetchSubtitles(true);\n                    let results = subtitleResults.get();\n                  \n                    if (results.length === 0 && formatRef.current !== \"all\" && $getUserPreference(\"autoSelect\") === \"smart\" && !autoSelected.get()) {\n                        //await fetchSubtitles(true, { format: \"all\" });\n                        formatRef.setValue(\"all\");\n                        applyFilters();\n                        results = subtitleResults.get();\n                    }\n                    if (results.length === 0 && hiRef.current && $getUserPreference(\"autoSelect\") === \"smart\" && !autoSelected.get()) {\n                        //await fetchSubtitles(true, { format: \"all\", hi: false });\n                        hiRef.setValue(false);\n                        applyFilters();\n                        results = subtitleResults.get();\n                    }\n                    if ($getUserPreference(\"autoSelect\") !== \"none\" && autoSelected.get() !== currentEpisode) {\n                        if (results.length > 0) {\n                            await injectSubtitle(results[0]);\n                            autoSelected.set(currentEpisode);\n                        } else {\n                            const type = $getUserPreference(\"autoSelect\") === \"auto\" ? \"Auto\" : \"Smart\";\n                            ctx.toast.warning(`${type} Select could not find any subtitles`);\n                            autoSelected.set(currentEpisode);\n                        }\n                    }\n                }\n            } catch (e) {\n                console.error(\"Mapping error\", e);\n            }\n        }\n\n        async function fetchAnimeTosho(eid: number) {\n            if (lastSearchedKey.get() === eid) return;\n            isSearching.set(true);\n            tray.update();\n        \n            try {\n                const url = `https://feed.animetosho.org/json?eid=${eid}`;\n                const res = await fetch(url);\n                const allEntries = await res.json();\n        \n                // 1. Resolution Value Helper\n                const getResValue = (title: string): number => {\n                    if (/\\b2160p\\b|\\b4k\\b/i.test(title)) return 2160;\n                    if (/\\b1440p\\b|\\b2k\\b/i.test(title)) return 1440;\n                    if (/\\b1080p\\b/i.test(title)) return 1080;\n                    if (/\\b720p\\b/i.test(title)) return 720;\n                    if (/\\b480p\\b/i.test(title)) return 480;\n                    return 0;\n                };\n        \n                // 2. DEDUPLICATION: Group by normalized title, pick highest resolution\n                const groups: Record<string, any[]> = {};\n                allEntries.forEach((entry: any) => {\n                    if (entry.title.toLowerCase().includes(\"batch\")) return;\n        \n                    const normalizedTitle = entry.title\n                        .replace(/\\b\\d{3,4}p\\b/gi, \"\")\n                        .replace(/\\b4k\\b|\\b2k\\b/gi, \"\")\n                        .replace(/\\b(?:avc|hevc|x264|x265|h\\.264|h\\.265)\\b/gi, \"\")\n                        .replace(/\\b(?:aac|flac|opus|mp3|dolby|truehd|dts(?:-hd)?(?:\\sma)?)\\b/gi, \"\")\n                        .replace(/[\\[\\(][0-9A-F]{8}[\\]\\)]/gi, \"\")\n                        .replace(/\\s+/g, \" \")\n                        .trim();\n        \n                    if (!groups[normalizedTitle]) groups[normalizedTitle] = [];\n                    groups[normalizedTitle].push(entry);\n                });\n        \n                const entries = Object.values(groups).map(group => {\n                    return group.sort((a, b) => getResValue(b.title) - getResValue(a.title))[0];\n                });\n        \n                // 3. CONCURRENCY & RETRY LOGIC\n                // Limit max speed to 12. 25 is too high and triggers browser/API bottlenecks.\n                const speedPref = $getUserPreference(\"speed\") === \"veryfast\" || $getUserPreference(\"speed\") === \"fast\";\n                const CONCURRENCY_LIMIT = speedPref ? 12 : 5;\n                \n                const allTorrents: any[] = [];\n                let index = 0;\n        \n                const fetchWithRetry = async (id: number, retries = 2): Promise<any> => {\n                    try {\n                        const tRes = await fetch(`https://feed.animetosho.org/json?show=torrent&id=${id}`);\n                        \n                        // If Rate Limited (429), wait and retry\n                        if (tRes.status === 429 && $getUserPreference(\"speed\") === \"fast\" && retries > 0) {\n                            await new Promise(r => ctx.setTimeout(r, 1500));\n                            return fetchWithRetry(id, retries - 1);\n                        }\n                        \n                        if (!tRes.ok) return null;\n                        return await tRes.json();\n                    } catch (e) {\n                        if (retries > 0) {\n                            await new Promise(r => ctx.setTimeout(r, 1000));\n                            return fetchWithRetry(id, retries - 1);\n                        }\n                        return null;\n                    }\n                };\n        \n                const worker = async () => {\n                    while (index < entries.length) {\n                        const entry = entries[index++];\n                        const data = await fetchWithRetry(entry.id);\n                        if (data) allTorrents.push(data);\n                    }\n                };\n        \n                // Start the worker pool\n                await Promise.all(\n                    Array(Math.min(CONCURRENCY_LIMIT, entries.length))\n                        .fill(null)\n                        .map(() => worker())\n                );\n        \n                // 4. DATA TRANSFORMATION\n                let results: any[] = [];\n                for (const torrent of allTorrents) {\n                    if (!torrent?.files) continue;\n                    for (const file of torrent.files) {\n                        if (!file.attachments) continue;\n                        for (const attach of file.attachments) {\n                            if (attach.type !== \"subtitle\") continue;\n        \n                            const providers = detectProvider(attach.info?.name);\n                            const langInfo = resolveLanguage(attach.info?.lang);\n                            \n                            let language = langInfo.iso2;\n                            let flag = langInfo.countryCode;\n                            const context = (torrent.title + (attach.info?.name || \"\")).toLowerCase();\n        \n                            // Language tagging logic\n                            if (langInfo.iso2 === \"pt\" && /brazil|\\bbr\\b/i.test(context)) {\n                                flag = \"BR\"; language = \"pb\";\n                            }\n                            if (langInfo.iso2 === \"zh\" && /(hong kong|\\bzt\\b|traditional)/i.test(context)) {\n                                language = \"zt\";\n                            }\n                            if (langInfo.iso2 === \"es\" && /latin america|\\bla\\b|\\blatam\\b/i.test(context)) {\n                                language = \"la\";\n                            }\n        \n                            results.push({\n                                release: torrent.title,\n                                display: langInfo.cleanName,\n                                language,\n                                format: attach.info?.codec,\n                                url: `https://sub.wyzie.io/c/animetosho/id/${attach.id}.animetosho?format=${attach.info?.codec?.toLowerCase()}`,\n                                source: \"animetosho\",\n                                isCR: providers.isCR,\n                                isNF: providers.isNF,\n                                isAMZN: providers.isAMZN,\n                                isATX: providers.isATX,\n                                isBili: providers.isBili,\n                                isIQ: providers.isIQ,\n                                isHearingImpaired: /\\b(cc|closed? captions?|hi|sdh|hearing impaired)\\b/i.test(attach.info?.name || \"\"),\n                                isSignSongs: /\\b(signs?|songs?|sign(?:[-_/ ]+)songs?)\\b/i.test(attach.info?.name || \"\"),\n                                isHonorifics: /honorific/i.test(attach.info?.name),\n                                flagUrl: `https://flagsapi.com/${flag}/flat/64.png`, \n                                media: torrent.title\n                            });\n                        }\n                    }\n                }\n        \n                subtitleResults.set(results);\n                applyFilters();\n                lastSearchedKey.set(eid);\n        \n            } catch (err) {\n                ctx.toast.error(\"AnimeTosho (Integrated) search failed\");\n                console.error(err);\n            } finally {\n                isSearching.set(false);\n            }\n        }\n\n        async function fetchJimaku(aniId: number, epNum: number, abEpNum: number, totalEpisodes: number) {\n            if (lastSearchedKey.get() === `${aniId}-${epNum}` || !$getUserPreference(\"jimakuKey\")) return;\n            isSearching.set(true);\n            tray.update();\n        \n            try {\n                const searchUrl = `https://jimaku.cc/api/entries/search?anilist_id=${aniId}`;\n                const searchRes = await fetch(searchUrl, {\n                    headers: {\n                          'Authorization': $getUserPreference(\"jimakuKey\")\n                      }\n                });\n                \n                if (!searchRes.ok) {\n                    throw new Error(`Jimaku ID resolution failed: ${searchRes.status}`);\n                }\n        \n                const searchData = await searchRes.json();\n                \n                if (!searchData || searchData.length === 0) {\n                    console.log(\"No Jimaku entry found for AniList ID:\", aniId);\n                    return; \n                }\n        \n                const jimakuId = searchData[0].id;\n        \n                const filesUrl = `https://jimaku.cc/api/entries/${jimakuId}/files`;\n                const filesRes = await fetch(filesUrl, {\n                    headers: {\n                          'Authorization': $getUserPreference(\"jimakuKey\")\n                      }\n                });\n                \n                if (!filesRes.ok) {\n                    throw new Error(`Jimaku files fetch failed: ${filesRes.status}`);\n                }\n        \n                const filesData = await filesRes.json();\n        \n                const results = filesData\n                    .filter((file) => {\n                        if (totalEpisodes === \"1\") return true;\n                          \n                        const parsed = $habari.parse(file.name);\n                        const parsedEp = Number(parsed.episode_number);\n\n                        return parsedEp === Number(epNum) || parsedEp === Number(abEpNum);\n                    })\n                    .map((file) => {\n                        const formatMatch = file.name.match(/\\.([^.]+)$/);\n                        const format = formatMatch ? formatMatch[1] : \"N/A\";\n                        const providers = detectProvider(file.name);\n        \n                        return {\n                            release: file.name,\n                            display: \"Japanese\", \n                            language: \"ja\",\n                            format: format,\n                            url: file.url,\n                            source: \"jimaku\",\n                            isCR: providers.isCR,\n                            isNF: providers.isNF,\n                            isAMZN: providers.isAMZN,\n                            isATX: providers.isATX,\n                            isBili: providers.isBili,\n                            isIQ: providers.isIQ,\n                            isHearingImpaired: /\\b(cc|closed? captions?|hi|sdh|hearing impaired)\\b/i.test(file.name),\n                            isSignSongs: /\\b(signs?|songs?|sign(?:[-_/ ]+)songs?)\\b/i.test(file.name),\n                            isHonorifics: /honorific/i.test(file.name),\n                            flagUrl: `https://flagsapi.com/JP/flat/64.png`, \n                            media: file.name\n                        };\n                    });\n        \n                subtitleResults.set(results);\n                const validLang = \"ja\" || \"all\";\n                if (langRef.current !== validLang) {\n                    langRef.setValue(\"all\")\n                }\n                applyFilters();\n                const currentKey = `${aniId}-${epNum}`;\n                lastSearchedKey.set(currentKey);\n        \n            } catch (err) {\n                ctx.toast.error(\"Jimaku (Integrated) search failed\");\n                console.error(err);\n            } finally {\n                isSearching.set(false);\n            }\n        }\n\n        async function fetchSubtitles(isAuto = false, overrides = {}) {\n            const id = imdbRef.current || imdbId.get();\n            const s = seasonRef.current || seasonNumber.get();\n            const ep = episodeRef.current || episodeNumber.get();\n            const source = overrides.source || sourceRef.current;\n            const format = overrides.format || formatRef.current;\n            const lang = overrides.lang || langRef.current;\n            const hi = overrides.hi !== undefined ? overrides.hi : hiRef.current;\n            if (!id) {\n              ctx.toast.warning(\"IMDB/TMDB ID not found\")\n              return\n            }\n\n            const currentKey = `${id}-${s}-${ep}-${source}-${format}-${lang}-${hi}`;\n            if (isAuto && lastSearchedKey.get() === currentKey) return;\n\n            isSearching.set(true);\n            try {\n                let url = `https://sub.wyzie.io/search?id=${id}`;\n                if (s && ep) url += `&season=${s}&episode=${ep}`;\n                if (source !== \"opensubtitles\") url += `&source=${source}`;\n                //if (format !== \"all\") url += `&format=${format}`;\n                //if (lang !== \"all\") url += `&language=${lang}`;\n                //if (hi) url += `&isHearingImpaired=true`;\n                url += `&key=${key}`\n                console.log(url)\n\n                const res = await fetch(url);\n                const data = await res.json();\n                subtitleResults.set(Array.isArray(data) ? data : []);\n                if (signRef.current || honorRef.current) {\n                    signRef.setValue(false)\n                    honorRef.setValue(false)\n                }\n                applyFilters();\n                lastSearchedKey.set(currentKey);\n            } catch (err) {\n                ctx.toast.error(\"Subtitle search failed\");\n            } finally {\n                isSearching.set(false);\n            }\n        }\n      \n        function detectProvider(name: string = \"\") {\n            // 1. Define the regexes for each provider\n            const providers = {\n                isCR: /(?:^|[^A-Za-z0-9])(CR|Crunchyroll)(?:[^A-Za-z0-9]|$)/i,\n                isNF: /(?:^|[^A-Za-z0-9])(NF|Netflix)(?:[^A-Za-z0-9]|$)/i,\n                isAMZN: /(?:^|[^A-Za-z0-9])(AMZ|AMZN|Amazon)(?:[^A-Za-z0-9]|$)/i,\n                isATX: /(?:^|[^A-Za-z0-9])(ATX|AT-X)(?:[^A-Za-z0-9]|$)/i,\n                isBili: /(?:^|[^A-Za-z0-9])(Bili|BiliBili)(?:[^A-Za-z0-9]|$)/i\n            };\n        \n            // 2. Find their positions in the string, sort them, and keep the first 2\n            const topMatches = Object.entries(providers)\n                .map(([key, regex]) => ({ key, index: name.search(regex) }))\n                .filter(match => match.index !== -1)\n                .sort((a, b) => a.index - b.index)\n                .slice(0, 2)\n                .map(match => match.key);\n        \n            // 3. Return the boolean object based on those top matches\n            return {\n                isCR: topMatches.includes(\"isCR\"),\n                isNF: topMatches.includes(\"isNF\"),\n                isAMZN: topMatches.includes(\"isAMZN\"),\n                isATX: topMatches.includes(\"isATX\"),\n                isBili: topMatches.includes(\"isBili\")\n            };\n        }\n\n        function resolveLanguage(rawLang: string = \"und\") {\n            const code = rawLang.toLowerCase().trim();\n        \n            // 2. Map 3-letter (AnimeTosho) to 2-letter (ISO 639-1)\n            const toAlpha2: Record<string, string> = {\n                \"ara\": \"ar\", \"chi\": \"zh\", \"zho\": \"zh\", \"fre\": \"fr\", \"fra\": \"fr\",\n                \"ger\": \"de\", \"deu\": \"de\", \"ind\": \"id\", \"ita\": \"it\", \"jpn\": \"ja\",\n                \"kor\": \"ko\", \"may\": \"ms\", \"msa\": \"ms\", \"por\": \"pt\", \"rus\": \"ru\",\n                \"spa\": \"es\", \"tha\": \"th\", \"vie\": \"vi\", \"eng\": \"en\"\n            };\n            \n            const iso2 = toAlpha2[code] || (code.length === 2 ? code : \"en\");\n        \n            // 3. Complete Country Code Map (Wyzie Sub)\n            const countryMap: Record<string, string> = {\n                af: \"ZA\", ak: \"GH\", ar: \"SA\", az: \"AZ\", be: \"BY\", bg: \"BG\", bn: \"BD\", bs: \"BA\", ca: \"ES\", cs: \"CZ\", da: \"DK\", de: \"DE\", el: \"GR\", en: \"US\", eo: \"PL\", es: \"ES\", et: \"EE\", fa: \"IR\", fi: \"FI\", fr: \"FR\", ga: \"IE\", gd: \"GB\", he: \"IL\", hi: \"IN\", hr: \"HR\", hu: \"HU\", hy: \"AM\", id: \"ID\", is: \"IS\", it: \"IT\", ja: \"JP\", ka: \"GE\", kk: \"KZ\", ko: \"KR\", lt: \"LT\", lv: \"LV\", mk: \"MK\", mn: \"MN\", ms: \"MY\", nb: \"NO\", nl: \"NL\", nn: \"NO\", no: \"NO\", pl: \"PL\", pt: \"PT\", ro: \"RO\", ru: \"RU\", sk: \"SK\", sl: \"SI\", sq: \"AL\", sr: \"RS\", sv: \"SE\", th: \"TH\", tr: \"TR\", uk: \"UA\", vi: \"VN\", zh: \"CN\", ze: \"CN\", zt: \"CN\", am: \"ET\", eu: \"ES\", gl: \"ES\", gu: \"IN\", ha: \"NG\", ig: \"NG\", iw: \"IL\", jv: \"ID\", km: \"KH\", kn: \"IN\", ky: \"KG\", lo: \"LA\", mg: \"MG\", ml: \"IN\", mr: \"IN\", my: \"MM\", ne: \"NP\", om: \"ET\", or: \"IN\", pa: \"IN\", ps: \"AF\", si: \"LK\", so: \"SO\", sw: \"TZ\", ta: \"IN\", te: \"IN\", tg: \"TJ\", tk: \"TM\", ur: \"PK\", uz: \"UZ\", yo: \"NG\", zu: \"ZA\", as: \"IN\", ay: \"BO\", bh: \"IN\", bi: \"VU\", br: \"FR\", ch: \"GU\", co: \"FR\", cr: \"CA\", cy: \"GB\", dv: \"MV\", ee: \"GH\", fj: \"FJ\", fo: \"FO\", ff: \"SN\", gn: \"PY\", ht: \"HT\", hz: \"NA\", ia: \"FR\", ie: \"FR\", ik: \"US\", kl: \"GL\", ki: \"KE\", kj: \"AO\", ku: \"IQ\", lb: \"LU\", lg: \"UG\", ln: \"CD\", lu: \"CD\", mh: \"MH\", na: \"NR\", nd: \"ZW\", ng: \"NA\", nr: \"ZA\", nv: \"US\", ny: \"MW\", oc: \"FR\", oj: \"CA\", os: \"RU\", pi: \"IN\", qu: \"PE\", rn: \"BI\", rw: \"RW\", sa: \"IN\", sc: \"IT\", sd: \"PK\", sg: \"CF\", sm: \"WS\", sn: \"ZW\", ss: \"SZ\", st: \"LS\", su: \"ID\", tl: \"PH\", tn: \"BW\", ts: \"ZA\", tt: \"RU\", tw: \"GH\", ty: \"PF\", ug: \"CN\", ve: \"ZA\", vo: \"DE\", wa: \"BE\", wo: \"SN\", xh: \"ZA\", yi: \"IL\", za: \"CN\"\n            };\n        \n            // 4. Complete Metadata Map (SubDL)\n            const metaMap: Record<string, {name: string}> = {\n                ab: { name: \"Abkhaz\" }, aa: { name: \"Afar\" }, af: { name: \"Afrikaans\" }, ak: { name: \"Akan\" }, sq: { name: \"Albanian\" }, am: { name: \"Amharic\" }, ar: { name: \"Arabic\" }, an: { name: \"Aragonese\" }, hy: { name: \"Armenian\" }, as: { name: \"Assamese\" }, av: { name: \"Avaric\" }, ae: { name: \"Avestan\" }, ay: { name: \"Aymara\" }, az: { name: \"Azerbaijani\" }, bm: { name: \"Bambara\" }, ba: { name: \"Bashkir\" }, eu: { name: \"Basque\" }, be: { name: \"Belarusian\" }, bn: { name: \"Bengali\" }, bh: { name: \"Bihari\" }, bi: { name: \"Bislama\" }, bs: { name: \"Bosnian\" }, br: { name: \"Breton\" }, bg: { name: \"Bulgarian\" }, my: { name: \"Burmese\" }, ca: { name: \"Catalan\" }, ch: { name: \"Chamorro\" }, ce: { name: \"Chechen\" }, ny: { name: \"Chichewa\" }, zh: { name: \"Chinese\" }, cv: { name: \"Chuvash\" }, kw: { name: \"Cornish\" }, co: { name: \"Corsican\" }, cr: { name: \"Cree\" }, hr: { name: \"Croatian\" }, cs: { name: \"Czech\" }, da: { name: \"Danish\" }, dv: { name: \"Divehi\" }, nl: { name: \"Dutch\" }, en: { name: \"English\" }, eo: { name: \"Esperanto\" }, et: { name: \"Estonian\" }, ee: { name: \"Ewe\" }, fo: { name: \"Faroese\" }, fj: { name: \"Fijian\" }, fi: { name: \"Finnish\" }, fr: { name: \"French\" }, ff: { name: \"Fula\" }, gl: { name: \"Galician\" }, ka: { name: \"Georgian\" }, de: { name: \"German\" }, el: { name: \"Greek\" }, gn: { name: \"Guaraní\" }, gu: { name: \"Gujarati\" }, ht: { name: \"Haitian\" }, ha: { name: \"Hausa\" }, he: { name: \"Hebrew\" }, hz: { name: \"Herero\" }, hi: { name: \"Hindi\" }, ho: { name: \"Hiri Motu\" }, hu: { name: \"Hungarian\" }, ia: { name: \"Interlingua\" }, id: { name: \"Indonesian\" }, ga: { name: \"Irish\" }, ig: { name: \"Igbo\" }, ik: { name: \"Inupiaq\" }, io: { name: \"Ido\" }, is: { name: \"Icelandic\" }, it: { name: \"Italian\" }, iu: { name: \"Inuktitut\" }, ja: { name: \"Japanese\" }, jv: { name: \"Javanese\" }, kl: { name: \"Greenlandic\" }, kn: { name: \"Kannada\" }, kr: { name: \"Kanuri\" }, ks: { name: \"Kashmiri\" }, kk: { name: \"Kazakh\" }, km: { name: \"Khmer\" }, ki: { name: \"Kikuyu\" }, rw: { name: \"Kinyarwanda\" }, ky: { name: \"Kirghiz\" }, kv: { name: \"Komi\" }, kg: { name: \"Kongo\" }, ko: { name: \"Korean\" }, ku: { name: \"Kurdish\" }, kj: { name: \"Kwanyama\" }, la: { name: \"Latin\" }, lb: { name: \"Luxembourgish\" }, lg: { name: \"Luganda\" }, li: { name: \"Limburgish\" }, ln: { name: \"Lingala\" }, lo: { name: \"Lao\" }, lt: { name: \"Lithuanian\" }, lu: { name: \"Luba-Katanga\" }, lv: { name: \"Latvian\" }, gv: { name: \"Manx\" }, mk: { name: \"Macedonian\" }, mg: { name: \"Malagasy\" }, ms: { name: \"Malay\" }, ml: { name: \"Malayalam\" }, mt: { name: \"Maltese\" }, mi: { name: \"Māori\" }, mr: { name: \"Marathi\" }, mh: { name: \"Marshallese\" }, mn: { name: \"Mongolian\" }, na: { name: \"Nauru\" }, nv: { name: \"Navajo\" }, nb: { name: \"Norwegian Bokmål\" }, nd: { name: \"North Ndebele\" }, ne: { name: \"Nepali\" }, ng: { name: \"Ndonga\" }, nn: { name: \"Norwegian Nynorsk\" }, no: { name: \"Norwegian\" }, ii: { name: \"Nuosu\" }, nr: { name: \"South Ndebele\" }, oc: { name: \"Occitan\" }, oj: { name: \"Ojibwe\" }, om: { name: \"Oromo\" }, or: { name: \"Oriya\" }, os: { name: \"Ossetian\" }, pa: { name: \"Panjabi\" }, pi: { name: \"Pāli\" }, fa: { name: \"Persian\" }, pl: { name: \"Polish\" }, ps: { name: \"Pashto\" }, pt: { name: \"Portuguese\" }, qu: { name: \"Quechua\" }, rm: { name: \"Romansh\" }, rn: { name: \"Kirundi\" }, ro: { name: \"Romanian\" }, ru: { name: \"Russian\" }, sa: { name: \"Sanskrit\" }, sc: { name: \"Sardinian\" }, sd: { name: \"Sindhi\" }, se: { name: \"Northern Sami\" }, sm: { name: \"Samoan\" }, sg: { name: \"Sango\" }, sr: { name: \"Serbian\" }, gd: { name: \"Scottish Gaelic\" }, sn: { name: \"Shona\" }, si: { name: \"Sinhala\" }, sk: { name: \"Slovak\" }, sl: { name: \"Slovene\" }, so: { name: \"Somali\" }, st: { name: \"Southern Sotho\" }, es: { name: \"Spanish\" }, su: { name: \"Sundanese\" }, sw: { name: \"Swahili\" }, ss: { name: \"Swati\" }, sv: { name: \"Swedish\" }, ta: { name: \"Tamil\" }, te: { name: \"Telugu\" }, tg: { name: \"Tajik\" }, th: { name: \"Thai\" }, ti: { name: \"Tigrinya\" }, bo: { name: \"Tibetan\" }, tk: { name: \"Turkmen\" }, tl: { name: \"Tagalog\" }, tn: { name: \"Tswana\" }, to: { name: \"Tonga\" }, tr: { name: \"Turkish\" }, ts: { name: \"Tsonga\" }, tt: { name: \"Tatar\" }, tw: { name: \"Twi\" }, ty: { name: \"Tahitian\" }, ug: { name: \"Uighur\" }, uk: { name: \"Ukrainian\" }, ur: { name: \"Urdu\" }, uz: { name: \"Uzbek\" }, ve: { name: \"Venda\" }, vi: { name: \"Vietnamese\" }, vo: { name: \"Volapük\" }, wa: { name: \"Walloon\" }, cy: { name: \"Welsh\" }, wo: { name: \"Wolof\" }, fy: { name: \"Western Frisian\" }, xh: { name: \"Xhosa\" }, yi: { name: \"Yiddish\" }, yo: { name: \"Yoruba\" }, za: { name: \"Zhuang\" }, pb: { name: \"Portuguese (Brazil)\" }, ze: { name: \"Chinese (Simplified)\" }, zt: { name: \"Chinese (Traditional)\" }, iw: { name: \"Hebrew\" }\n            };\n        \n            return {\n                iso2: iso2,\n                countryCode: countryMap[iso2],\n                cleanName: metaMap[iso2]?.name\n            };\n        }\n\n        function applyFilters() {\n            let filteredSubs = [...subtitleResults.get()];\n            const format = formatRef.current;\n            const lang = langRef.current;\n            const hi = hiRef.current;\n            const sign = signRef.current;\n            const honor = honorRef.current;\n        \n            if (format && format !== \"all\") {\n                filteredSubs = filteredSubs.filter(sub => sub.format.toLowerCase() === format.toLowerCase());\n            }\n        \n            if (lang && lang !== \"all\") {\n                if (sourceRef.current === \"animetoshoSource\" && lang === \"ea\") {\n                    filteredSubs = filteredSubs.filter(sub => sub.language === \"la\");\n                }\n                else { filteredSubs = filteredSubs.filter(sub => sub.language === lang); }\n            }\n        \n            if (hi) {\n                filteredSubs = filteredSubs.filter(sub => sub.isHearingImpaired === true);\n            }\n        \n            if (sign) {\n                filteredSubs = filteredSubs.filter(sub => sub.isSignSongs === true);\n            }\n        \n            if (honor) {\n                filteredSubs = filteredSubs.filter(sub => sub.isHonorifics === true);\n            }\n        \n            filteredSubtitleResults.set(filteredSubs);\n        }\n\n        ctx.registerEventHandler(\"filter\", () => {\n            ctx.setTimeout(() => {\n                applyFilters();\n            }, 50);\n        });\n        \n        ctx.registerEventHandler(\"update\", () => {\n            ctx.setTimeout(async () => {\n                const info = await ctx.videoCore.getCurrentPlaybackInfo();\n                loadMediaData(parseInt(info.media.id));\n                tray.update();\n            }, 50);\n        });\n\n        ctx.registerEventHandler(\"triggerManualSearch\", () => {\n            const id = imdbRef.current;\n            const s = seasonRef.current;\n            const e = episodeRef.current;\n          \n            if (!id) return ctx.toast.warning(\"IMDB/TMDB ID is required\");\n            if (s && !e) return ctx.toast.warning(\"Episode number required\");\n            if (!s && e) return ctx.toast.warning(\"Season number required\");\n\n            if (activeSession.get()) {\n                fetchSubtitles(false);\n            }\n        });\n        \n        ctx.screen.onNavigate(async (e) => {\n            if (e.pathname === \"/entry\" && e.searchParams.id) {\n                activeSession.set(true);\n                selectedSubUrls.set([]);\n                autoSelected.set(\"\")\n                langRef.setValue($getUserPreference(\"language\"));\n                sourceRef.setValue($getUserPreference(\"source\"));\n                formatRef.setValue($getUserPreference(\"format\"));\n                if ($getUserPreference(\"autoSelect\") !== \"none\") {\n                    ctx.videoCore.addEventListener(\"video-loaded\", () => loadMediaData(parseInt(e.searchParams.id)));\n                }\n            }\n            else activeSession.set(false)\n        });\n\n        tray.onOpen(async () => {\n            if (activeSession.get()) {\n                const info = await ctx.videoCore.getCurrentPlaybackInfo();\n                loadMediaData(parseInt(info.media.id));           \n            }\n        })\n\n        tray.render(() => {\n            const subs = filteredSubtitleResults.get() || [];\n            const currentlySelectedList = selectedSubUrls.get() || [];\n            const integrated = sourceRef.current === \"animetoshoSource\" || sourceRef.current === \"jimakuSource\";\n            const jimaku = sourceRef.current === \"jimakuSource\"\n\n            return tray.div([\n                tray.css(`                 \n                    .subtitle-item { transition: all 0.3s ease !important; margin: 0 8px; border-radius: 8px !important; }\n                    .subtitle-item:hover { background-color: rgba(255, 255, 255, 0.10) !important; }\n                `),\n                tray.div([\n                    tray.div([\n                        tray.flex([\n                            tray.stack([\n                                tray.text(\"Subtitle Engine\", { style: { fontSize: \"18px\", fontWeight: \"700\", color: \"#FFF\" } }),\n                                tray.text(\"Powered by Wyzie\", { style: { fontSize: \"11px\", opacity: 0.5 } })\n                            ]),\n                            isSearching.get() \n                                ? tray.badge(\"Syncing Providers...\", { intent: \"warning\" }) \n                                : tray.badge(`${subs.length} items found`, { intent: subs.length > 0 ? \"success\" : \"gray\" })\n                        ], { justifyContent: \"space-between\", alignItems: \"center\" })\n                    ], { style: { padding: \"20px 20px 15px 20px\" } }),\n\n                    tray.stack([\n                        tray.flex([\n                            !integrated && tray.input({ label: \"IMDB/TMDB ID\", fieldRef: imdbRef, style: { flex: 2 } }),\n                            !integrated && tray.input({ label: \"S\", fieldRef: seasonRef, style: { width: \"55px\" } }),\n                            !integrated && tray.input({ label: \"E\", fieldRef: episodeRef, style: { width: \"55px\" } }),\n                            !integrated && tray.button({ \n                                label: \"Search\", \n                                onClick: \"triggerManualSearch\", \n                                intent: isSearching.get() ? \"gray\" : \"white-subtle\",\n                                disabled: isSearching.get() || !imdbRef.current,\n                                style: { marginTop: \"24px\", height: \"38px\" } \n                            })\n                        ].filter(Boolean), { gap: 1 }),\n\n                        tray.flex([\n                            tray.select(\"Source\", {\n                                fieldRef: sourceRef,\n                                onChange: \"update\",\n                                options: [\n                                  { label: \"AnimeTosho (Integrated)\", value: \"animetoshoSource\" },\n                                  { label: \"Jimaku (Integrated)\", value: \"jimakuSource\" },\n                                  { label: \"AnimeTosho\", value: \"animetosho\" },\n                                  { label: \"Jimaku\", value: \"jimaku\" },\n                                  { label: \"Kitsunekko\", value: \"kitsunekko\" },\n                                  { label: \"SubDL\", value: \"subdl\" },\n                                  { label: \"Subf2m\", value: \"subf2m\" },\n                                  { label: \"OpenSubtitles\", value: \"opensubtitles\" },\n                                  { label: \"Podnapisi\", value: \"podnapisi\" },\n                                  { label: \"Gestdown\", value: \"gestdown\" },\n                                  { label: \"YIFY\", value: \"yify\" },\n                                  { label: \"Ajatt Tools\", value: \"ajatttools\" }\n                                ],\n                                style: { flex: 1 }\n                            }),\n                            !jimaku && tray.select(\"Language\", {\n                                fieldRef: langRef,\n                                onChange: \"filter\",\n                                options: [\n                                    { label: \"All\", value: \"all\" },\n                                    { label: \"English\", value: \"en\" },\n                                    { label: \"Spanish (ES)\", value: \"es\" },\n                                    { label: \"Spanish (LA)\", value: \"ea\" },\n                                    { label: \"French\", value: \"fr\" },\n                                    { label: \"German\", value: \"de\" },\n                                    { label: \"Italian\", value: \"it\" },\n                                    { label: \"Portuguese (PT)\", value: \"pt\" },\n                                    { label: \"Portuguese (BR)\", value: \"pb\" },\n                                    { label: \"Japanese\", value: \"ja\" },\n                                    { label: \"Korean\", value: \"ko\" },\n                                    { label: \"Chinese (Simplified)\", value: \"zh\" },\n                                    { label: \"Chinese (Traditional)\", value: \"zt\" },\n                                    { label: \"Russian\", value: \"ru\" },\n                                    { label: \"Arabic\", value: \"ar\" },\n                                    { label: \"Turkish\", value: \"tr\" },\n                                    { label: \"Indonesian\", value: \"id\" },\n                                    { label: \"Vietnamese\", value: \"vi\" },\n                                    { label: \"Thai\", value: \"th\" },\n                                    { label: \"Hindi\", value: \"hi\" },\n                                    { label: \"Bengali\", value: \"bn\" },\n                                    { label: \"Malay\", value: \"ms\" },\n                                    { label: \"Tagalog\", value: \"tl\" },\n                                    { label: \"Persian\", value: \"fa\" },\n                                    { label: \"Hebrew\", value: \"he\" },\n                                    { label: \"Polish\", value: \"pl\" },\n                                    { label: \"Dutch\", value: \"nl\" },\n                                    { label: \"Greek\", value: \"el\" },\n                                    { label: \"Czech\", value: \"cs\" },\n                                    { label: \"Hungarian\", value: \"hu\" },\n                                    { label: \"Romanian\", value: \"ro\" },\n                                    { label: \"Swedish\", value: \"sv\" },\n                                    { label: \"Danish\", value: \"da\" },\n                                    { label: \"Finnish\", value: \"fi\" },\n                                    { label: \"Norwegian\", value: \"no\" },\n                                    { label: \"Ukrainian\", value: \"uk\" },\n                                    { label: \"Bulgarian\", value: \"bg\" },\n                                    { label: \"Slovak\", value: \"sk\" },\n                                    { label: \"Croatian\", value: \"hr\" },\n                                    { label: \"Serbian\", value: \"sr\" },\n                                    { label: \"Slovenian\", value: \"sl\" },\n                                    { label: \"Lithuanian\", value: \"lt\" },\n                                    { label: \"Latvian\", value: \"lv\" },\n                                    { label: \"Estonian\", value: \"et\" },\n                                    { label: \"Icelandic\", value: \"is\" },\n                                    { label: \"Albanian\", value: \"sq\" },\n                                    { label: \"Armenian\", value: \"hy\" },\n                                    { label: \"Azerbaijani\", value: \"az\" },\n                                    { label: \"Basque\", value: \"eu\" },\n                                    { label: \"Belarusian\", value: \"be\" },\n                                    { label: \"Bosnian\", value: \"bs\" },\n                                    { label: \"Catalan\", value: \"ca\" },\n                                    { label: \"Galician\", value: \"gl\" },\n                                    { label: \"Georgian\", value: \"ka\" },\n                                    { label: \"Gujarati\", value: \"gu\" },\n                                    { label: \"Kazakh\", value: \"kk\" },\n                                    { label: \"Khmer\", value: \"km\" },\n                                    { label: \"Macedonian\", value: \"mk\" },\n                                    { label: \"Malayalam\", value: \"ml\" },\n                                    { label: \"Marathi\", value: \"mr\" },\n                                    { label: \"Mongolian\", value: \"mn\" },\n                                    { label: \"Nepali\", value: \"ne\" },\n                                    { label: \"Punjabi\", value: \"pa\" },\n                                    { label: \"Sinhala\", value: \"si\" },\n                                    { label: \"Tamil\", value: \"ta\" },\n                                    { label: \"Telugu\", value: \"te\" },\n                                    { label: \"Urdu\", value: \"ur\" },\n                                    { label: \"Uzbek\", value: \"uz\" },\n                                    { label: \"Welsh\", value: \"cy\" }\n                                ],\n                                style: { flex: 1 }\n                            }),\n                            tray.select(\"Format\", {\n                                fieldRef: formatRef,\n                                onChange: \"filter\",\n                                options: [\n                                  { label: \"All\", value: \"all\" },\n                                  { label: \"ASS\", value: \"ass\" },\n                                  { label: \"SSA\", value: \"ssa\" },\n                                  { label: \"SRT\", value: \"srt\" },\n                                  { label: \"VTT\", value: \"vtt\" }\n                                ],\n                                style: { flex: 1 }\n                            })\n                        ].filter(Boolean), { gap: 1 }),\n\n                        tray.flex([\n                            tray.switch(\"Closed Captions (CC)\", { fieldRef: hiRef, onChange: \"filter\" }),\n                            integrated && tray.switch(\"Sign/Song\", { fieldRef: signRef, onChange: \"filter\" }),\n                            integrated && tray.switch(\"Honorifics\", { fieldRef: honorRef, onChange: \"filter\" }),\n                        ].filter(Boolean), { padding: \"4px 0\" })\n                    ], { style: { padding: \"0 20px 20px 20px\", borderBottom: \"3px solid rgba(255,255,255,0.08)\" }, gap: 1.2 }),\n\n                    tray.div([\n                        isSearching.get() ? \n                            tray.div([tray.text(\"Searching...\", { style: { textAlign: \"center\", padding: \"60px\", opacity: 0.5 } })]) : \n                        subs.length === 0 ?\n                            tray.stack([\n                                (activeSession.get() && [\"es\", \"ea\", \"pb\", \"pt\", \"zh\", \"zt\"].includes(langRef.current)) && !integrated ?\n                                    tray.alert({\n                                        title: \"Smart Tip\",\n                                        description: \n                                            langRef.current === \"es\" ? \"Try switching to Spanish (LA). It might contain Spanish (ES).\" :\n                                            langRef.current === \"ea\" ? \"Try switching to Spanish (ES). It might contain Spanish (LA).\" :\n                                            langRef.current === \"pb\" ? \"Try switching to Portuguese (PT). It might contain Portuguese (BR).\" :\n                                            langRef.current === \"pt\" ? \"Try switching to Portuguese (BR). It might contain Portuguese (PT).\" :\n                                            langRef.current === \"zt\" ? \"Try switching to Chinese (Traditional). It might contain Chinese (Simplified)\" :\n                                            \"Try switching to Chinese (Simplified). It might contain Chinese (Traditional).\",\n                                        intent: \"info\",\n                                        style: { margin: \"20px 20px 0px 20px\" }\n                                    }) : tray.div([]),\n\n                                activeSession.get() && jimaku && !$getUserPreference(\"jimakuKey\") ?\n                                    tray.alert({\n                                        title: \"API Key Required\",\n                                        description: \"Please set your Jimaku API key in the extension preferences. To obtain one, register an account at https://jimaku.cc/login, then navigate to https://jimaku.cc/account to generate your key.\",\n                                        intent: \"alert\",\n                                        style: { margin: \"20px 20px 0px 20px\" }\n                                    }) : tray.div([]),\n                        \n                                activeSession.get() ? \n                                    tray.alert({\n                                        title: \"No Results\",\n                                        description: \"Try changing your search parameters or source.\",\n                                        intent: \"warning\",\n                                        style: { margin: \"20px\" }\n                                    }) : \n                                    tray.alert({\n                                        title: \"No Active Session Found\",\n                                        description: \"Subtitle Engine is only compatible with Seanime's built-in player. Please start a video for auto search, or enter an ID manually.\",\n                                        intent: \"warning\",\n                                        style: { margin: \"20px\" }\n                                    })\n                            ]) :\n                        tray.stack(subs.map((sub, i) => {\n                            const isThisSelected = currentlySelectedList.includes(sub.url);\n\n                            return tray.flex([\n                                tray.stack([\n                                    tray.text(sub.release, { style: { fontSize: \"15px\", fontWeight: \"600\", color: \"#efefef\" }, maxLines: 1 }),\n                                    tray.flex([\n                                        tray.flex([\n                                            tray.img(sub.flagUrl, { style: { width: \"18px\", height: \"12px\", borderRadius: \"1px\", objectFit: \"cover\", flexShrink: 0 } }),\n                                            tray.text(`${sub.display.toUpperCase()} (${sub.language.toUpperCase()})`, { \n                                                style: { fontSize: \"12px\", fontWeight: \"700\", color: \"rgba(255,255,255,0.9)\", whiteSpace: \"nowrap\", lineHeight: \"12px\", marginTop: \"0.5px\" } \n                                            })\n                                        ], { gap: 0.6, alignItems: \"center\", style: { backgroundColor: \"rgba(255,255,255,0.12)\", padding: \"2px 8px\", borderRadius: \"100px\", border: \"1px solid rgba(255,255,255,0.2)\", height: \"18px\", flexShrink: 0 } }),\n                                        sub.isCR && tray.badge(\"CR\", { intent: \"warning\", size: \"sm\" }),\n                                        sub.isNF && tray.badge(\"NF\", { intent: \"alert\", size: \"sm\" }),\n                                        sub.isAMZN && tray.badge(\"AMZN\", { intent: \"info\", size: \"sm\" }),\n                                        sub.isATX && tray.badge(\"AT-X\", { intent: \"success\", size: \"sm\" }),\n                                        sub.isBili && tray.badge(\"Bili\", { intent: \"info\", size: \"sm\" }),\n                                        tray.badge(sub.format.toUpperCase(), { intent: \"primary\", size: \"sm\" }),\n                                        sub.isHearingImpaired && tray.badge(\"CC\", { intent: \"info\", size: \"sm\" }),\n                                        sub.isSignSongs && tray.badge(\"Sign/Song\", { intent: \"info\", size: \"sm\" }),\n                                        sub.isHonorifics && tray.badge(\"Honorifics\", { intent: \"info\", size: \"sm\" }),\n                                        tray.text(`• ${sub.source}`, { style: { fontSize: \"11px\", opacity: 0.4, marginLeft: \"2px\" } })\n                                    ].filter(Boolean), { gap: 0.8, alignItems: \"center\" })\n                                ], { style: { flex: 1 }, gap: 0.5 }),\n\n                                tray.button({\n                                    label: isThisSelected ? \"Added\" : \"Select\",\n                                    size: \"sm\",\n                                    intent: isThisSelected ? \"gray\" : \"primary\",\n                                    disabled: isThisSelected,\n                                    onClick: ctx.eventHandler(`inject-${i}`, () => injectSubtitle(sub))\n                                })\n                            ], { \n                                className: \"subtitle-item\",\n                                style: { padding: \"14px 20px\", borderBottom: \"3px solid rgba(255,255,255,0.08)\", alignItems: \"center\", marginTop: i === 0 ? \"8px\" : \"0\" } \n                            })\n                        }))\n                    ])\n                ], { style: { display: \"flex\", flexDirection: \"column\", height: \"100%\" } })\n            ], { style: { width: \"100%\", height: \"100%\" } })\n        })\n    })\n}",
+  "plugin": {
+    "version": "1",
+    "permissions": {
+      "scopes": [
+        "playback"
+      ],
+      "allow": {
+        "networkAccess": {
+          "allowedDomains": [
+            "https://feed.animetosho.org",
+            "https://sub.wyzie.io",
+            "https://ramregar97-idmapper.hf.space",
+            "https://jimaku.cc"
+          ],
+          "reasoning": "Fetch subtitles"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "always-advanced-search",
+  "name": "Always Advanced Search",
+  "version": "1.0.2",
+  "manifestURI": "https://raw.githubusercontent.com/SyntaxSama/advanced-search/refs/heads/main/manifest.json",
+  "language": "typescript",
+  "type": "plugin",
+  "description": "Always use advanced search instead of the basic search feature.",
+  "author": "SyntaxSama",
+  "icon": "https://raw.githubusercontent.com/SyntaxSama/advanced-search/refs/heads/main/2015046.png",
+  "website": "",
+  "lang": "en",
+  "payload": "/// <reference path=\"./plugin.d.ts\" />\n\nfunction init() {\n  $ui.register((ctx) => {\n    ctx.dom.onReady(() => {\n      ctx.dom.observe(\"div[data-headlessui-state='open']\", async (elements) => {\n        for (const el of elements) {\n          el.setProperty('className', 'hidden')\n          ctx.screen.navigateTo(\"/search\");\n        }\n      });\n    });\n  });\n}\n",
+  "payloadURI": "https://raw.githubusercontent.com/SyntaxSama/advanced-search/refs/heads/main/advsearch.ts",
+  "plugin": {
+    "version": "1",
+    "permissions": {
+      "allow": {}
+    }
+  }
+}

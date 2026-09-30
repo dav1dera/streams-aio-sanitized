@@ -16,3 +16,9 @@
 *.pem
 *.key
 *.crt
+
+# Local fresh-host provisioning marker
+/.dr-fresh-target.json
+
+# Optional local decrypted DR input staging (prefer outside the clone)
+/.private-dr/

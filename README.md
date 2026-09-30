@@ -17,18 +17,17 @@ Headscale, Headplane, Jackett and Seanime configuration remains owned by the
 applications. The Agent must not continuously overwrite their live files.
 `config/private-config-overlays.json` describes the approved private fields.
 Headscale/Headplane examples preserve public YAML defaults and use explicit
-Infisical references. Extension implementation code, instance identities,
-application data and existing private configs are intentionally absent.
-For a fresh installation, supply upstream config skeletons and apply the
-private overlays once before the config files exist. Never use this operation
-to overwrite an initialized deployment.
+Infisical references. Reviewed extension implementation code and declarative skeletons are under
+`config/dr-templates/`. Recovered template security reviews are complete; required external input
+contracts are listed in the DR manifest. Runtime identities, application data and real private
+configs remain excluded. Never use fresh-host provisioning to overwrite an
+initialized deployment.
 
 ## Existing deployment
 
 Keep all current bind mounts, named and anonymous volumes, DBs, caches,
 certificates and application identities in their original locations. The
-public candidate is configuration source, not a runtime backup or a standalone
-fresh-install bundle. Do not replace the live deployment directory with this
+repository is configuration/bootstrap source, not a runtime backup. Do not replace the live deployment directory with this
 candidate or copy empty directories over existing data.
 
 Private runtime/config inputs must already exist before Compose validation:
@@ -43,5 +42,17 @@ Migration evidence and credential-rotation records are kept outside this
 repository. Only sanitized files belong in its independent Git history.
 
 See [fresh-deployment prerequisites](docs/BOOTSTRAP.md) before preparing a new
-installation. This repository does not include private bootstrap credentials
-or deployment-specific provisioning tools.
+installation. Private bootstrap credentials are supplied separately. The portable renderer, external private payload contracts and fresh-only
+importers are documented in the DR guide.
+
+## Disaster recovery readiness
+
+See [the DR plan](docs/DISASTER-RECOVERY.md) and `config/dr-manifest.yaml`.
+The quick-redeploy bundle initializes empty state by default; optional runtime
+backups are not prerequisites. It is **DR READY to consume the declared external inputs**, verified with
+synthetic equivalents in an isolated public archive. The only required
+runtime backup is NPM's database; TLS is reissued through NPM/Let's Encrypt and
+Cloudflare DNS-01. AIO application DB backups are optional; their logical exports are private
+DR payloads held separately, with stable identity bindings from Infisical. Existing publication
+audits do not establish deployment completeness. Do not run fresh-host
+provisioning tools against an initialized deployment.

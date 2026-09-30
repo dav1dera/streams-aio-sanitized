@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "aiostreams": [
+    {
+      "profile": "primary",
+      "version": "2.35.3",
+      "export": {
+        "REPLACE_WITH_OFFICIAL_PRIVATE_EXPORT": true
+      },
+      "bindings": [],
+      "dependencies": [],
+      "reauthorize": [],
+      "linked_accounts": "reauthorize"
+    }
+  ],
+  "aiometadata": [
+    {
+      "profile": "primary",
+      "version": "3.3.0",
+      "export": {
+        "version": "3.3.0",
+        "config": {
+          "REPLACE_WITH_OFFICIAL_PRIVATE_CONFIG": true
+        },
+        "metadata": {}
+      },
+      "bindings": [],
+      "dependencies": [],
+      "reauthorize": []
+    }
+  ]
+}

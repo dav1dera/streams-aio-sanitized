@@ -1,0 +1,15 @@
+{
+  "aiostreams": {
+    "primary": {
+      "uuid": "",
+      "password": ""
+    }
+  },
+  "aiometadata": {
+    "primary": {
+      "uuid": "",
+      "password": "",
+      "trusted": false
+    }
+  }
+}

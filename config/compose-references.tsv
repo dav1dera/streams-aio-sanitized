@@ -1,0 +1,251 @@
+SERVICE	REFERENCE	TYPE	SOURCE	RESTORE_METHOD	RESOLVED	DETAIL
+tailscale	data/tailscale/.env	ENV_FILE	data/tailscale/.env	TRACKED_PUBLIC	True	-
+tailscale	.secrets/tailscale.env	ENV_FILE	.secrets/tailscale.env	INFISICAL_AGENT_RENDER	True	-
+tailscale	/var/lib/tailscale	BIND_MOUNT	data/tailscale/data/state	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+tailscale	/dev/net/tun	HOST_PREREQUISITE	/dev/net/tun	BOOTSTRAP_GENERATED	True	Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.
+tailscale	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:tailscale/tailscale:latest	IMAGE_INTERNAL	True	-
+tailscale	device:/dev/net/tun	HOST_PREREQUISITE	/dev/net/tun	BOOTSTRAP_GENERATED	True	Existing host device; never generated as a regular file.
+portainer	data/portainer/.env	ENV_FILE	data/portainer/.env	TRACKED_PUBLIC	True	-
+portainer	/data	NAMED_VOLUME	volume:portainer-data	DOCKER_NAMED_VOLUME	True	-
+portainer	/var/run/docker.sock	HOST_PREREQUISITE	/var/run/docker.sock	BOOTSTRAP_GENERATED	True	Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.
+portainer	INFISICAL_PORTAINER_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+dnscrypt-proxy	data/dnscrypt-proxy/.env	ENV_FILE	data/dnscrypt-proxy/.env	TRACKED_PUBLIC	True	-
+dnscrypt-proxy	/config	BIND_MOUNT	data/dnscrypt-proxy/data	BOOTSTRAP_GENERATED	True	-
+dnscrypt-proxy	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:klutchell/dnscrypt-proxy:latest	IMAGE_INTERNAL	True	-
+dnscrypt-proxy	INFISICAL_DNSCRYPT_PROXY_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+headscale	/etc/headscale	BIND_MOUNT	data/headscale/data/config	BOOTSTRAP_GENERATED	True	-
+headscale	/var/lib/headscale	BIND_MOUNT	data/headscale/data/lib	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+headscale	/var/run/headscale	BIND_MOUNT	data/headscale/data/run	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+headscale	command	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:headscale/headscale:stable	IMAGE_INTERNAL	True	-
+headscale	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:headscale/headscale:stable	IMAGE_INTERNAL	True	-
+headscale	INFISICAL_HEADSCALE_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+headplane	/etc/headplane/config.yaml	BIND_MOUNT	data/headplane/data/config.yaml	BOOTSTRAP_GENERATED	True	-
+headplane	/var/lib/headplane	BIND_MOUNT	data/headplane/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+headplane	/etc/headscale/config.yaml	BIND_MOUNT	data/headscale/data/config/config.yaml	BOOTSTRAP_GENERATED	True	-
+headplane	/var/run/docker.sock	HOST_PREREQUISITE	/var/run/docker.sock	BOOTSTRAP_GENERATED	True	Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.
+headplane	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:ghcr.io/tale/headplane:latest	IMAGE_INTERNAL	True	-
+headplane	INFISICAL_HEADPLANE_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+npm	data/npm/.env	ENV_FILE	data/npm/.env	TRACKED_PUBLIC	True	-
+npm	/data	BIND_MOUNT	data/npm/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+npm	/etc/letsencrypt	BIND_MOUNT	data/npm/data/letsencrypt	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+npm	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:jc21/nginx-proxy-manager:latest	IMAGE_INTERNAL	True	-
+npm	INFISICAL_NPM_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+npm	INFISICAL_NPM_NETWORK_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+cloudflare-ddns	data/cloudflare-ddns/.env	ENV_FILE	data/cloudflare-ddns/.env	TRACKED_PUBLIC	True	-
+cloudflare-ddns	.secrets/cloudflare-ddns.env	ENV_FILE	.secrets/cloudflare-ddns.env	INFISICAL_AGENT_RENDER	True	-
+cloudflare-ddns	INFISICAL_STACK_CLOUDFLARE_DDNS_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+aiometadata	data/aiometadata/.env	ENV_FILE	data/aiometadata/.env	TRACKED_PUBLIC	True	-
+aiometadata	.secrets/aiometadata.env	ENV_FILE	.secrets/aiometadata.env	INFISICAL_AGENT_RENDER	True	Required declarative input contract is explicit; fresh rendering fails closed when a value is missing. No Infisical provisioning is claimed by source readiness.
+aiometadata	/app/addon/data	BIND_MOUNT	data/aiometadata/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+aiometadata	INFISICAL_STACK_AIOMETADATA_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+aiometadata	INFISICAL_STACK_AIOMETADATA_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+mediaflow-proxy-light	data/mediaflow-proxy-light/.env	ENV_FILE	data/mediaflow-proxy-light/.env	TRACKED_PUBLIC	True	-
+mediaflow-proxy-light	.secrets/mediaflow-proxy-light.env	ENV_FILE	.secrets/mediaflow-proxy-light.env	INFISICAL_AGENT_RENDER	True	-
+mediaflow-proxy-light	INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+mediaflow-proxy-light	INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+aiostreams	data/aiostreams/.env	ENV_FILE	data/aiostreams/.env	TRACKED_PUBLIC	True	-
+aiostreams	.secrets/aiostreams.env	ENV_FILE	.secrets/aiostreams.env	INFISICAL_AGENT_RENDER	True	Required declarative input contract is explicit; fresh rendering fails closed when a value is missing. No Infisical provisioning is claimed by source readiness.
+aiostreams	/app/data	BIND_MOUNT	data/aiostreams/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+aiostreams	INFISICAL_STACK_AIOSTREAMS_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+aiostreams	INFISICAL_STACK_AIOSTREAMS_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+pgbouncer	data/pgbouncer/.env	ENV_FILE	data/pgbouncer/.env	TRACKED_PUBLIC	True	-
+pgbouncer	.secrets/pgbouncer.env	ENV_FILE	.secrets/pgbouncer.env	INFISICAL_AGENT_RENDER	True	-
+pgbouncer	/etc/pgbouncer/pgbouncer.ini	BIND_MOUNT	data/pgbouncer/data/pgbouncer.ini	BOOTSTRAP_GENERATED	True	-
+pgbouncer	/etc/pgbouncer/userlist.txt	BIND_MOUNT	.generated/pgbouncer/userlist.txt	BOOTSTRAP_GENERATED	True	-
+pgbouncer	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:edoburu/pgbouncer:latest	IMAGE_INTERNAL	True	-
+pgbouncer	INFISICAL_STACK_PGBOUNCER_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+pgbouncer	INFISICAL_STACK_PGBOUNCER_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+postgres	data/postgres/.env	ENV_FILE	data/postgres/.env	TRACKED_PUBLIC	True	-
+postgres	.secrets/postgres.env	ENV_FILE	.secrets/postgres.env	INFISICAL_AGENT_RENDER	True	-
+postgres	/docker-entrypoint-initdb.d	BIND_MOUNT	data/postgres/init	BOOTSTRAP_GENERATED	True	-
+postgres	/var/lib/postgresql/data	NAMED_VOLUME	volume:pgdata	DOCKER_NAMED_VOLUME	True	-
+postgres	/var/lib/postgresql/data/postgresql.conf	BIND_MOUNT	data/postgres/postgresql.conf	TRACKED_PUBLIC	True	-
+postgres	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:postgres:18-alpine	IMAGE_INTERNAL	True	-
+postgres	INFISICAL_STACK_POSTGRES_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+postgres	INFISICAL_STACK_POSTGRES_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+redis	/data	NAMED_VOLUME	volume:redis-data	DOCKER_NAMED_VOLUME	True	-
+redis	command	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:redis:latest	IMAGE_INTERNAL	True	-
+redis	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:redis:latest	IMAGE_INTERNAL	True	-
+redis	INFISICAL_REDIS_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+redis	INFISICAL_REDIS_NETWORK_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+watchtower	data/watchtower/.env	ENV_FILE	data/watchtower/.env	TRACKED_PUBLIC	True	-
+watchtower	/var/run/docker.sock	HOST_PREREQUISITE	/var/run/docker.sock	BOOTSTRAP_GENERATED	True	Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.
+watchtower	/config.json	BIND_MOUNT	.generated/watchtower/config.json	BOOTSTRAP_GENERATED	True	-
+watchtower	INFISICAL_STACK_WATCHTOWER_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+honey	/app/dist/config	BIND_MOUNT	data/honey/data/config	BOOTSTRAP_GENERATED	True	-
+honey	INFISICAL_HONEY_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+teamspeak	data/teamspeak/.env	ENV_FILE	data/teamspeak/.env	TRACKED_PUBLIC	True	-
+teamspeak	/var/tsserver	NAMED_VOLUME	volume:teamspeak-data	DOCKER_NAMED_VOLUME	True	-
+teamspeak	INFISICAL_TEAMSPEAK_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+microwarp	/etc/wireguard	NAMED_VOLUME	volume:warp-data	DOCKER_NAMED_VOLUME	True	-
+microwarp	INFISICAL_MICROWARP_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+gost	command	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:gogost/gost:latest	IMAGE_INTERNAL	True	-
+gost	INFISICAL_GOST_COMMAND_ARG_1	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+gost	INFISICAL_GOST_NETWORK_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+gost	INFISICAL_GOST_NETWORK_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+oauth2-proxy	data/oauth2-proxy/.env	ENV_FILE	data/oauth2-proxy/.env	TRACKED_PUBLIC	True	-
+oauth2-proxy	.secrets/oauth2-proxy.env	ENV_FILE	.secrets/oauth2-proxy.env	INFISICAL_AGENT_RENDER	True	-
+oauth2-proxy	/etc/oauth2-proxy/allowed-emails.txt	BIND_MOUNT	data/oauth2-proxy/allowed-emails.txt	BOOTSTRAP_GENERATED	True	Required declarative input contract is explicit; fresh rendering fails closed when a value is missing. No Infisical provisioning is claimed by source readiness.
+oauth2-proxy	INFISICAL_STACK_OAUTH2_PROXY_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+easyproxy	data/easyproxy/.env	ENV_FILE	data/easyproxy/.env	TRACKED_PUBLIC	True	-
+easyproxy	.secrets/easyproxy.env	ENV_FILE	.secrets/easyproxy.env	INFISICAL_AGENT_RENDER	True	-
+easyproxy	/data	BIND_MOUNT	data/easyproxy/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+easyproxy	INFISICAL_STACK_EASYPROXY_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+easyproxy	INFISICAL_STACK_EASYPROXY_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+streamvix	data/streamvix/.env	ENV_FILE	data/streamvix/.env	TRACKED_PUBLIC	True	-
+streamvix	.secrets/streamvix.env	ENV_FILE	.secrets/streamvix.env	INFISICAL_AGENT_RENDER	True	-
+streamvix	INFISICAL_STACK_STREAMVIX_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+streamvix	INFISICAL_STACK_STREAMVIX_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+tvvoo	data/tvvoo/.env	ENV_FILE	data/tvvoo/.env	TRACKED_PUBLIC	True	-
+tvvoo	.secrets/tvvoo.env	ENV_FILE	.secrets/tvvoo.env	INFISICAL_AGENT_RENDER	True	-
+tvvoo	INFISICAL_STACK_TVVOO_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+tvvoo	INFISICAL_STACK_TVVOO_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+aiomanager	data/aiomanager/.env	ENV_FILE	data/aiomanager/.env	TRACKED_PUBLIC	True	-
+aiomanager	.secrets/aiomanager.env	ENV_FILE	.secrets/aiomanager.env	INFISICAL_AGENT_RENDER	True	-
+aiomanager	/app/data	BIND_MOUNT	data/aiomanager/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+aiomanager	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:ghcr.io/sonicx161/aiomanager:beta	IMAGE_INTERNAL	True	-
+aiomanager	INFISICAL_STACK_AIOMANAGER_DEFAULT_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+deunhealth	data/deunhealth/.env	ENV_FILE	data/deunhealth/.env	TRACKED_PUBLIC	True	-
+deunhealth	/var/run/docker.sock	HOST_PREREQUISITE	/var/run/docker.sock	BOOTSTRAP_GENERATED	True	Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.
+gluetun	data/gluetun/.env	ENV_FILE	data/gluetun/.env	TRACKED_PUBLIC	True	-
+gluetun	.secrets/gluetun.env	ENV_FILE	.secrets/gluetun.env	INFISICAL_AGENT_RENDER	True	-
+gluetun	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:qmcgaw/gluetun:latest	IMAGE_INTERNAL	True	-
+gluetun	device:/dev/net/tun	HOST_PREREQUISITE	/dev/net/tun	BOOTSTRAP_GENERATED	True	Existing host device; never generated as a regular file.
+gluetun	INFISICAL_STACK_GLUETUN_VPN_NET_IPV4_ADDRESS	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+comet	data/comet/.env	ENV_FILE	data/comet/.env	TRACKED_PUBLIC	True	-
+comet	.secrets/comet.env	ENV_FILE	.secrets/comet.env	INFISICAL_AGENT_RENDER	True	-
+comet	/app/data	BIND_MOUNT	data/comet/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+cometnet	data/cometnet/.env	ENV_FILE	data/cometnet/.env	TRACKED_PUBLIC	True	-
+cometnet	.secrets/cometnet.env	ENV_FILE	.secrets/cometnet.env	INFISICAL_AGENT_RENDER	True	-
+cometnet	/app/data	BIND_MOUNT	data/comet/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+cometnet	entrypoint	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:g0ldyy/comet:latest	IMAGE_INTERNAL	True	-
+cometnet	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:g0ldyy/comet:latest	IMAGE_INTERNAL	True	-
+stremthru	data/stremthru/.env	ENV_FILE	data/stremthru/.env	TRACKED_PUBLIC	True	-
+stremthru	.secrets/stremthru.env	ENV_FILE	.secrets/stremthru.env	INFISICAL_AGENT_RENDER	True	-
+jackett	data/jackett/.env	ENV_FILE	data/jackett/.env	TRACKED_PUBLIC	True	-
+jackett	/config	BIND_MOUNT	data/jackett/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+seanime	/anime	BIND_MOUNT	data/seanime/data/main/anime	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+seanime	/downloads	BIND_MOUNT	data/seanime/data/main/downloads	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+seanime	/mnt	BIND_MOUNT	data/seanime/data/main	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+seanime	/root/.config/Seanime	BIND_MOUNT	data/seanime/data/main/config	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+seanime	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:umagistr/seanime:latest	IMAGE_INTERNAL	True	-
+seanime-shared	/anime	BIND_MOUNT	data/seanime/data/shared/anime	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+seanime-shared	/downloads	BIND_MOUNT	data/seanime/data/shared/downloads	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+seanime-shared	/mnt	BIND_MOUNT	data/seanime/data/shared	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+seanime-shared	/root/.config/Seanime	BIND_MOUNT	data/seanime/data/shared/config	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+seanime-shared	healthcheck	IMAGE_EXECUTABLE_OR_ARGUMENTS	image:umagistr/seanime:latest	IMAGE_INTERNAL	True	-
+stack-network	INFISICAL_STACK_DEFAULT_SUBNET	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+stack-network	INFISICAL_STACK_VPN_NET_SUBNET	COMPOSE_INTERPOLATION	.env	INFISICAL_AGENT_RENDER	True	-
+postgres	/var/lib/postgresql	IMAGE_PERSISTENT_VOLUME	volume:postgres-cluster	DOCKER_NAMED_VOLUME	True	Compose creates empty named storage; restoring prior contents is optional.
+stremthru	/app/data	IMAGE_PERSISTENT_VOLUME	volume:stremthru-data	DOCKER_NAMED_VOLUME	True	Compose creates empty named storage; restoring prior contents is optional.
+pgbouncer	.generated/pgbouncer/userlist.txt	GENERATED_CONFIG	.generated/pgbouncer/userlist.txt	BOOTSTRAP_GENERATED	True	-
+watchtower	.generated/watchtower/config.json	GENERATED_CONFIG	.generated/watchtower/config.json	BOOTSTRAP_GENERATED	True	-
+dnscrypt-proxy	data/dnscrypt-proxy/data/dnscrypt-proxy.toml	GENERATED_CONFIG	data/dnscrypt-proxy/data/dnscrypt-proxy.toml	BOOTSTRAP_GENERATED	True	-
+dnscrypt-proxy	template:data/dnscrypt-proxy/data/dnscrypt-proxy.toml	CONFIG_TEMPLATE	config/dr-templates/dnscrypt-proxy/data/dnscrypt-proxy.toml.template	TRACKED_SANITIZED_TEMPLATE	True	-
+easyproxy	data/easyproxy/data/config.json	GENERATED_CONFIG	data/easyproxy/data/config.json	BOOTSTRAP_GENERATED	True	-
+easyproxy	template:data/easyproxy/data/config.json	CONFIG_TEMPLATE	config/dr-templates/easyproxy/data/config.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+headplane	data/headplane/data/config.yaml	GENERATED_CONFIG	data/headplane/data/config.yaml	BOOTSTRAP_GENERATED	True	-
+headplane	template:data/headplane/data/config.yaml	CONFIG_TEMPLATE	config/dr-templates/headplane/data/config.yaml.template	TRACKED_SANITIZED_TEMPLATE	True	-
+headscale	data/headscale/data/config/config.yaml	GENERATED_CONFIG	data/headscale/data/config/config.yaml	BOOTSTRAP_GENERATED	True	-
+headscale	template:data/headscale/data/config/config.yaml	CONFIG_TEMPLATE	config/dr-templates/headscale/data/config/config.yaml.template	TRACKED_SANITIZED_TEMPLATE	True	-
+honey	data/honey/data/config/config.json	GENERATED_CONFIG	data/honey/data/config/config.json	BOOTSTRAP_GENERATED	True	-
+honey	template:data/honey/data/config/config.json	CONFIG_TEMPLATE	config/dr-templates/honey/data/config/config.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+jackett	data/jackett/data/Jackett/Indexers/animetosho-xyz.json	GENERATED_CONFIG	data/jackett/data/Jackett/Indexers/animetosho-xyz.json	BOOTSTRAP_GENERATED	True	-
+jackett	template:data/jackett/data/Jackett/Indexers/animetosho-xyz.json	CONFIG_TEMPLATE	config/dr-templates/jackett/data/Jackett/Indexers/animetosho-xyz.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+jackett	data/jackett/data/Jackett/Indexers/knaben.json	GENERATED_CONFIG	data/jackett/data/Jackett/Indexers/knaben.json	BOOTSTRAP_GENERATED	True	-
+jackett	template:data/jackett/data/Jackett/Indexers/knaben.json	CONFIG_TEMPLATE	config/dr-templates/jackett/data/Jackett/Indexers/knaben.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+jackett	data/jackett/data/Jackett/Indexers/nyaasi.json	GENERATED_CONFIG	data/jackett/data/Jackett/Indexers/nyaasi.json	BOOTSTRAP_GENERATED	True	-
+jackett	template:data/jackett/data/Jackett/Indexers/nyaasi.json	CONFIG_TEMPLATE	config/dr-templates/jackett/data/Jackett/Indexers/nyaasi.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+jackett	data/jackett/data/Jackett/Indexers/thepiratebay.json	GENERATED_CONFIG	data/jackett/data/Jackett/Indexers/thepiratebay.json	BOOTSTRAP_GENERATED	True	-
+jackett	template:data/jackett/data/Jackett/Indexers/thepiratebay.json	CONFIG_TEMPLATE	config/dr-templates/jackett/data/Jackett/Indexers/thepiratebay.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+jackett	data/jackett/data/Jackett/Indexers/therarbg.json	GENERATED_CONFIG	data/jackett/data/Jackett/Indexers/therarbg.json	BOOTSTRAP_GENERATED	True	-
+jackett	template:data/jackett/data/Jackett/Indexers/therarbg.json	CONFIG_TEMPLATE	config/dr-templates/jackett/data/Jackett/Indexers/therarbg.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+jackett	data/jackett/data/Jackett/ServerConfig.json	GENERATED_CONFIG	data/jackett/data/Jackett/ServerConfig.json	BOOTSTRAP_GENERATED	True	-
+jackett	template:data/jackett/data/Jackett/ServerConfig.json	CONFIG_TEMPLATE	config/dr-templates/jackett/data/Jackett/ServerConfig.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+pgbouncer	data/pgbouncer/data/pgbouncer.ini	GENERATED_CONFIG	data/pgbouncer/data/pgbouncer.ini	BOOTSTRAP_GENERATED	True	-
+pgbouncer	template:data/pgbouncer/data/pgbouncer.ini	CONFIG_TEMPLATE	config/dr-templates/pgbouncer/data/pgbouncer.ini.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/config.toml	GENERATED_CONFIG	data/seanime/data/main/config/config.toml	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/config.toml	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/config.toml.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/aiostreams-plugin.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/aiostreams-plugin.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/aiostreams-plugin.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/aiostreams-plugin.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/always-advanced-search.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/always-advanced-search.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/always-advanced-search.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/always-advanced-search.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/anilist-watch-order.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/anilist-watch-order.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/anilist-watch-order.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/anilist-watch-order.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/animetosho-new.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/animetosho-new.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/animetosho-new.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/animetosho-new.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/aq-anikoto.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/aq-anikoto.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/aq-anikoto.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/aq-anikoto.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/aq-animepahe-beta.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/aq-animepahe-beta.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/aq-animepahe-beta.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/aq-animepahe-beta.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/episodeshistory.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/episodeshistory.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/episodeshistory.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/episodeshistory.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/mangabuddy.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/mangabuddy.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/mangabuddy.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/mangabuddy.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/mangadex.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/mangadex.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/mangadex.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/mangadex.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/mangafreak.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/mangafreak.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/mangafreak.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/mangafreak.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/mangaworld.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/mangaworld.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/mangaworld.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/mangaworld.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/setwatched.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/setwatched.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/setwatched.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/setwatched.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime	data/seanime/data/main/config/extensions/subtitle-engine.json	GENERATED_CONFIG	data/seanime/data/main/config/extensions/subtitle-engine.json	BOOTSTRAP_GENERATED	True	-
+seanime	template:data/seanime/data/main/config/extensions/subtitle-engine.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/main/config/extensions/subtitle-engine.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/config.toml	GENERATED_CONFIG	data/seanime/data/shared/config/config.toml	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/config.toml	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/config.toml.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/AnimeUnity.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/AnimeUnity.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/AnimeUnity.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/AnimeUnity.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/Watch-Next.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/Watch-Next.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/Watch-Next.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/Watch-Next.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/aiostreams-plugin.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/aiostreams-plugin.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/aiostreams-plugin.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/aiostreams-plugin.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/always-advanced-search.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/always-advanced-search.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/always-advanced-search.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/always-advanced-search.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/anidream.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/anidream.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/anidream.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/anidream.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/animesaturn.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/animesaturn.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/animesaturn.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/animesaturn.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/animesaturnmirror.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/animesaturnmirror.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/animesaturnmirror.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/animesaturnmirror.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/animetosho-new.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/animetosho-new.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/animetosho-new.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/animetosho-new.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/animeunitymirror.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/animeunitymirror.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/animeunitymirror.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/animeunitymirror.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/animeworld.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/animeworld.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/animeworld.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/animeworld.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/aq-anikoto.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/aq-anikoto.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/aq-anikoto.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/aq-anikoto.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/custom-banner-images.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/custom-banner-images.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/custom-banner-images.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/custom-banner-images.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/episodeshistory.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/episodeshistory.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/episodeshistory.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/episodeshistory.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/picked-for-you.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/picked-for-you.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/picked-for-you.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/picked-for-you.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/setwatched.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/setwatched.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/setwatched.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/setwatched.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/subtitle-engine.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/subtitle-engine.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/subtitle-engine.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/subtitle-engine.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+seanime-shared	data/seanime/data/shared/config/extensions/watch-order.json	GENERATED_CONFIG	data/seanime/data/shared/config/extensions/watch-order.json	BOOTSTRAP_GENERATED	True	-
+seanime-shared	template:data/seanime/data/shared/config/extensions/watch-order.json	CONFIG_TEMPLATE	config/dr-templates/seanime/data/shared/config/extensions/watch-order.json.template	TRACKED_SANITIZED_TEMPLATE	True	-
+oauth2-proxy	data/oauth2-proxy/allowed-emails.txt	GENERATED_CONFIG	data/oauth2-proxy/allowed-emails.txt	BOOTSTRAP_GENERATED	True	Required declarative input contract is explicit; fresh rendering fails closed when a value is missing. No Infisical provisioning is claimed by source readiness.
+postgres	data/postgres/init/init.sql	FRESH_CLUSTER_BOOTSTRAP	data/postgres/init/init.sql	BOOTSTRAP_GENERATED	True	-
+postgres	template:init.sql	CONFIG_TEMPLATE	config/dr-templates/postgres/init.sql.template	TRACKED_SANITIZED_TEMPLATE	True	-
+aiometadata	DATABASE_URI	ENV_RUNTIME_FILE	data/aiometadata/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+aiostreams	DATABASE_URI	ENV_RUNTIME_FILE	data/aiostreams/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+comet	PUBLIC_API_TOKEN_FILE	ENV_RUNTIME_FILE	data/comet/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+easyproxy	CONFIG_DIR	ENV_RUNTIME_FILE	data/easyproxy/data	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+oauth2-proxy	OAUTH2_PROXY_AUTHENTICATED_EMAILS_FILE	ENV_IMAGE_PATH	container:/etc/oauth2-proxy/allowed-emails.txt	IMAGE_INTERNAL	True	-
+tailscale	TS_STATE_DIR	ENV_RUNTIME_FILE	data/tailscale/data/state	BOOTSTRAP_GENERATED	True	Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup.
+tvvoo	PROXY_PATH	ENV_IMAGE_PATH	container:/proxy/hls/manifest.m3u8	IMAGE_INTERNAL	True	-
+npm	minimal required NPM database	REQUIRED_USER_STATE	data/npm/data/database.sqlite	RUNTIME_BACKUP_RESTORE	True	-
+npm	TLS reissuance helper	BOOTSTRAP_SCRIPT	scripts/npm-dr.py	TRACKED_PUBLIC	True	-
+npm	NPM certificate/association implementation	BOOTSTRAP_SCRIPT	scripts/npm-dr-helper.mjs	TRACKED_PUBLIC	True	-
+aiostreams	logical config export/import with fixed identity bindings	LOGICAL_EXPORT_BOOTSTRAP	scripts/aio-dr.py	BOOTSTRAP_GENERATED	True	Consumes an external PRIVATE_DR_PAYLOAD plus /dr/AIO_PROFILE_BINDINGS; no whole runtime database required.
+aiometadata	logical user config export/import with fixed identity bindings	LOGICAL_EXPORT_BOOTSTRAP	scripts/aio-dr.py	BOOTSTRAP_GENERATED	True	Consumes an external PRIVATE_DR_PAYLOAD plus /dr/AIO_PROFILE_BINDINGS; no whole runtime database required.
+aiostreams	logical import schema	BOOTSTRAP_SCHEMA	config/dr-templates/aio/aiostreams-bootstrap.sql	TRACKED_SANITIZED_TEMPLATE	True	-
+aiometadata	logical import schema	BOOTSTRAP_SCHEMA	config/dr-templates/aio/aiometadata-bootstrap.sql	TRACKED_SANITIZED_TEMPLATE	True	-

@@ -1,0 +1,20 @@
+[databases]
+comet = host=postgres port=5432 dbname=comet pool_size=32 max_db_connections=40
+stremthru = host=postgres port=5432 dbname=stremthru pool_size=16 max_db_connections=24
+aiomanager = host=postgres port=5432 dbname=aiomanager pool_size=8 max_db_connections=12
+
+
+[pgbouncer]
+listen_addr = 0.0.0.0
+listen_port = 6432
+auth_type = scram-sha-256
+auth_file = /etc/pgbouncer/userlist.txt
+pool_mode = transaction
+max_client_conn = 700
+default_pool_size = 16
+reserve_pool_size = 4
+reserve_pool_timeout= 5
+max_db_connections = 0
+client_idle_timeout = 360
+server_idle_timeout = 120
+query_wait_timeout = 60

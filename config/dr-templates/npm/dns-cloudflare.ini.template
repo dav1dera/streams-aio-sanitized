@@ -1,0 +1,1 @@
+dns_cloudflare_api_token = @@INFISICAL:/shared/CLOUDFLARE_API_TOKEN@@

@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PRIVATE_DR_PAYLOAD logical export bundle",
+  "type": "object",
+  "required": [
+    "schema",
+    "aiostreams",
+    "aiometadata"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": 1
+    },
+    "aiostreams": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profile",
+          "version",
+          "export",
+          "bindings",
+          "dependencies",
+          "reauthorize",
+          "linked_accounts"
+        ],
+        "properties": {
+          "profile": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+          },
+          "version": {
+            "const": "2.35.3"
+          },
+          "export": {
+            "type": "object",
+            "minProperties": 1
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pointer",
+                "ref"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "pointer": {
+                  "type": "string",
+                  "pattern": "^/"
+                },
+                "ref": {
+                  "type": "string",
+                  "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                },
+                "encoding": {
+                  "enum": [
+                    "string",
+                    "json"
+                  ]
+                }
+              }
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pointer",
+                "service",
+                "profile",
+                "field"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "pointer": {
+                  "type": "string",
+                  "pattern": "^/"
+                },
+                "service": {
+                  "enum": [
+                    "aiostreams",
+                    "aiometadata"
+                  ]
+                },
+                "profile": {
+                  "type": "string"
+                },
+                "field": {
+                  "enum": [
+                    "uuid",
+                    "password",
+                    "alias"
+                  ]
+                }
+              }
+            }
+          },
+          "reauthorize": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "provider",
+                "remove_pointers"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "provider": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+                },
+                "remove_pointers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^/"
+                  },
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          "linked_accounts": {
+            "const": "reauthorize"
+          }
+        }
+      }
+    },
+    "aiometadata": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profile",
+          "version",
+          "export",
+          "bindings",
+          "dependencies",
+          "reauthorize"
+        ],
+        "properties": {
+          "profile": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+          },
+          "version": {
+            "const": "3.3.0"
+          },
+          "export": {
+            "type": "object",
+            "required": [
+              "version",
+              "config",
+              "metadata"
+            ],
+            "properties": {
+              "version": {
+                "const": "3.3.0"
+              },
+              "config": {
+                "type": "object",
+                "minProperties": 1
+              },
+              "metadata": {
+                "type": "object"
+              }
+            }
+          },
+          "bindings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pointer",
+                "ref"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "pointer": {
+                  "type": "string",
+                  "pattern": "^/"
+                },
+                "ref": {
+                  "type": "string",
+                  "pattern": "^/[a-z0-9/-]+/[A-Z][A-Z0-9_]*$"
+                },
+                "encoding": {
+                  "enum": [
+                    "string",
+                    "json"
+                  ]
+                }
+              }
+            }
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "pointer",
+                "service",
+                "profile",
+                "field"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "pointer": {
+                  "type": "string",
+                  "pattern": "^/"
+                },
+                "service": {
+                  "enum": [
+                    "aiostreams",
+                    "aiometadata"
+                  ]
+                },
+                "profile": {
+                  "type": "string"
+                },
+                "field": {
+                  "enum": [
+                    "uuid",
+                    "password",
+                    "alias"
+                  ]
+                }
+              }
+            }
+          },
+          "reauthorize": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "provider",
+                "remove_pointers"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "provider": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+                },
+                "remove_pointers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^/"
+                  },
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          "linked_accounts": {
+            "const": "reauthorize"
+          }
+        }
+      }
+    }
+  }
+}

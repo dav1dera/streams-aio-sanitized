@@ -1,0 +1,56 @@
+[
+  {
+    "id": "sitelink",
+    "type": "inputstring",
+    "name": "Site Link",
+    "value": "https://animetosho.xyz/"
+  },
+  {
+    "id": "cookieheader",
+    "type": "hiddendata",
+    "name": "CookieHeader",
+    "value": ""
+  },
+  {
+    "id": "lasterror",
+    "type": "hiddendata",
+    "name": "LastError",
+    "value": ""
+  },
+  {
+    "id": "apikey",
+    "type": "inputstring",
+    "name": "API Key",
+    "value": "@@INFISICAL:/jackett/ANIMETOSHO_XYZ_API_KEY@@"
+  },
+  {
+    "id": "apiurl",
+    "type": "inputstring",
+    "name": "API URL",
+    "value": "feed.animetosho.xyz"
+  },
+  {
+    "id": "improvesonarrcompatibilitybytryingtoaddseasoninformationintoreleasetitles",
+    "type": "inputbool",
+    "name": "Improve Sonarr compatibility by trying to add Season information into Release Titles",
+    "value": false
+  },
+  {
+    "id": "removefirstseasonkeywords(s1/s01/season1),assomeresultsdonotincludethisforfirst/singleseasonreleases",
+    "type": "inputbool",
+    "name": "Remove first season keywords (S1/S01/Season 1), as some results do not include this for first/single season releases",
+    "value": false
+  },
+  {
+    "id": "improveradarrcompatibilitybyremovingyearinformationfromkeywordsandaddingittoreleasetitles",
+    "type": "inputbool",
+    "name": "Improve Radarr compatibility by removing year information from keywords and adding it to Release Titles",
+    "value": false
+  },
+  {
+    "id": "tags",
+    "type": "inputtags",
+    "name": "Tags",
+    "value": ""
+  }
+]

@@ -1,0 +1,3 @@
+-- Generated only for an EMPTY PostgreSQL cluster. Never run against an existing DB.
+-- Role names, database names and passwords come from Infisical connection URIs.
+@@POSTGRES_ROLES_AND_DATABASES@@

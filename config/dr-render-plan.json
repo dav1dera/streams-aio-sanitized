@@ -1,0 +1,1330 @@
+{
+  "schema": 1,
+  "env_files": {
+    ".secrets/aiomanager.env": {
+      "DATABASE_URL": {
+        "path": "/aiomanager",
+        "key": "DATABASE_URL"
+      }
+    },
+    ".secrets/cloudflare-ddns.env": {
+      "CLOUDFLARE_API_TOKEN": {
+        "path": "/shared",
+        "key": "CLOUDFLARE_API_TOKEN"
+      },
+      "DOMAINS": {
+        "path": "/cloudflare-ddns",
+        "key": "DOMAINS"
+      }
+    },
+    ".secrets/easyproxy.env": {
+      "API_PASSWORD": {
+        "path": "/shared",
+        "key": "PROXY_PASSWORD"
+      }
+    },
+    ".secrets/oauth2-proxy.env": {
+      "OAUTH2_PROXY_CLIENT_ID": {
+        "path": "/oauth2-proxy",
+        "key": "OAUTH2_PROXY_CLIENT_ID"
+      },
+      "OAUTH2_PROXY_CLIENT_SECRET": {
+        "path": "/oauth2-proxy",
+        "key": "OAUTH2_PROXY_CLIENT_SECRET"
+      },
+      "OAUTH2_PROXY_COOKIE_SECRET": {
+        "path": "/oauth2-proxy",
+        "key": "OAUTH2_PROXY_COOKIE_SECRET"
+      },
+      "OAUTH2_PROXY_REDIRECT_URL": {
+        "path": "/oauth2-proxy",
+        "key": "OAUTH2_PROXY_REDIRECT_URL"
+      },
+      "OAUTH2_PROXY_REDIS_CONNECTION_URL": {
+        "path": "/oauth2-proxy",
+        "key": "OAUTH2_PROXY_REDIS_CONNECTION_URL"
+      },
+      "OAUTH2_PROXY_TRUSTED_PROXY_IPS": {
+        "path": "/oauth2-proxy",
+        "key": "OAUTH2_PROXY_TRUSTED_PROXY_IPS"
+      },
+      "OAUTH2_PROXY_UPSTREAMS": {
+        "path": "/oauth2-proxy",
+        "key": "OAUTH2_PROXY_UPSTREAMS"
+      },
+      "OAUTH2_PROXY_WHITELIST_DOMAINS": {
+        "path": "/oauth2-proxy",
+        "key": "OAUTH2_PROXY_WHITELIST_DOMAINS"
+      }
+    },
+    ".secrets/streamvix.env": {
+      "ADDON_BASE_URL": {
+        "path": "/streamvix",
+        "key": "ADDON_BASE_URL"
+      },
+      "MFP_PSW": {
+        "path": "/shared",
+        "key": "PROXY_PASSWORD"
+      },
+      "MFP_URL": {
+        "path": "/streamvix",
+        "key": "MFP_URL"
+      },
+      "PROXY": {
+        "path": "/streamvix",
+        "key": "PROXY"
+      },
+      "PROXY_BACKUP": {
+        "path": "/streamvix",
+        "key": "PROXY_BACKUP"
+      },
+      "TMDB_API_KEY": {
+        "path": "/shared",
+        "key": "TMDB_API_KEY"
+      }
+    },
+    ".secrets/tvvoo.env": {
+      "PROXY_BASE_URL": {
+        "path": "/tvvoo",
+        "key": "PROXY_BASE_URL"
+      },
+      "PROXY_PASSWORD": {
+        "path": "/shared",
+        "key": "PROXY_PASSWORD"
+      }
+    },
+    ".secrets/postgres.env": {
+      "POSTGRES_PASSWORD": {
+        "path": "/shared",
+        "key": "POSTGRES_PASSWORD"
+      }
+    },
+    ".secrets/pgbouncer.env": {
+      "DB_PASSWORD": {
+        "path": "/shared",
+        "key": "POSTGRES_PASSWORD"
+      }
+    },
+    ".secrets/gluetun.env": {
+      "WIREGUARD_PRIVATE_KEY": {
+        "path": "/gluetun",
+        "key": "WIREGUARD_PRIVATE_KEY"
+      },
+      "WIREGUARD_ADDRESSES": {
+        "path": "/gluetun",
+        "key": "WIREGUARD_ADDRESSES"
+      },
+      "FIREWALL_OUTBOUND_SUBNETS": {
+        "path": "/gluetun",
+        "key": "FIREWALL_OUTBOUND_SUBNETS"
+      },
+      "SERVER_CITIES": {
+        "path": "/gluetun",
+        "key": "SERVER_CITIES"
+      }
+    },
+    ".secrets/stremthru.env": {
+      "STREMTHRU_AUTH": {
+        "path": "/stremthru",
+        "key": "STREMTHRU_AUTH"
+      },
+      "STREMTHRU_VAULT_SECRET": {
+        "path": "/stremthru",
+        "key": "STREMTHRU_VAULT_SECRET"
+      },
+      "STREMTHRU_INTEGRATION_GITHUB_TOKEN": {
+        "path": "/stremthru",
+        "key": "STREMTHRU_INTEGRATION_GITHUB_TOKEN"
+      },
+      "STREMTHRU_DATABASE_URI": {
+        "path": "/stremthru",
+        "key": "STREMTHRU_DATABASE_URI"
+      },
+      "STREMTHRU_BASE_URL": {
+        "path": "/stremthru",
+        "key": "STREMTHRU_BASE_URL"
+      },
+      "STREMTHRU_AUTH_ADMIN": {
+        "path": "/stremthru",
+        "key": "STREMTHRU_AUTH_ADMIN"
+      },
+      "STREMTHRU_INTEGRATION_GITHUB_USER": {
+        "path": "/stremthru",
+        "key": "STREMTHRU_INTEGRATION_GITHUB_USER"
+      },
+      "STREMTHRU_REDIS_URI": {
+        "path": "/stremthru",
+        "key": "STREMTHRU_REDIS_URI"
+      }
+    },
+    ".secrets/comet.env": {
+      "ADMIN_DASHBOARD_PASSWORD": {
+        "path": "/comet",
+        "key": "ADMIN_DASHBOARD_PASSWORD"
+      },
+      "CONFIGURE_PAGE_PASSWORD": {
+        "path": "/comet",
+        "key": "CONFIGURE_PAGE_PASSWORD"
+      },
+      "DATABASE_URL": {
+        "path": "/comet",
+        "key": "DATABASE_URL"
+      },
+      "MEDIAFUSION_API_PASSWORD": {
+        "path": "/comet",
+        "key": "MEDIAFUSION_API_PASSWORD"
+      },
+      "AIOSTREAMS_USER_UUID_AND_PASSWORD": {
+        "path": "/comet",
+        "key": "AIOSTREAMS_USER_UUID_AND_PASSWORD"
+      },
+      "DEBRIDIO_API_KEY": {
+        "path": "/comet",
+        "key": "DEBRIDIO_API_KEY"
+      },
+      "DEBRIDIO_PROVIDER_KEY": {
+        "path": "/comet",
+        "key": "DEBRIDIO_PROVIDER_KEY"
+      },
+      "PROXY_DEBRID_STREAM_PASSWORD": {
+        "path": "/comet",
+        "key": "PROXY_DEBRID_STREAM_PASSWORD"
+      },
+      "PROXY_DEBRID_STREAM_DEBRID_DEFAULT_APIKEY": {
+        "path": "/comet",
+        "key": "PROXY_DEBRID_STREAM_DEBRID_DEFAULT_APIKEY"
+      },
+      "ADDON_ID": {
+        "path": "/comet",
+        "key": "ADDON_ID"
+      },
+      "ADDON_NAME": {
+        "path": "/comet",
+        "key": "ADDON_NAME"
+      },
+      "TORRENTIO_PROXY_URL": {
+        "path": "/comet",
+        "key": "TORRENTIO_PROXY_URL"
+      },
+      "JACKETT_URL": {
+        "path": "/comet",
+        "key": "JACKETT_URL"
+      },
+      "COMET_URL": {
+        "path": "/comet",
+        "key": "COMET_URL"
+      },
+      "STREMTHRU_SCRAPE_URL": {
+        "path": "/comet",
+        "key": "STREMTHRU_SCRAPE_URL"
+      },
+      "BITMAGNET_URL": {
+        "path": "/comet",
+        "key": "BITMAGNET_URL"
+      },
+      "TORRENTIO_URL": {
+        "path": "/comet",
+        "key": "TORRENTIO_URL"
+      },
+      "MEDIAFUSION_URL": {
+        "path": "/comet",
+        "key": "MEDIAFUSION_URL"
+      },
+      "AIOSTREAMS_URL": {
+        "path": "/comet",
+        "key": "AIOSTREAMS_URL"
+      },
+      "JACKETTIO_URL": {
+        "path": "/comet",
+        "key": "JACKETTIO_URL"
+      },
+      "STREMTHRU_URL": {
+        "path": "/comet",
+        "key": "STREMTHRU_URL"
+      },
+      "COMETNET_RELAY_URL": {
+        "path": "/comet",
+        "key": "COMETNET_RELAY_URL"
+      },
+      "JACKETT_API_KEY": {
+        "path": "/shared",
+        "key": "JACKETT_API_KEY"
+      },
+      "PUBLIC_API_TOKEN": {
+        "path": "/shared",
+        "key": "COMET_PUBLIC_API_TOKEN"
+      },
+      "COMETNET_API_KEY": {
+        "path": "/shared",
+        "key": "COMET_PUBLIC_API_TOKEN"
+      },
+      "ZILEAN_URL": {
+        "path": "/shared",
+        "key": "ZILEAN_URL"
+      }
+    },
+    ".secrets/cometnet.env": {
+      "DATABASE_URL": {
+        "path": "/cometnet",
+        "key": "DATABASE_URL"
+      },
+      "COMETNET_BOOTSTRAP_NODES": {
+        "path": "/cometnet",
+        "key": "COMETNET_BOOTSTRAP_NODES"
+      },
+      "COMETNET_ADVERTISE_URL": {
+        "path": "/cometnet",
+        "key": "COMETNET_ADVERTISE_URL"
+      },
+      "COMETNET_NODE_ALIAS": {
+        "path": "/cometnet",
+        "key": "COMETNET_NODE_ALIAS"
+      },
+      "COMETNET_API_KEY": {
+        "path": "/shared",
+        "key": "COMET_PUBLIC_API_TOKEN"
+      }
+    },
+    ".secrets/mediaflow-proxy-light.env": {
+      "APP__PROXY__PROXY_URL": {
+        "path": "/mediaflow-proxy-light",
+        "key": "APP__PROXY__PROXY_URL"
+      },
+      "APP__PROXY__TRANSPORT_ROUTES": {
+        "path": "/mediaflow-proxy-light",
+        "key": "APP__PROXY__TRANSPORT_ROUTES"
+      },
+      "APP__REDIS__URL": {
+        "path": "/mediaflow-proxy-light",
+        "key": "APP__REDIS__URL"
+      },
+      "APP__AUTH__API_PASSWORD": {
+        "path": "/shared",
+        "key": "PROXY_PASSWORD"
+      }
+    },
+    ".secrets/tailscale.env": {
+      "TS_AUTHKEY": {
+        "path": "/tailscale",
+        "key": "TS_AUTHKEY"
+      },
+      "TS_EXTRA_ARGS": {
+        "path": "/tailscale",
+        "key": "TS_EXTRA_ARGS"
+      }
+    }
+  },
+  "service_folder_exports": {
+    ".secrets/aiometadata.env": {
+      "path": "/aiometadata",
+      "overrides": {}
+    },
+    ".secrets/aiostreams.env": {
+      "path": "/aiostreams",
+      "overrides": {
+        "BUILTIN_JACKETT_API_KEY": {
+          "path": "/shared",
+          "key": "JACKETT_API_KEY"
+        },
+        "TMDB_API_KEY": {
+          "path": "/shared",
+          "key": "TMDB_API_KEY"
+        },
+        "COMET_PUBLIC_API_TOKEN": {
+          "path": "/shared",
+          "key": "COMET_PUBLIC_API_TOKEN"
+        },
+        "BUILTIN_ZILEAN_URL": {
+          "path": "/shared",
+          "key": "ZILEAN_URL"
+        }
+      }
+    }
+  },
+  "root_env": {
+    "INFISICAL_GOST_COMMAND_ARG_1": {
+      "path": "/gost",
+      "key": "COMMAND_ARG_1"
+    },
+    "INFISICAL_GOST_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/gost",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_GOST_NETWORK_VPN_NET_IPV4_ADDRESS": {
+      "path": "/gost",
+      "key": "NETWORK_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_MICROWARP_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/microwarp",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_NPM_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/npm",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_NPM_NETWORK_VPN_NET_IPV4_ADDRESS": {
+      "path": "/npm",
+      "key": "NETWORK_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_PORTAINER_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/portainer",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_REDIS_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/redis",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_REDIS_NETWORK_VPN_NET_IPV4_ADDRESS": {
+      "path": "/redis",
+      "key": "NETWORK_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_TEAMSPEAK_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/teamspeak",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_DNSCRYPT_PROXY_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/dnscrypt-proxy",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_HONEY_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/honey",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_HEADPLANE_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/headplane",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_HEADSCALE_NETWORK_DEFAULT_IPV4_ADDRESS": {
+      "path": "/headscale",
+      "key": "NETWORK_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_DEFAULT_SUBNET": {
+      "path": "/stack-network",
+      "key": "DEFAULT_SUBNET"
+    },
+    "INFISICAL_STACK_VPN_NET_SUBNET": {
+      "path": "/stack-network",
+      "key": "VPN_NET_SUBNET"
+    },
+    "INFISICAL_STACK_CLOUDFLARE_DDNS_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "CLOUDFLARE_DDNS_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_AIOMETADATA_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "AIOMETADATA_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_AIOMETADATA_VPN_NET_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "AIOMETADATA_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "MEDIAFLOW_PROXY_LIGHT_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_VPN_NET_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "MEDIAFLOW_PROXY_LIGHT_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_AIOSTREAMS_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "AIOSTREAMS_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_AIOSTREAMS_VPN_NET_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "AIOSTREAMS_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_PGBOUNCER_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "PGBOUNCER_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_PGBOUNCER_VPN_NET_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "PGBOUNCER_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_POSTGRES_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "POSTGRES_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_POSTGRES_VPN_NET_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "POSTGRES_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_WATCHTOWER_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "WATCHTOWER_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_OAUTH2_PROXY_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "OAUTH2_PROXY_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_EASYPROXY_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "EASYPROXY_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_EASYPROXY_VPN_NET_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "EASYPROXY_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_STREAMVIX_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "STREAMVIX_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_STREAMVIX_VPN_NET_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "STREAMVIX_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_TVVOO_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "TVVOO_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_TVVOO_VPN_NET_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "TVVOO_VPN_NET_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_AIOMANAGER_DEFAULT_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "AIOMANAGER_DEFAULT_IPV4_ADDRESS"
+    },
+    "INFISICAL_STACK_GLUETUN_VPN_NET_IPV4_ADDRESS": {
+      "path": "/stack-network",
+      "key": "GLUETUN_VPN_NET_IPV4_ADDRESS"
+    }
+  },
+  "files": [
+    {
+      "destination": ".generated/pgbouncer/userlist.txt",
+      "format": "opaque",
+      "ref": "/pgbouncer/USERLIST_CONTENT",
+      "mode": "0640",
+      "owner": "root:deployment-group",
+      "app_owned": false,
+      "uid": 0,
+      "gid": 1000,
+      "named_acl": [
+        "user:70:r--",
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": ".generated/watchtower/config.json",
+      "format": "opaque",
+      "ref": "/watchtower/REGISTRY_AUTH_CONFIG",
+      "mode": "0640",
+      "owner": "root:deployment-group",
+      "app_owned": false,
+      "uid": 0,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/dnscrypt-proxy/data/dnscrypt-proxy.toml",
+      "template": "config/dr-templates/dnscrypt-proxy/data/dnscrypt-proxy.toml.template",
+      "format": "toml",
+      "app_owned": false,
+      "mode": "0640",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/easyproxy/data/config.json",
+      "template": "config/dr-templates/easyproxy/data/config.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/headplane/data/config.yaml",
+      "template": "config/dr-templates/headplane/data/config.yaml.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/headscale/data/config/config.yaml",
+      "template": "config/dr-templates/headscale/data/config/config.yaml.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/honey/data/config/config.json",
+      "template": "config/dr-templates/honey/data/config/config.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/jackett/data/Jackett/Indexers/animetosho-xyz.json",
+      "template": "config/dr-templates/jackett/data/Jackett/Indexers/animetosho-xyz.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/jackett/data/Jackett/Indexers/knaben.json",
+      "template": "config/dr-templates/jackett/data/Jackett/Indexers/knaben.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/jackett/data/Jackett/Indexers/nyaasi.json",
+      "template": "config/dr-templates/jackett/data/Jackett/Indexers/nyaasi.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/jackett/data/Jackett/Indexers/thepiratebay.json",
+      "template": "config/dr-templates/jackett/data/Jackett/Indexers/thepiratebay.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/jackett/data/Jackett/Indexers/therarbg.json",
+      "template": "config/dr-templates/jackett/data/Jackett/Indexers/therarbg.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/jackett/data/Jackett/ServerConfig.json",
+      "template": "config/dr-templates/jackett/data/Jackett/ServerConfig.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/pgbouncer/data/pgbouncer.ini",
+      "template": "config/dr-templates/pgbouncer/data/pgbouncer.ini.template",
+      "format": "text",
+      "app_owned": false,
+      "mode": "0640",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/config.toml",
+      "template": "config/dr-templates/seanime/data/main/config/config.toml.template",
+      "format": "toml",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/aiostreams-plugin.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/aiostreams-plugin.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 0,
+      "gid": 0,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/always-advanced-search.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/always-advanced-search.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/anilist-watch-order.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/anilist-watch-order.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 0,
+      "gid": 0,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/animetosho-new.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/animetosho-new.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 0,
+      "gid": 0,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/aq-anikoto.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/aq-anikoto.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 0,
+      "gid": 0,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/aq-animepahe-beta.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/aq-animepahe-beta.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 0,
+      "gid": 0,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/episodeshistory.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/episodeshistory.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/mangabuddy.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/mangabuddy.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/mangadex.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/mangadex.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/mangafreak.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/mangafreak.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/mangaworld.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/mangaworld.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/setwatched.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/setwatched.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/main/config/extensions/subtitle-engine.json",
+      "template": "config/dr-templates/seanime/data/main/config/extensions/subtitle-engine.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/config.toml",
+      "template": "config/dr-templates/seanime/data/shared/config/config.toml.template",
+      "format": "toml",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/AnimeUnity.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/AnimeUnity.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/Watch-Next.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/Watch-Next.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/aiostreams-plugin.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 0,
+      "gid": 0,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 0,
+      "gid": 0,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/always-advanced-search.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/always-advanced-search.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/anidream.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/anidream.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/animesaturn.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/animesaturn.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/animesaturnmirror.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/animesaturnmirror.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/animetosho-new.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/animetosho-new.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 0,
+      "gid": 0,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/animeunitymirror.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/animeunitymirror.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/animeworld.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/animeworld.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/aq-anikoto.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/aq-anikoto.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0670",
+      "owner": "application-user:application-group",
+      "uid": 0,
+      "gid": 0,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/custom-banner-images.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/custom-banner-images.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/episodeshistory.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/episodeshistory.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/picked-for-you.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/picked-for-you.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/setwatched.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/setwatched.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/subtitle-engine.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/subtitle-engine.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/seanime/data/shared/config/extensions/watch-order.json",
+      "template": "config/dr-templates/seanime/data/shared/config/extensions/watch-order.json.template",
+      "format": "json",
+      "app_owned": true,
+      "mode": "0660",
+      "owner": "application-user:application-group",
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    },
+    {
+      "destination": "data/oauth2-proxy/allowed-emails.txt",
+      "format": "oauth2-allowlist",
+      "ref": "/oauth2-proxy/ALLOWED_EMAILS",
+      "mode": "0640",
+      "owner": "root:deployment-group",
+      "app_owned": false,
+      "uid": 1000,
+      "gid": 1000,
+      "named_acl": [
+        "user:1000:rw-"
+      ]
+    }
+  ],
+  "required_values": [
+    "/aiomanager/DATABASE_URL",
+    "/aiostreams/SECRET_KEY",
+    "/cloudflare-ddns/DOMAINS",
+    "/comet/ADDON_ID",
+    "/comet/ADDON_NAME",
+    "/comet/ADMIN_DASHBOARD_PASSWORD",
+    "/comet/AIOSTREAMS_URL",
+    "/comet/AIOSTREAMS_USER_UUID_AND_PASSWORD",
+    "/comet/BITMAGNET_URL",
+    "/comet/COMETNET_RELAY_URL",
+    "/comet/COMET_URL",
+    "/comet/CONFIGURE_PAGE_PASSWORD",
+    "/comet/DATABASE_URL",
+    "/comet/DEBRIDIO_API_KEY",
+    "/comet/DEBRIDIO_PROVIDER_KEY",
+    "/comet/JACKETTIO_URL",
+    "/comet/JACKETT_URL",
+    "/comet/MEDIAFUSION_API_PASSWORD",
+    "/comet/MEDIAFUSION_URL",
+    "/comet/PROXY_DEBRID_STREAM_DEBRID_DEFAULT_APIKEY",
+    "/comet/PROXY_DEBRID_STREAM_PASSWORD",
+    "/comet/STREMTHRU_SCRAPE_URL",
+    "/comet/STREMTHRU_URL",
+    "/comet/TORRENTIO_PROXY_URL",
+    "/comet/TORRENTIO_URL",
+    "/cometnet/COMETNET_ADVERTISE_URL",
+    "/cometnet/COMETNET_BOOTSTRAP_NODES",
+    "/cometnet/COMETNET_NODE_ALIAS",
+    "/cometnet/DATABASE_URL",
+    "/dnscrypt-proxy/LISTEN_ADDRESSES_0",
+    "/dnscrypt-proxy/MONITORING_UI_LISTEN_ADDRESS",
+    "/dnscrypt-proxy/MONITORING_UI_PASSWORD",
+    "/dnscrypt-proxy/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/dr/AIO_PROFILE_BINDINGS",
+    "/gluetun/FIREWALL_OUTBOUND_SUBNETS",
+    "/gluetun/SERVER_CITIES",
+    "/gluetun/WIREGUARD_ADDRESSES",
+    "/gluetun/WIREGUARD_PRIVATE_KEY",
+    "/gost/COMMAND_ARG_1",
+    "/gost/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/gost/NETWORK_VPN_NET_IPV4_ADDRESS",
+    "/headplane/HEADSCALE_API_KEY",
+    "/headplane/INTEGRATION_AGENT_HOST_NAME",
+    "/headplane/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/headplane/OIDC_CLIENT_ID",
+    "/headplane/OIDC_CLIENT_SECRET",
+    "/headplane/SERVER_BASE_URL",
+    "/headplane/SERVER_COOKIE_SECRET",
+    "/headplane/SERVER_PROXY_AUTH_ALLOWED_CIDRS_0",
+    "/headscale/DERP_SERVER_IPV4",
+    "/headscale/DNS_BASE_DOMAIN",
+    "/headscale/DNS_EXTRA_RECORDS_0_NAME",
+    "/headscale/DNS_EXTRA_RECORDS_0_VALUE",
+    "/headscale/DNS_NAMESERVERS_GLOBAL_0",
+    "/headscale/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/honey/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/honey/SERVICES_0_HREF",
+    "/honey/SERVICES_10_HREF",
+    "/honey/SERVICES_10_ICON",
+    "/honey/SERVICES_11_HREF",
+    "/honey/SERVICES_11_ICON",
+    "/honey/SERVICES_12_HREF",
+    "/honey/SERVICES_13_HREF",
+    "/honey/SERVICES_14_HREF",
+    "/honey/SERVICES_15_HREF",
+    "/honey/SERVICES_1_HREF",
+    "/honey/SERVICES_21_HREF",
+    "/honey/SERVICES_3_HREF",
+    "/honey/SERVICES_4_ICON",
+    "/honey/SERVICES_5_HREF",
+    "/honey/SERVICES_6_HREF",
+    "/honey/SERVICES_6_ICON",
+    "/honey/SERVICES_7_HREF",
+    "/honey/SERVICES_8_HREF",
+    "/honey/SERVICES_9_HREF",
+    "/jackett/ANIMETOSHO_XYZ_API_KEY",
+    "/mediaflow-proxy-light/APP__PROXY__PROXY_URL",
+    "/mediaflow-proxy-light/APP__PROXY__TRANSPORT_ROUTES",
+    "/mediaflow-proxy-light/APP__REDIS__URL",
+    "/microwarp/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/npm/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/npm/NETWORK_VPN_NET_IPV4_ADDRESS",
+    "/oauth2-proxy/ALLOWED_EMAILS",
+    "/oauth2-proxy/OAUTH2_PROXY_CLIENT_ID",
+    "/oauth2-proxy/OAUTH2_PROXY_CLIENT_SECRET",
+    "/oauth2-proxy/OAUTH2_PROXY_COOKIE_SECRET",
+    "/oauth2-proxy/OAUTH2_PROXY_REDIRECT_URL",
+    "/oauth2-proxy/OAUTH2_PROXY_REDIS_CONNECTION_URL",
+    "/oauth2-proxy/OAUTH2_PROXY_TRUSTED_PROXY_IPS",
+    "/oauth2-proxy/OAUTH2_PROXY_UPSTREAMS",
+    "/oauth2-proxy/OAUTH2_PROXY_WHITELIST_DOMAINS",
+    "/pgbouncer/USERLIST_CONTENT",
+    "/portainer/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/redis/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/redis/NETWORK_VPN_NET_IPV4_ADDRESS",
+    "/seanime-shared/AIOSTREAMS_CONFIGURATION_ID",
+    "/seanime-shared/AIOSTREAMS_ORIGIN",
+    "/seanime-shared/SERVER_PASSWORD",
+    "/seanime/SERVER_PASSWORD",
+    "/shared/CLOUDFLARE_API_TOKEN",
+    "/shared/COMET_PUBLIC_API_TOKEN",
+    "/shared/HEADSCALE_SERVER_URL",
+    "/shared/JACKETT_API_KEY",
+    "/shared/POSTGRES_PASSWORD",
+    "/shared/PROXY_PASSWORD",
+    "/shared/SEANIME_SOLVER_URL",
+    "/shared/TMDB_API_KEY",
+    "/shared/ZILEAN_URL",
+    "/stack-network/AIOMANAGER_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/AIOMETADATA_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/AIOMETADATA_VPN_NET_IPV4_ADDRESS",
+    "/stack-network/AIOSTREAMS_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/AIOSTREAMS_VPN_NET_IPV4_ADDRESS",
+    "/stack-network/CLOUDFLARE_DDNS_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/DEFAULT_SUBNET",
+    "/stack-network/EASYPROXY_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/EASYPROXY_VPN_NET_IPV4_ADDRESS",
+    "/stack-network/GLUETUN_VPN_NET_IPV4_ADDRESS",
+    "/stack-network/MEDIAFLOW_PROXY_LIGHT_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/MEDIAFLOW_PROXY_LIGHT_VPN_NET_IPV4_ADDRESS",
+    "/stack-network/OAUTH2_PROXY_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/PGBOUNCER_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/PGBOUNCER_VPN_NET_IPV4_ADDRESS",
+    "/stack-network/POSTGRES_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/POSTGRES_VPN_NET_IPV4_ADDRESS",
+    "/stack-network/STREAMVIX_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/STREAMVIX_VPN_NET_IPV4_ADDRESS",
+    "/stack-network/TVVOO_DEFAULT_IPV4_ADDRESS",
+    "/stack-network/TVVOO_VPN_NET_IPV4_ADDRESS",
+    "/stack-network/VPN_NET_SUBNET",
+    "/stack-network/WATCHTOWER_DEFAULT_IPV4_ADDRESS",
+    "/streamvix/ADDON_BASE_URL",
+    "/streamvix/MFP_URL",
+    "/streamvix/PROXY",
+    "/streamvix/PROXY_BACKUP",
+    "/stremthru/STREMTHRU_AUTH",
+    "/stremthru/STREMTHRU_AUTH_ADMIN",
+    "/stremthru/STREMTHRU_BASE_URL",
+    "/stremthru/STREMTHRU_DATABASE_URI",
+    "/stremthru/STREMTHRU_INTEGRATION_GITHUB_TOKEN",
+    "/stremthru/STREMTHRU_INTEGRATION_GITHUB_USER",
+    "/stremthru/STREMTHRU_REDIS_URI",
+    "/stremthru/STREMTHRU_VAULT_SECRET",
+    "/tailscale/TS_AUTHKEY",
+    "/tailscale/TS_EXTRA_ARGS",
+    "/teamspeak/NETWORK_DEFAULT_IPV4_ADDRESS",
+    "/tvvoo/PROXY_BASE_URL",
+    "/watchtower/REGISTRY_AUTH_CONFIG"
+  ],
+  "readiness_blockers": [],
+  "runtime_fields": {
+    "data/jackett/data/Jackett/ServerConfig.json": [
+      "InstanceId"
+    ],
+    "data/jackett/data/Jackett/Indexers/animetosho-xyz.json": [
+      "hiddendata"
+    ]
+  },
+  "postgres_bootstrap": {
+    "destination": "data/postgres/init/init.sql",
+    "template": "config/dr-templates/postgres/init.sql.template",
+    "connections": [
+      {
+        "service": "comet",
+        "ref": "/comet/DATABASE_URL"
+      },
+      {
+        "service": "stremthru",
+        "ref": "/stremthru/STREMTHRU_DATABASE_URI"
+      },
+      {
+        "service": "aiomanager",
+        "ref": "/aiomanager/DATABASE_URL"
+      }
+    ],
+    "public_work_mem": "16MB",
+    "userlist_ref": "/pgbouncer/USERLIST_CONTENT",
+    "admin_password_ref": "/shared/POSTGRES_PASSWORD",
+    "admin_user": "postgres",
+    "comet_authority_only_supported": true
+  },
+  "quick_redeploy_default": "fresh",
+  "runtime_fields_restore_optional": true,
+  "npm_recovery": {
+    "canonical_token_ref": "/shared/CLOUDFLARE_API_TOKEN",
+    "continuous_writer": false,
+    "certificate_manager": "NPM_CERTBOT_CLOUDFLARE_DNS01",
+    "recovery_script": "scripts/npm-dr.py",
+    "host_bootstrap_only": true
+  },
+  "additional_input_folders": [
+    "/dr"
+  ],
+  "private_dr_bindings_ref": "/dr/AIO_PROFILE_BINDINGS",
+  "input_contract_note": "Input existence is validated at fresh rendering/import; input contracts do not assert those keys/payloads were provisioned on the current deployment."
+}

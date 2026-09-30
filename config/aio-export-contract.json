@@ -1,0 +1,46 @@
+{
+  "schema": 2,
+  "status": "PRIVATE_DR_INPUT_CONTRACT",
+  "classification": "PRIVATE_DR_PAYLOAD",
+  "public_schemas": [
+    "config/aio-payload.schema.json",
+    "config/aio-bindings.schema.json"
+  ],
+  "importer": "scripts/aio-dr.py",
+  "identities_source": "/dr/AIO_PROFILE_BINDINGS",
+  "new_infisical_inputs_not_provisioned_by_this_job": [
+    "/dr/AIO_PROFILE_BINDINGS",
+    "/oauth2-proxy/ALLOWED_EMAILS"
+  ],
+  "payload_storage": "Future separate streams-aio-dr encrypted with SOPS/age; repository not created by this job.",
+  "identity_strategy": "Version-pinned fresh SQLite seed; existing IDs/passwords/aliases preserved from Infisical; official UI UUID regeneration intentionally avoided.",
+  "database_backup_required": false,
+  "user_runtime_data_read": false,
+  "source_versions": {
+    "aiostreams": "2.35.3",
+    "aiometadata": "3.3.0"
+  },
+  "preserved": [
+    "configuration UUIDs",
+    "configuration passwords",
+    "optional aliases/profile owners",
+    "parent links",
+    "private field bindings"
+  ],
+  "reauthorize": [
+    "AIOStreams linked accounts",
+    "AIOMetadata OAuth/token-reference and linked-key accounts explicitly named in payload"
+  ],
+  "private_payloads": [
+    "AIOStreams logical export",
+    "AIOMetadata logical exports"
+  ],
+  "security_rules": [
+    "No payload in public Git",
+    "No existing DB overwrite",
+    "No source DB extraction",
+    "No automatic Infisical import",
+    "No silently changed IDs or discarded linked credentials",
+    "No application startup by bootstrap"
+  ]
+}

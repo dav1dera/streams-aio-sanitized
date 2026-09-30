@@ -1,0 +1,149 @@
+{
+  "ui": {
+    "name": "honey",
+    "desc": "",
+    "icon": "",
+    "wallpaper": "img/background.jpg",
+    "wallpaper_dark": "img/background-dark.jpg",
+    "dark_mode": "Auto",
+    "open_new_tab": false,
+    "ping_dots": false,
+    "blur": true,
+    "animations": true,
+    "trusted_domains": []
+  },
+  "services": [
+    {
+      "name": "Service 1",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_0_HREF@@",
+      "icon": "https://avatars.githubusercontent.com/u/2678585?s=200&v=4"
+    },
+    {
+      "name": "Service 2",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_1_HREF@@",
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/proxmox-backup-server.svg"
+    },
+    {
+      "name": "Service 3",
+      "desc": "",
+      "href": "#",
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/infisical.svg"
+    },
+    {
+      "name": "Portainer",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_3_HREF@@",
+      "icon": "https://avatars.githubusercontent.com/u/22225832?s=200&v=4"
+    },
+    {
+      "name": "Aiostreams",
+      "desc": "",
+      "href": "#",
+      "icon": "@@INFISICAL:/honey/SERVICES_4_ICON@@"
+    },
+    {
+      "name": "AIOManager",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_5_HREF@@",
+      "icon": "https://github.com/Sonicx161/AIOManager/raw/main/public/logo.png"
+    },
+    {
+      "name": "Aiometadata",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_6_HREF@@",
+      "icon": "@@INFISICAL:/honey/SERVICES_6_ICON@@"
+    },
+    {
+      "name": "Service 8",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_7_HREF@@",
+      "icon": "https://avatars.githubusercontent.com/u/8361145?s=200&v=4"
+    },
+    {
+      "name": "Comet",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_8_HREF@@",
+      "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/docker.svg"
+    },
+    {
+      "name": "Headplane",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_9_HREF@@",
+      "icon": "https://avatars.githubusercontent.com/u/48932923?s=200&v=4"
+    },
+    {
+      "name": "Jackett",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_10_HREF@@",
+      "icon": "@@INFISICAL:/honey/SERVICES_10_ICON@@"
+    },
+    {
+      "name": "Service 12",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_11_HREF@@",
+      "icon": "@@INFISICAL:/honey/SERVICES_11_ICON@@"
+    },
+    {
+      "name": "Service 13",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_12_HREF@@",
+      "icon": ""
+    },
+    {
+      "name": "Service 14",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_13_HREF@@",
+      "icon": "https://avatars.githubusercontent.com/u/88089605?s=200&v=4"
+    },
+    {
+      "name": "Stremthru",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_14_HREF@@",
+      "icon": "https://cdn-icons-png.flaticon.com/512/7334/7334113.png"
+    },
+    {
+      "name": "Service 16",
+      "desc": "dnscrypt-proxy",
+      "href": "@@INFISICAL:/honey/SERVICES_15_HREF@@",
+      "icon": "https://avatars.githubusercontent.com/u/34526273?s=200&v=4"
+    },
+    {
+      "name": "Seanime",
+      "desc": "",
+      "href": "#",
+      "icon": ""
+    },
+    {
+      "name": "Service 18",
+      "desc": "",
+      "href": "#",
+      "icon": ""
+    },
+    {
+      "name": "StreamViX",
+      "desc": "",
+      "href": "#",
+      "icon": "https://raw.githubusercontent.com/qwertyuiop8899/streamvix/refs/heads/main/public/icon.png"
+    },
+    {
+      "name": "Tvvoo",
+      "desc": "",
+      "href": "#",
+      "icon": ""
+    },
+    {
+      "name": "Service 21",
+      "desc": "",
+      "href": "#",
+      "icon": ""
+    },
+    {
+      "name": "Service 22",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_21_HREF@@",
+      "icon": "https://avatars.githubusercontent.com/u/9978589?s=200&v=4"
+    }
+  ]
+}

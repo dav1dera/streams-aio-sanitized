@@ -1,0 +1,24 @@
+{
+  "id": "setwatched",
+  "name": "SetWatched",
+  "version": "1.0.0",
+  "manifestURI": "https://raw.githubusercontent.com/RhythmParadox/SetWatched/refs/heads/master/manifest.json",
+  "language": "typescript",
+  "type": "plugin",
+  "description": "A plugin that enables you to quickly set an anime / a specific episode to watched on Anilist, and input a rating if completed",
+  "author": "./Zzzz",
+  "icon": "",
+  "website": "",
+  "lang": "multi",
+  "payload": "/// <reference path=\"./plugin.d.ts\" />\n/// <reference path=\"./system.d.ts\" />\n/// <reference path=\"./app.d.ts\" />\n/// <reference path=\"./core.d.ts\" />\n\nimport { $app } from \"./app\";\n\nfunction init() {\n    // Everything is magically typed!\n\n    $ui.register((ctx) => {\n        const tray = ctx.newTray({\n            withContent: true,\n            iconUrl: 'https://seanime.rahim.app/logo_2.png',\n        })\n\n        const sw_episode_card = ctx.action.newEpisodeCardContextMenuItem({\n            label: \"Set Watched\",\n        })\n\n        const sw_media_card = ctx.action.newMediaCardContextMenuItem({\n            label: \"Set Watched\",\n        })\n\n        sw_media_card.mount()\n        sw_episode_card.mount()\n\n        const anime_rating_ref = ctx.fieldRef<string>('0')\n        sw_media_card.onClick((e) => {\n            const id = e.media.id\n            const max_eps = e.media.episodes\n            $store.set('sw_anime_name', e.media.title.english)\n            $store.set('sw_anime_id', id)\n            $store.set('sw_anime_ep', max_eps)\n            tray.open()\n        })\n\n\n        sw_episode_card.onClick((e) => {\n            const id = e.episode.baseAnime.id\n            const max_eps = e.episode.baseAnime.episodes\n            if (e.episode.progressNumber == max_eps) {\n                $store.set('sw_anime_name', e.episode.baseAnime.title.english)\n                $store.set('sw_anime_id', id)\n                $store.set('sw_anime_ep', max_eps)\n                tray.open()\n            }\n            else {\n                $anilist.updateEntryProgress(id,\n                    e.episode.progressNumber,\n                    max_eps\n                )\n            }\n\n            $anilist.refreshAnimeCollection()\n            ctx.toast.success('Watched episode ' + e.episode.progressNumber + ' of ' + e.episode.baseAnime.title.english)\n        })\n\n        ctx.registerEventHandler('rating-submitted', () => {\n            const anime_id = $store.get('sw_anime_id')\n            const anime_name = $store.get('sw_anime_name')\n            const anime_episode = +$store.get('sw_anime_ep')\n            const rating = +anime_rating_ref.current\n\n            $anilist.updateEntry(anime_id,\n                'COMPLETED',\n                rating * 10,\n                anime_episode,\n                undefined,\n                undefined\n            )\n\n            ctx.toast.success(\"Rated \" + anime_name + \" a \" + rating)\n            $anilist.refreshAnimeCollection()\n            tray.close()\n        })\n\n        tray.render(() => {\n            const anime_name = $store.get('sw_anime_name')\n\n            return tray.stack({\n                items: [\n                    tray.text('What is your rating for ' + anime_name + '?'),\n                    tray.input('Rating', {\n                        placeholder: '0-10',\n                        fieldRef: anime_rating_ref,\n                    }),\n                    tray.button('Submit Rating', {\n                        intent: 'primary',\n                        onClick: 'rating-submitted'\n                    })\n                ]\n            })\n        })\n    })\n}",
+  "payloadURI": "https://raw.githubusercontent.com/RhythmParadox/SetWatched/refs/heads/master/setwatched.ts",
+  "plugin": {
+    "version": "1",
+    "permissions": {
+      "scopes": [
+        "anilist"
+      ],
+      "allow": {}
+    }
+  }
+}
