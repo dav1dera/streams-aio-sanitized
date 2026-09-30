@@ -40,6 +40,9 @@
   "warp_off_extractors": [],
   "proxy_off_extractors": [],
   "proxy_exclude_domains": [],
+  "max_res_extractors": [],
+  "max_res_mpd": false,
+  "max_res_hls": false,
   "dvr_enabled": false,
   "recordings_dir": "/data/recordings",
   "max_recording_duration": 28800,
@@ -48,3 +51,4 @@
   "proxy_test_concurrency": null,
   "log_level": "DEBUG"
 }
+
