@@ -115,8 +115,12 @@ The following inputs must exist on the replacement host, not in Git:
 - External AIOStreams/AIOMetadata PRIVATE_DR_PAYLOAD matching the public schemas.
 - The consistent encrypted-layer NPM database artifact.
 
-The protected live Agent mapping audit is **EXECUTION_REQUIRES_ROOT** because
-non-interactive sudo is unavailable. The single read-only check is:
+The protected live Agent mapping audit passed on 2026-09-30:
+**AGENT_MAPPING_REAL=PASS**, **INITIAL_AGENT_MAPPING=CLOSED**. An operator ran
+the updated verifier with sudo against the applied Agent configuration; its
+real output confirmed both service mappings and ended with `TOTAL PASS`.
+This evidence is recorded separately from synthetic template tests. Repeat
+the read-only check on a fresh host or after changing the Agent mappings:
 
 ```sh
 sudo python3 -B scripts/verify-agent-dr-mappings.py --target "$PWD"
@@ -125,9 +129,12 @@ sudo python3 -B scripts/verify-agent-dr-mappings.py --target "$PWD"
 It outputs only service/folder/destination/key names and status, reads no auth
 credential files, and never edits/restarts Agent. The public renderer explicitly
 maps `/aiometadata` and `/aiostreams` to their service env files, with the declared
-AIOStreams shared-key aliases. An unexecuted protected-file audit is not presented
-as PASS. On a fresh host use these explicit contracts; validate any mapping
-change reported by the helper before substituting another Agent configuration.
+AIOStreams shared-key aliases. `CONFIG_ACCESS_KEY` remains in the `/aiostreams`
+export: its conditional quoting changes formatting only, not its source. Unknown
+or ambiguous template expressions fail closed. The real check neither renders
+secrets nor proves fresh-host startup; those remain separate checks. On a fresh
+host use these explicit contracts and validate any mapping change reported by
+the helper before substituting another Agent configuration.
 
 Honey/Seanime template security reviews are complete. One optional Honey icon
 uses a generic public asset and one legacy provider mirror uses the author's
