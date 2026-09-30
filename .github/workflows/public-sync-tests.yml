@@ -1,0 +1,16 @@
+name: Public stack sync safety
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  public-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install 'PyYAML==6.0.3'
+      - run: python3 -B -m unittest discover -s tests -p test_public_sync.py -v
+      - run: python3 -m py_compile scripts/sync-public-stack.py
+      - run: bash -n scripts/verify-public-sync-systemd.sh

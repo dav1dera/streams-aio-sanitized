@@ -1,0 +1,26 @@
+[Unit]
+Description=Publish reviewed Streams-AIO configuration without private data
+Wants=network-online.target
+After=network-online.target docker.service
+
+[Service]
+Type=oneshot
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/.local/share/streams-aio-public-sync/tooling
+Environment=HOME=/home/pi
+Environment=GH_HOST=github.com
+Environment=GH_PROMPT_DISABLED=1
+Environment=GIT_TERMINAL_PROMPT=0
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/home/pi/.local/share/streams-aio-public-sync/venv/bin/python -B /home/pi/.local/share/streams-aio-public-sync/tooling/scripts/sync-public-stack.py --source /home/pi/streams-aio --publish
+UMask=0077
+TimeoutStartSec=10min
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/pi/.local/state/streams-aio-public-sync
+
+[Install]
+WantedBy=multi-user.target
