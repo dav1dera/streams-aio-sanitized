@@ -266,6 +266,51 @@ def image_repository(value):
     return value.split("@")[0].rsplit(":", 1)[0]
 
 
+def docker_repository_identity(repo):
+    # Docker Hub's familiar and fully qualified names identify the same repo.
+    # Keep other registry hosts and namespaces distinct; do not normalize paths.
+    first, separator, rest = repo.partition("/")
+    if not separator:
+        return "docker.io/library/" + repo
+    if first == "index.docker.io":
+        domain, path = "docker.io", rest
+    elif first == "localhost" or "." in first or ":" in first or first.lower() != first:
+        domain, path = first, rest
+    else:
+        domain, path = "docker.io", repo
+    if domain == "docker.io" and "/" not in path:
+        path = "library/" + path
+    return domain + "/" + path
+
+
+def select_image_digest(configured, observed, previous, location):
+    repo = image_repository(configured)
+    identity = docker_repository_identity(repo)
+    require(observed is None or isinstance(observed, list), "INVALID_IMAGE_DIGEST_METADATA", location)
+    digests = set()
+    for reference in observed or []:
+        require(isinstance(reference, str), "INVALID_IMAGE_DIGEST_METADATA", location)
+        candidate_repo, separator, candidate_digest = reference.partition("@")
+        if docker_repository_identity(candidate_repo) != identity:
+            continue
+        require(separator and re.fullmatch(r"sha256:[0-9a-f]{64}", candidate_digest),
+                "INVALID_REPOSITORY_DIGEST", location)
+        digests.add(candidate_digest)
+    require(digests, "PUBLIC_IMAGE_DIGEST_UNAVAILABLE", location)
+    if "@" in configured:
+        selected = configured.partition("@")[2]
+        require(selected in digests, "CONFIGURED_IMAGE_DIGEST_NOT_VERIFIED", location)
+    else:
+        previous_repo, _, previous_digest = previous.partition("@")
+        if docker_repository_identity(previous_repo) == identity and previous_digest in digests:
+            selected = previous_digest
+        else:
+            # Every candidate comes from inspection of the container's exact
+            # image ID. Multiple manifests may reference that same image.
+            selected = sorted(digests)[0]
+    return repo + "@" + selected
+
+
 def run(args, location=""):
     env = os.environ.copy()
     env.update(GH_HOST="github.com", GH_PROMPT_DISABLED="1", GIT_TERMINAL_PROMPT="0")
@@ -343,13 +388,11 @@ def docker_locks(source, compose, old_locks):
         metadata = '{"RepoDigests":{{json .RepoDigests}},"Os":{{json .Os}},"Architecture":{{json .Architecture}}}'
         data = loads(run(["docker", "image", "inspect", "--format", metadata, image_id]))
         # Request only public image metadata; never Config.Env, labels or auth.
-        repo = image_repository(compose["services"][service]["image"])
-        candidates = [d for d in data.get("RepoDigests", []) if d.startswith(repo + "@sha256:")]
-        require(candidates and len(set(candidates)) == 1, "PUBLIC_IMAGE_DIGEST_UNAVAILABLE", "docker-compose.yml:services/" + service)
-        require(re.fullmatch(re.escape(repo) + r"@sha256:[0-9a-f]{64}", candidates[0]), "INVALID_REPOSITORY_DIGEST")
+        selected = select_image_digest(compose["services"][service]["image"], data.get("RepoDigests"),
+                                       old_locks[service]["image"], "docker-compose.yml:services/" + service)
         platform = data.get("Os", "") + "/" + data.get("Architecture", "")
         require(platform in {"linux/amd64", "linux/arm64"}, "IMAGE_PLATFORM_REVIEW_REQUIRED")
-        result[service] = {"image": candidates[0], "platform": platform,
+        result[service] = {"image": selected, "platform": platform,
                            "configured_image": compose["services"][service]["image"]}
     return result
 
