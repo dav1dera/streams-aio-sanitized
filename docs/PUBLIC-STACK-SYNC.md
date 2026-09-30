@@ -24,6 +24,19 @@ render plan. It exports:
   private fields retain `@@INFISICAL:...@@` references. An embedded binding must
   preserve its exact reviewed public code/URI skeleton.
 
+Docker can associate several manifest digests with the same local image, as
+documented in its [image inspection model](https://github.com/moby/moby/blob/master/api/types/image/image_inspect.go).
+The worker inspects the container's exact image ID and selects only RepoDigests
+for its reviewed repository. An explicit Compose digest must be present and
+takes priority; otherwise the previous public pin is kept if still present.
+When neither applies, the first digest in sorted order is selected from the
+verified candidates, avoiding changes caused only by listing order. Docker Hub's
+familiar and fully qualified [repository names](https://docs.docker.com/reference/cli/docker/image/tag/)
+are treated as aliases for this comparison; other registries and namespaces stay
+distinct. Missing or invalid matching digest metadata still blocks publication.
+An image ID or mutable tag is never substituted for a manifest digest. Image
+inspection does not pull images or recreate containers.
+
 Private/empty env slots retain their public placeholders. Known application
 runtime identity fields are omitted. Reviewed generic Honey defaults remain
 generic. Live comments are never copied. Root `.env`, `.secrets`, `.generated`,

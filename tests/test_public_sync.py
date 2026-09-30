@@ -456,6 +456,101 @@ class PublicSyncTests(unittest.TestCase):
         self.assertNotIn("Config.Env", args)
         self.assertNotIn("{{json .}}", args)
 
+    def test_postgres_multiple_manifests_keep_verified_existing_pin(self):
+        compose = sync.yaml_load(self.public["docker-compose.yml"])
+        locks = sync.loads(self.public["config/image-lock.json"])
+        image_id = "sha256:c293117fcecda7344b5480222e813b9f673d7abd69b1dd95eff239b768b04f59"
+        # Public metadata from the reported PostgreSQL image; no runtime config.
+        digests = [
+            "postgres@sha256:650d7a867dc5336eff67802a1417fcc801821d73d824c608e80afbde792fe6e1",
+            "postgres@sha256:6c538e7206ea40ff740ef27883529390a690b6ead6ba96b44c67a9f7c638e8fd",
+            "postgres@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873",
+        ]
+        configured = compose["services"]["postgres"]["image"]
+        for order in (digests, list(reversed(digests))):
+            values = [b"123abcdefabc\n",
+                      " ".join(map(json.dumps, ("postgres", image_id, configured))).encode(),
+                      json.dumps({"RepoDigests": order, "Os": "linux", "Architecture": "amd64"}).encode()]
+            with mock.patch.object(sync, "run", side_effect=values) as transport:
+                result = sync.docker_locks(self.source, compose, locks)
+            self.assertEqual(result["postgres"]["image"], locks["postgres"]["image"])
+            self.assertEqual(result["postgres"]["platform"], "linux/amd64")
+            self.assertEqual(transport.call_args_list[-1].args[0][-1], image_id)
+            commands = [call.args[0] for call in transport.call_args_list]
+            self.assertEqual([c[:2] for c in commands], [["docker", "ps"], ["docker", "inspect"], ["docker", "image"]])
+            self.assertEqual(commands[-1][2], "inspect")
+            self.assertNotIn("Config.Env", str(commands))
+            self.assertNotIn("{{json .}}", str(commands))
+
+    def test_new_running_image_selects_stable_digest_and_updates_recovery_pair(self):
+        compose = sync.yaml_load(self.public["docker-compose.yml"])
+        image_id = "sha256:" + "e" * 64
+        configured = compose["services"]["postgres"]["image"]
+        digests = ["mirror.invalid/library/postgres@sha256:" + "0" * 64,
+                   "docker.io/other/postgres@sha256:" + "0" * 64,
+                   "postgres@sha256:" + "f" * 64,
+                   "docker.io/library/postgres@sha256:" + "b" * 64]
+        values = []
+        # A changed listing order between the two reads must not cause churn.
+        for order in (digests, list(reversed(digests))):
+            values += [b"123abcdefabc\n",
+                       " ".join(map(json.dumps, ("postgres", image_id, configured))).encode(),
+                       json.dumps({"RepoDigests": order, "Os": "linux", "Architecture": "amd64"}).encode()]
+        with mock.patch.object(sync, "run", side_effect=values):
+            changes = self.render(sync.docker_locks)
+        lock = sync.loads(changes["config/image-lock.json"])["postgres"]
+        override = sync.loads(changes["config/compose.dr.yaml"])["services"]["postgres"]
+        self.assertEqual(lock["image"], "postgres@sha256:" + "b" * 64)
+        self.assertEqual(override["image"], lock["image"])
+        self.assertEqual(override["platform"], lock["platform"])
+        self.assertEqual(lock["configured_image"], configured)
+        self.assertNotEqual(lock["image"], image_id)
+        self.assertNotIn(SECRET.encode(), b"".join(changes.values()))
+
+    def test_digest_matching_accepts_only_exact_docker_hub_repository_aliases(self):
+        aliases = ("postgres", "library/postgres", "docker.io/postgres",
+                   "docker.io/library/postgres", "index.docker.io/library/postgres")
+        previous = "postgres@sha256:" + "f" * 64
+        for configured_repo in aliases:
+            for observed_repo in aliases:
+                candidates = ["untrusted.invalid/library/postgres@sha256:" + "0" * 64,
+                              "docker.io/other/postgres@sha256:" + "0" * 64,
+                              "postgres@sha256:" + "a" * 64,
+                              observed_repo + "@sha256:" + "f" * 64]
+                result = sync.select_image_digest(configured_repo + ":18-alpine", candidates, previous, "reviewed")
+                self.assertEqual(result, configured_repo + "@sha256:" + "f" * 64)
+        for repo, equivalent, unrelated in (
+                ("g0ldyy/comet", "docker.io/g0ldyy/comet", "docker.io/library/comet"),
+                ("ghcr.io/tale/headplane", "ghcr.io/tale/headplane", "docker.io/tale/headplane")):
+            result = sync.select_image_digest(repo + ":latest", [unrelated + "@sha256:" + "0" * 64,
+                                               equivalent + "@sha256:" + "b" * 64], repo + "@sha256:" + "f" * 64, "reviewed")
+            self.assertEqual(result, repo + "@sha256:" + "b" * 64)
+
+    def test_missing_or_invalid_digests_block_without_old_pin_or_image_id_fallback(self):
+        previous = "postgres@sha256:" + "f" * 64
+        cases = [(None, "PUBLIC_IMAGE_DIGEST_UNAVAILABLE"),
+                 ([], "PUBLIC_IMAGE_DIGEST_UNAVAILABLE"),
+                 (["mirror.invalid/library/postgres@sha256:" + "b" * 64], "PUBLIC_IMAGE_DIGEST_UNAVAILABLE"),
+                 (["docker.io/other/postgres@sha256:" + "b" * 64], "PUBLIC_IMAGE_DIGEST_UNAVAILABLE"),
+                 ({SECRET: SECRET}, "INVALID_IMAGE_DIGEST_METADATA"),
+                 (SECRET, "INVALID_IMAGE_DIGEST_METADATA"),
+                 ([{SECRET: SECRET}], "INVALID_IMAGE_DIGEST_METADATA"),
+                 ([previous, "postgres@sha256:" + SECRET], "INVALID_REPOSITORY_DIGEST")]
+        for observed, code in cases:
+            with self.assertRaises(sync.Refused) as error:
+                sync.select_image_digest("postgres:18-alpine", observed, previous, "reviewed")
+            self.assertIn(code, str(error.exception))
+            self.assertNotIn(SECRET, str(error.exception))
+
+    def test_explicit_compose_pin_must_be_observed_and_takes_priority(self):
+        previous = "postgres@sha256:" + "f" * 64
+        configured = "postgres@sha256:" + "b" * 64
+        candidates = [previous, "docker.io/library/postgres@sha256:" + "b" * 64]
+        self.assertEqual(sync.select_image_digest(configured, candidates, previous, "reviewed"), configured)
+        with self.assertRaises(sync.Refused) as error:
+            sync.select_image_digest(configured, [previous], previous, "reviewed")
+        self.assertIn("CONFIGURED_IMAGE_DIGEST_NOT_VERIFIED", str(error.exception))
+
     def test_unapplied_compose_image_blocks_publication(self):
         compose = sync.yaml_load(self.public["docker-compose.yml"])
         locks = sync.loads(self.public["config/image-lock.json"])
