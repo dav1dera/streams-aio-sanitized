@@ -198,6 +198,42 @@ class PublicSyncTests(unittest.TestCase):
         with self.assertRaises(sync.Refused):
             self.render()
 
+    def test_easyproxy_quality_switches_follow_live_and_preserve_private_boundary(self):
+        name = "config/dr-templates/easyproxy/data/config.json.template"
+        path = self.source / "data/easyproxy/data/config.json"
+        value = sync.loads(path.read_bytes())
+        value["max_res_mpd"] = True
+        value["max_res_hls"] = True
+        path.write_text(json.dumps(value), encoding="utf-8")
+        changes = self.render()
+        result = sync.loads(changes[name])
+        self.assertIs(result["max_res_mpd"], True)
+        self.assertIs(result["max_res_hls"], True)
+        self.assertEqual(result["max_res_extractors"], [])
+        self.assertNotIn(SECRET.encode(), changes[name])
+        # Reviewing these three fields does not admit future VPN credentials,
+        # even when their source value is currently empty.
+        for extra in ("nordvpn_token", SECRET):
+            value[extra] = ""
+            path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaises(sync.Refused) as error:
+                self.render()
+            self.assertIn("STRUCTURE_REVIEW_REQUIRED", str(error.exception))
+            self.assertNotIn(SECRET, str(error.exception))
+            del value[extra]
+
+    def test_easyproxy_quality_strings_lists_and_wrong_types_require_review(self):
+        path = self.source / "data/easyproxy/data/config.json"
+        original = sync.loads(path.read_bytes())
+        for key, new in (("max_res_extractors", [SECRET]),
+                         ("max_res_mpd", SECRET), ("max_res_hls", 1)):
+            value = copy.deepcopy(original)
+            value[key] = new
+            path.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaises(sync.Refused) as error:
+                self.render()
+            self.assertNotIn(SECRET, str(error.exception))
+
     def test_image_lock_and_recovery_override_move_together(self):
         def images(source, compose, locks):
             result = copy.deepcopy(locks)

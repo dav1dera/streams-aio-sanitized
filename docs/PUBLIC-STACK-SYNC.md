@@ -41,6 +41,13 @@ This prevents a secret added to an apparently public file from automatically
 becoming permanent public Git content. The existing image repository may receive
 a new tag; a new image repository also needs review and its DR classification.
 
+EasyProxy's reviewed template includes the upstream `max_res_mpd` and
+`max_res_hls` boolean switches and the empty `max_res_extractors` list introduced
+in [its quality settings change](https://github.com/realbestia1/EasyProxy/blob/425334c1f820e9eee046acf49c4057a9cdd47056/config_store.py).
+The two switches follow live changes. Populating the extractor list, adding VPN
+settings, or introducing other keys still requires a template/mapping review.
+An empty value does not make an unknown field safe to publish.
+
 Every selected file and the image inventory are read twice to refuse a changing
 export. Only generated, validated files are committed on top of current public
 `main`, using the API token's normal write permission and `force=false`. Other
