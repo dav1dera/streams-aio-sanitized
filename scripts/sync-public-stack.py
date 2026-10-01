@@ -311,14 +311,15 @@ def select_image_digest(configured, observed, previous, location):
     return repo + "@" + selected
 
 
-def run(args, location=""):
+def run(args, location="", acceptable=(0,), input_data=None):
     env = os.environ.copy()
     env.update(GH_HOST="github.com", GH_PROMPT_DISABLED="1", GIT_TERMINAL_PROMPT="0")
     try:
-        result = subprocess.run(args, stdin=subprocess.DEVNULL, capture_output=True, env=env, check=False)
+        result = subprocess.run(args, input=input_data, stdin=subprocess.DEVNULL if input_data is None else None,
+                                capture_output=True, env=env, check=False)
     except OSError:
         raise Refused("DEPENDENCY_UNAVAILABLE") from None
-    require(result.returncode == 0, "COMMAND_FAILED", location)
+    require(result.returncode in acceptable, "COMMAND_FAILED", location)
     return result.stdout
 
 
@@ -342,13 +343,13 @@ class GitHub:
     def head(self):
         return sha(self.api("git/ref/heads/main")["object"]["sha"])
 
-    def baseline(self, commit):
+    def baseline(self, commit, include_all=False):
         tree = self.api("git/trees/" + commit + "?recursive=1")
         require(not tree.get("truncated"), "TRUNCATED_PUBLIC_TREE")
         paths = {e["path"]: e for e in tree["tree"] if e["type"] == "blob"}
         result = {}
         for name, entry in paths.items():
-            if (name in {"docker-compose.yml", "config/dr-render-plan.json", "config/private-config-overlays.json",
+            if (include_all or name in {"docker-compose.yml", "config/dr-render-plan.json", "config/dr-manifest.yaml", "config/private-config-overlays.json",
                         "config/compose.dr.yaml", "config/image-lock.json", "data/postgres/postgresql.conf"}
                     or re.fullmatch(r"data/[a-z0-9-]+/\.env", name)
                     or name.startswith("config/dr-templates/") and name.endswith(".template")):
@@ -509,18 +510,23 @@ def write_record(path, value):
     os.replace(temporary, path)
 
 
-def verify_commit(github, commit, hashes):
+def verify_commit(github, commit, hashes, modes=None):
     tree = github.api("git/trees/" + sha(commit) + "?recursive=1")
     require(not tree.get("truncated"), "TRUNCATED_VERIFICATION_TREE")
     entries = {e["path"]: e for e in tree["tree"] if e["type"] == "blob"}
     for name, expected in hashes.items():
+        if expected is None:
+            require(name not in entries, "PUBLISHED_DELETION_NOT_CONFIRMED")
+            continue
         require(name in entries, "PUBLISHED_FILE_MISSING")
+        if modes and name in modes:
+            require(entries[name].get("mode") == modes[name], "PUBLISHED_MODE_MISMATCH")
         blob = github.api("git/blobs/" + sha(entries[name]["sha"]))
         data = base64.b64decode(blob["content"])
         require(digest(data) == expected, "PUBLISHED_HASH_MISMATCH")
 
 
-def publish(github, state, base, changes):
+def publish(github, state, base, changes, modes=None):
     pending = state / "pending.json"
     if pending.exists():
         safe_path(pending)
@@ -529,7 +535,7 @@ def publish(github, state, base, changes):
         commit = sha(intent["commit"])
         # Never replay a branch mutation after an ambiguous write response.
         require(github.head() == commit, "PENDING_PUBLICATION_NEEDS_REVIEW")
-        verify_commit(github, commit, intent["hashes"])
+        verify_commit(github, commit, intent["hashes"], intent.get("modes"))
         write_record(state / "current.json", {"repository": REPOSITORY, "commit": commit, "verified": True})
         pending.unlink()
         print("PUBLIC_SYNC_RECOVERED PASS commit=" + commit)
@@ -541,16 +547,19 @@ def publish(github, state, base, changes):
         return base
     require(github.head() == base, "PUBLIC_BASE_MOVED")
     parent = github.api("git/commits/" + sha(base))
-    elements = [{"path": relative(name), "mode": "100644", "type": "blob", "content": data.decode("utf-8")}
+    modes = modes or {}
+    require(all(mode in {"100644", "100755"} for mode in modes.values()), "UNSAFE_PUBLIC_MODE")
+    elements = [{"path": relative(name), "mode": modes.get(name, "100644"), "type": "blob",
+                 **({"sha": None} if data is None else {"content": data.decode("utf-8")})}
                 for name, data in sorted(changes.items())]
     tree = sha(github.api("git/trees", {"base_tree": parent["tree"]["sha"], "tree": elements})["sha"])
     commit = sha(github.api("git/commits", {"message": "Sync reviewed stack configuration " + dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                                           "tree": tree, "parents": [base]})["sha"])
-    hashes = {name: digest(data) for name, data in changes.items()}
-    write_record(pending, {"repository": REPOSITORY, "base": base, "commit": commit, "hashes": hashes})
+    hashes = {name: digest(data) if data is not None else None for name, data in changes.items()}
+    write_record(pending, {"repository": REPOSITORY, "base": base, "commit": commit, "hashes": hashes, "modes": modes})
     github.api("git/refs/heads/main", {"sha": commit, "force": False})
     confirm(github.head, lambda value: value == commit)
-    verify_commit(github, commit, hashes)
+    verify_commit(github, commit, hashes, modes)
     write_record(state / "current.json", {"repository": REPOSITORY, "commit": commit, "verified": True})
     pending.unlink()
     print("PUBLIC_SYNC PASS commit=" + commit + " files=" + str(len(changes)))
@@ -562,6 +571,7 @@ def main():
     parser.add_argument("--source", type=Path, default=Path("/home/pi/streams-aio"))
     parser.add_argument("--state", type=Path, default=Path("/home/pi/.local/state/streams-aio-public-sync"))
     parser.add_argument("--publish", action="store_true", help="otherwise read-only check; no GitHub mutation")
+    parser.add_argument("--seamless", action="store_true", help="discover public files and service additions/removals")
     args = parser.parse_args()
     os.umask(0o077)
     safe_path(args.source)
@@ -592,12 +602,22 @@ def execute(args):
         publish(github, args.state, "", {})
         return
     base = github.head()
-    changes = render(args.source, github.baseline(base))
+    if getattr(args, "seamless", False):
+        import public_export
+        changes = public_export.render(args.source, github.baseline(base, include_all=True), sys.modules[__name__])
+    else:
+        changes = render(args.source, github.baseline(base))
     print("PUBLIC_SYNC_CHECK PASS changed_files=" + str(len(changes)))
     for name in sorted(changes):
-        print("PUBLIC_FILE " + name)
+        print(("PUBLIC_DELETE " if changes[name] is None else "PUBLIC_FILE ") + name)
     if args.publish:
-        publish(github, args.state, base, changes)
+        modes = {}
+        if getattr(args, "seamless", False):
+            for name, data in changes.items():
+                if data is not None and public_export.allowed(name) and (args.source / name).is_file():
+                    safe_path(args.source / name)
+                    modes[name] = "100755" if (args.source / name).stat().st_mode & 0o111 else "100644"
+        publish(github, args.state, base, changes, modes)
 
 
 if __name__ == "__main__":

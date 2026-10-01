@@ -1,5 +1,11 @@
 # Automatic public stack export
 
+The installed unit now selects the configuration-only discovery policy with
+`--seamless`. See [current publication rules and installation](SEAMLESS-PUBLIC-SYNC.md).
+The strict fixed-schema policy described below remains available when running
+the exporter without `--seamless`. Both policies use the same verified,
+non-force GitHub transport and independent worker.
+
 The live source is `/home/pi/streams-aio`. The destination is the existing public
 repository `dav1dera/streams-aio-sanitized`. The installed worker lives separately
 under `/home/pi/.local/share/streams-aio-public-sync/tooling`; its state and verified

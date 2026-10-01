@@ -4,12 +4,13 @@ Docker Compose declarations and sanitized public environment templates.
 Private configuration is supplied by Infisical; persistent application state
 is managed separately and is never included in this repository.
 
-To keep reviewed public configuration in sync with the live stack, see
-[automatic public stack export](docs/PUBLIC-STACK-SYNC.md). Its separate worker
-reads `/home/pi/streams-aio`, masks private fields and publishes only classified
-changes after verification. A timer checks about every fifteen minutes; unknown
-changes stop publication for review. Encrypted runtime backups retain their
-separate weekly schedule.
+To keep public configuration in sync with the live stack, see
+[configuration-only local export](docs/SEAMLESS-PUBLIC-SYNC.md). Its independent
+worker reads `/home/pi/streams-aio`, discovers service additions/removals and
+public settings, preserves explicit Infisical bindings, and checks the contents
+before publication. The timer checks about every fifteen minutes. New runtime
+files are excluded by default; unresolved private bindings stop publication.
+The separate encrypted DR backup retains its weekly schedule and five releases.
 
 ## Private configuration
 

@@ -13,7 +13,7 @@ Environment=GH_HOST=github.com
 Environment=GH_PROMPT_DISABLED=1
 Environment=GIT_TERMINAL_PROMPT=0
 Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ExecStart=/home/pi/.local/share/streams-aio-public-sync/venv/bin/python -B /home/pi/.local/share/streams-aio-public-sync/tooling/scripts/sync-public-stack.py --source /home/pi/streams-aio --publish
+ExecStart=/home/pi/.local/share/streams-aio-public-sync/venv/bin/python -B /home/pi/.local/share/streams-aio-public-sync/tooling/scripts/sync-public-stack.py --source /home/pi/streams-aio --seamless --publish
 UMask=0077
 TimeoutStartSec=10min
 NoNewPrivileges=true

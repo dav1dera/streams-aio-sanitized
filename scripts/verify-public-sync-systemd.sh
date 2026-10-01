@@ -2,7 +2,7 @@
 set -euo pipefail
 systemd-analyze verify /etc/systemd/system/streams-aio-public-sync.service /etc/systemd/system/streams-aio-public-sync.timer
 [[ "$(systemctl show streams-aio-public-sync.service -p User --value)" == pi ]]
-systemctl show streams-aio-public-sync.service -p ExecStart --value | grep -Fq 'sync-public-stack.py --source /home/pi/streams-aio --publish'
+systemctl show streams-aio-public-sync.service -p ExecStart --value | grep -Fq 'sync-public-stack.py --source /home/pi/streams-aio --seamless --publish'
 sudo -n systemctl start streams-aio-public-sync.service
 [[ "$(systemctl show streams-aio-public-sync.service -p Result --value)" == success ]]
 [[ "$(systemctl show streams-aio-public-sync.service -p ExecMainStatus --value)" == 0 ]]
