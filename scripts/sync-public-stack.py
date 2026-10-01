@@ -620,13 +620,31 @@ def execute(args):
         publish(github, args.state, base, changes, modes)
 
 
-if __name__ == "__main__":
+def cli():
     try:
         main()
+        return 0
     except Refused as error:
         print("PUBLIC_SYNC FAIL: " + str(error), file=sys.stderr)
-        sys.exit(1)
-    except Exception:
+    except Exception as error:
         # Parsers and transports may include deployment values in exceptions.
-        print("PUBLIC_SYNC FAIL: operation stopped; no source contents logged", file=sys.stderr)
-        sys.exit(1)
+        # Emit only the exception class and line numbers in these trusted scripts.
+        # Never format the traceback, message, source lines, filenames from input,
+        # chained exceptions or frame locals.
+        trusted = {str(Path(__file__).resolve().parent / name): name
+                   for name in ("sync-public-stack.py", "public_export.py")}
+        frames = []
+        trace = error.__traceback__
+        while trace is not None:
+            name = trusted.get(str(Path(trace.tb_frame.f_code.co_filename).resolve()))
+            if name:
+                frames.append(name + ":" + str(trace.tb_lineno))
+            trace = trace.tb_next
+        print("PUBLIC_SYNC FAIL: operation stopped; type=" + type(error).__name__
+              + "; code=" + (",".join(frames) or "unavailable")
+              + "; no source contents logged", file=sys.stderr)
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(cli())

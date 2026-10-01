@@ -401,6 +401,13 @@ def declared_refs(value, sync):
     return refs
 
 
+def live_json_template(item, data, sync):
+    # The render-plan format describes the public template. JSON is also the
+    # canonical representation for reviewed YAML application configurations.
+    # Match the existing strict exporter without accepting YAML for .json files.
+    return sync.yaml_load(data) if item["destination"].endswith((".yaml", ".yml")) else sync.loads(data)
+
+
 def render(source, baseline, sync, image_reader=None):
     inputs, outputs, directories = {}, {}, {}
     def read(name):
@@ -409,7 +416,7 @@ def render(source, baseline, sync, image_reader=None):
     for item in guard.plan["files"]:
         if not item.get("template") or not (source / item["destination"]).is_file(): continue
         old, new = baseline[item["template"]], read(item["destination"])
-        if item["format"] == "json": old, new = sync.loads(old), sync.loads(new)
+        if item["format"] == "json": old, new = sync.loads(old), live_json_template(item, new, sync)
         elif item["format"] == "toml": old, new = sync.tomllib.loads(old.decode()), sync.tomllib.loads(new.decode())
         else: old, new = old.decode(), new.decode()
         guard.bindings(old, new)
@@ -544,7 +551,7 @@ def render(source, baseline, sync, image_reader=None):
             sync.require(False, "ACTIVE_TEMPLATE_SOURCE_MISSING", name)
         old, raw = baseline[name], read(dest)
         if item["format"] == "json":
-            a, b = sync.loads(old), sync.loads(raw)
+            a, b = sync.loads(old), live_json_template(item, raw, sync)
             omitted = set(overlays.get(dest, {}).get("omit_runtime_identity_fields", []))
             if isinstance(b, dict): b = {k: v for k, v in b.items() if k not in omitted}
             if isinstance(a, list) and isinstance(b, list):

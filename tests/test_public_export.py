@@ -40,7 +40,10 @@ def fixture(root, public):
     write(".env", ("\n".join(key + "=" + secret(ref["path"] + "/" + ref["key"]) for key, ref in plan["root_env"].items()) + "\nCOMPOSE_PROJECT_NAME=streams-aio\n").encode())
     for item in plan["files"]:
         if "template" in item:
-            write(item["destination"], sync.MARKER.sub(lambda m: secret(m[1]), public[item["template"]].decode()).encode())
+            text = sync.MARKER.sub(lambda m: secret(m[1]), public[item["template"]].decode())
+            if item["format"] == "json" and item["destination"].endswith((".yaml", ".yml")):
+                text = "# Synthetic live YAML; public template uses JSON.\n" + sync.yaml.safe_dump(sync.loads(text), sort_keys=False)
+            write(item["destination"], text.encode())
     compose = sync.yaml_load(public["docker-compose.yml"])
     destinations = {r["destination"] for r in plan["files"]}
     for row in compose["services"].values():
@@ -72,6 +75,38 @@ class PublicExportTests(unittest.TestCase):
 
     def tearDown(self):
         self.tmp.cleanup()
+
+    def test_yaml_application_sources_keep_json_templates_and_private_bindings(self):
+        cases = [("data/headplane/data/config.yaml", ("server", "port"), 3001),
+                 ("data/headscale/data/config/config.yaml", ("listen_addr",), "0.0.0.0:8081")]
+        for name, keys, value in cases:
+            with self.subTest(name=name):
+                raw = (self.source / name).read_bytes()
+                with self.assertRaises(json.JSONDecodeError): sync.loads(raw)
+                obj = sync.yaml_load(raw)
+                target = obj
+                for key in keys[:-1]: target = target[key]
+                target[keys[-1]] = value
+                self.write(name, ("# YAML comments are local only.\n" + sync.yaml.safe_dump(obj, sort_keys=False)).encode())
+        changes = self.render()
+        for name, keys, value in cases:
+            template = "config/dr-templates/" + name.removeprefix("data/") + ".template"
+            safe = sync.loads(changes[template])
+            target = safe
+            for key in keys: target = target[key]
+            self.assertEqual(target, value)
+            self.assertEqual(set(sync.MARKER.findall(changes[template].decode())),
+                             set(sync.MARKER.findall(self.public[template].decode())))
+            self.assertNotIn(b"SYNTHETIC_PRIVATE_", changes[template])
+            self.assertNotIn(b"comments are local", changes[template])
+
+    def test_yaml_application_duplicate_keys_aliases_and_unsafe_tags_still_block(self):
+        name = "data/headplane/data/config.yaml"
+        for data in (b"server: {}\nserver: {}\n", b"server: &a [*a]\n",
+                     b"server: !!python/object/apply:os.system [forbidden]\n"):
+            with self.subTest(data=data):
+                self.write(name, data)
+                with self.assertRaises(Exception): self.render()
 
     def render(self, images=None):
         return export.render(self.source, self.public, sync, images or self.images)
