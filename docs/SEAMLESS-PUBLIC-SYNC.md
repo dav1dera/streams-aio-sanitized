@@ -27,6 +27,15 @@ credential assignments, or known private values. Additional source Git ignore
 rules can exclude more files; negation cannot override the exporter's private
 path/type floor. The runtime tree is not recursively inspected for public files.
 
+Public examples may use the existing `INFISICAL:/folder/KEY` notation, canonical
+`@@INFISICAL:/folder/KEY@@` markers or `${VARIABLE}` references. Credential fields
+accept a complete reference, never a reference with an additional literal value.
+JSON/YAML/TOML checks also parse `.example` and `.template` variants, including
+inline objects. Python source is inspected as syntax, without import or execution:
+reading credentials from runtime inputs and composing SQL with runtime values are
+valid, while static passwords/API keys and SQL containing literal passwords remain
+refused. Known-private-value, identity, token and default-value checks still apply.
+
 The `.gitignore` rule set follows this layout for future services as well. The
 installer preserves custom exclusions. Git ignore does not untrack existing
 files: this installer never stages files, deletes application data or rewrites
