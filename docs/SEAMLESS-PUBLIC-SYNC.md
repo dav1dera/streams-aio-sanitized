@@ -97,7 +97,16 @@ No raw private env hashes are published. Inventory hashes describe the sanitized
 public inputs. File contents and image inventories are read twice to reject
 changes during collection. Publication preserves concurrent-head checks,
 non-force writes, SHA256 read-back and recovery from ambiguous write responses.
-Errors print codes and paths, never configuration values or raw diffs.
+Errors print codes and paths, never configuration values or raw diffs. Unexpected
+failures report only the exception class and line numbers in the two exporter
+scripts; exception messages, source lines and frame locals are never printed.
+
+Headplane and Headscale store live YAML configurations. Their reviewed public
+templates intentionally use JSON, which is also valid YAML and remains compatible
+with the existing recovery renderer. Export reads the live `.yaml`/`.yml` source
+with the same safe YAML loader as the strict mode, masks its Infisical bindings,
+and writes the public JSON template. Duplicate keys, aliases and unsafe YAML tags
+remain refused; files declared as `.json` still require valid JSON.
 
 ## Disaster recovery scope
 

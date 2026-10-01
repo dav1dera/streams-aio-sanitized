@@ -1,7 +1,9 @@
 """Synthetic live inputs; no production credentials, Docker mutation or API writes."""
 import base64
 import copy
+import contextlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -637,6 +639,46 @@ class PublicSyncTests(unittest.TestCase):
             with self.assertRaises(sync.Refused) as error:
                 sync.GitHub().preflight()
         self.assertNotIn(SECRET, str(error.exception))
+
+
+class SafeDiagnosticsTests(unittest.TestCase):
+    def invoke(self, action):
+        output = io.StringIO()
+        with mock.patch.object(sync, "main", side_effect=action), contextlib.redirect_stderr(output):
+            status = sync.cli()
+        return status, output.getvalue()
+
+    def test_parser_error_reports_class_and_trusted_line_without_input_or_source(self):
+        status, output = self.invoke(lambda: sync.loads('{"' + SECRET + '": invalid}'))
+        self.assertEqual(status, 1)
+        self.assertIn("type=JSONDecodeError", output)
+        self.assertRegex(output, r"code=sync-public-stack\.py:\d+")
+        self.assertNotIn(SECRET, output)
+        self.assertNotIn(str(ROOT), output)
+        self.assertNotIn("json.loads", output)
+        self.assertNotIn("Traceback", output)
+
+    def test_os_error_does_not_log_private_filename_message_or_chained_error(self):
+        def denied():
+            try:
+                raise ValueError(SECRET)
+            except ValueError as error:
+                raise PermissionError(13, SECRET, "/private/" + SECRET + ".env") from error
+        status, output = self.invoke(denied)
+        self.assertEqual(status, 1)
+        self.assertIn("type=PermissionError", output)
+        self.assertNotIn(SECRET, output)
+        self.assertNotIn("/private", output)
+        self.assertNotIn("denied", output)
+        self.assertNotIn("test_public_sync.py", output)
+
+    def test_known_refusal_keeps_safe_code(self):
+        status, output = self.invoke(lambda: sync.require(False, "SOURCE_CHANGED_DURING_EXPORT"))
+        self.assertEqual(status, 1)
+        self.assertEqual(output, "PUBLIC_SYNC FAIL: SOURCE_CHANGED_DURING_EXPORT\n")
+
+    def test_success_returns_zero(self):
+        self.assertEqual(self.invoke(lambda: None), (0, ""))
 
 
 if __name__ == "__main__":
