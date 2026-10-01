@@ -120,6 +120,18 @@ class PublicExportTests(unittest.TestCase):
         self.assertNotIn("jackett", sync.loads(changes["config/dr-manifest.yaml"])["components"])
         self.assertTrue((self.source / "data/jackett/data/Jackett/ServerConfig.json").exists())
 
+    def test_removed_service_root_secret_reference_is_not_required_for_restore(self):
+        old = sync.loads(self.public["config/dr-render-plan.json"])
+        self.compose(lambda rows: rows.pop("portainer"))
+        changes = self.render()
+        plan = sync.loads(changes["config/dr-render-plan.json"])
+        compose = changes.get("docker-compose.yml", self.public["docker-compose.yml"]).decode()
+        obsolete = [key for key in old["root_env"] if "PORTAINER" in key and "${" + key + "}" not in compose]
+        self.assertTrue(obsolete)
+        for key in obsolete:
+            self.assertNotIn(key, plan["root_env"])
+            self.assertNotIn(old["root_env"][key]["path"] + "/" + old["root_env"][key]["key"], plan["required_values"])
+
     def test_extension_version_user_config_and_code_updates_preserve_binding(self):
         name = "data/seanime/data/main/config/extensions/aq-anikoto.json"
         value = sync.loads((self.source / name).read_bytes())
@@ -132,6 +144,19 @@ class PublicExportTests(unittest.TestCase):
         self.assertEqual(result["version"], "2.0.0")
         self.assertIn("updated public extension logic", result["payload"])
         self.assertNotIn("SYNTHETIC_PRIVATE_", result["payload"])
+
+    def test_rewritten_extension_code_uses_existing_binding_from_native_agent(self):
+        ref = "/shared/SEANIME_SOLVER_URL"
+        value = "SYNTHETIC_PRIVATE_" + hashlib.sha256(ref.encode()).hexdigest()
+        self.write(".secrets/shared.env", ("SEANIME_SOLVER_URL=" + value + "\n").encode())
+        name = "data/seanime/data/main/config/extensions/aq-anikoto.json"
+        row = sync.loads((self.source / name).read_bytes())
+        row["payload"] = "const NEW_LOGIC = {endpoint: '" + value + "'};\n"
+        self.write(name, json.dumps(row).encode())
+        result = sync.loads(self.render()["config/dr-templates/" + name.removeprefix("data/") + ".template"])
+        self.assertIn("NEW_LOGIC", result["payload"])
+        self.assertIn("@@INFISICAL:/shared/SEANIME_SOLVER_URL@@", result["payload"])
+        self.assertNotIn(value, result["payload"])
 
     def test_reordered_indexer_fields_preserve_private_binding_by_id(self):
         name = "data/jackett/data/Jackett/Indexers/animetosho-xyz.json"
@@ -165,6 +190,13 @@ class PublicExportTests(unittest.TestCase):
         changes = self.render()
         self.assertIn(b"ADDITIONAL_SETTING=public-option", changes["data/comet/.env"])
         self.assertNotIn(b"API_KEY=", changes["data/comet/.env"])
+
+    def test_agent_public_constants_do_not_block_or_hide_other_service_settings(self):
+        path = self.source / ".secrets/aiostreams.env"
+        path.write_bytes(path.read_bytes() + b"DATABASE_TYPE=postgres\nTZ=Europe/Rome\nLOG_LEVEL=info\n")
+        self.write("data/comet/.env", b"FASTAPI_WORKERS=8\nLOG_LEVEL=debug\n")
+        changes = self.render()
+        self.assertIn(b"LOG_LEVEL=debug", changes["data/comet/.env"])
 
     def test_runtime_trees_and_suspicious_names_are_never_published(self):
         for name in ("data/new/db/config.json", "data/new/state", "data/new/public/auth.sqlite", "config/public/credentials.json", "secrets/unfamiliar.txt", "docs/session.json"):
@@ -215,6 +247,16 @@ class PublicExportTests(unittest.TestCase):
         self.compose(lambda rows: rows["comet"].update(environment={"API_KEY": "${API_KEY:-some_unrecognized_private_default}"}))
         with self.assertRaisesRegex(sync.Refused, "PRIVATE_VARIABLE_DEFAULT_REFUSED"):
             self.render()
+
+    def test_database_url_credential_default_blocks(self):
+        self.compose(lambda rows: rows["comet"].update(environment={"SETTING": "${DATABASE_URL:-postgresql://user:private-password@example.org/db}"}))
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VARIABLE_DEFAULT_REFUSED"): self.render()
+
+    def test_removing_private_binding_requires_explicit_contract_review(self):
+        name = "data/jackett/data/Jackett/ServerConfig.json"
+        value = sync.loads((self.source / name).read_bytes()); value.pop("APIKey")
+        self.write(name, json.dumps(value).encode())
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_BINDING_REMOVAL_REVIEW_REQUIRED"): self.render()
 
     def test_private_literal_in_public_env_requires_agent(self):
         self.write("data/comet/.env", b"PASSWORD=literal_not_managed_in_infisical\n")

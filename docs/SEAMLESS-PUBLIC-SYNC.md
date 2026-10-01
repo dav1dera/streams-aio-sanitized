@@ -69,11 +69,18 @@ The exporter reads only container service/image metadata and never pulls images
 or starts containers. Image locks, the fresh-host override, dependencies,
 service/reference inventory and empty directory layout update together. Changes
 to the existing reviewed PostgreSQL recovery volume override require a review.
+Private env keys are classified per consuming service, so an Agent setting for
+one service cannot hide another service's public tuning. Public constants already
+declared in the baseline are not treated as evidence of a credential leak.
+Config rows are aligned by stable public IDs/names when available; reordering
+does not move private bindings to another row. Removing a private binding or
+changing an unidentified bound array still requires an explicit contract review.
 
 ## Removal and direct GitHub changes
 
 Removing a service from local Compose removes its image lock, component and
-unused reviewed templates/public env files. Shared active config remains. Local
+unused reviewed templates/public env files and private references. Shared active
+config and bindings remain. Local
 runtime data is never deleted. New exported public files are recorded in
 `config/public-sync-inventory.json`; later source deletions remove only those
 owned files whose public digest still matches. An externally edited deletion

@@ -106,9 +106,21 @@ class Guard:
         self.baseline = baseline
         self.plan = sync.loads(baseline["config/dr-render-plan.json"])
         self.values = {}
-        self.private_keys = {ref.rsplit("/", 1)[1] for ref in self.plan["required_values"]}
+        # Common settings already declared public are not evidence of a leak.
+        self.public_values = set()
+        def literals(row):
+            if isinstance(row, dict):
+                for key, value in row.items(): literals(value)
+            elif isinstance(row, list):
+                for value in row: literals(value)
+            elif isinstance(row, str) and not sync.MARKER.search(row): self.public_values.add(row)
+        literals(sync.yaml_load(baseline["docker-compose.yml"]))
+        for name, data in baseline.items():
+            if name.endswith("/.env"):
+                self.public_values.update(sync.env_values(data).values())
+        for item in self.plan["files"]:
+            if item.get("template") and item["format"] == "json": literals(sync.loads(baseline[item["template"]]))
         for name, bindings in self.plan["env_files"].items():
-            self.private_keys.update(bindings)
             if (source / name).is_file():
                 rows = sync.env_values(read(name))
                 for key, binding in bindings.items():
@@ -119,7 +131,6 @@ class Guard:
                 for key, value in sync.env_values(read(name)).items():
                     binding = export["overrides"].get(key, {"path": export["path"], "key": key})
                     self.remember(value, binding["path"] + "/" + binding["key"])
-                    self.private_keys.add(key)
         if (source / ".env").is_file():
             for key, value in sync.env_values(read(".env")).items():
                 binding = self.plan["root_env"].get(key)
@@ -132,8 +143,9 @@ class Guard:
             for path in sorted(private.glob("*.env")):
                 sync.require(len(self.values) < 3000, "PRIVATE_INPUT_LIMIT")
                 for key, value in sync.env_values(read(path.relative_to(source).as_posix())).items():
-                    self.private_keys.add(key)
-                    self.remember(value, None)
+                    existing = [ref for ref in self.plan["required_values"] if ref.rsplit("/", 1)[1] == key]
+                    # Reuse a unique published binding; never invent a folder for a new key.
+                    self.remember(value, existing[0] if len(existing) == 1 else None)
 
     def remember(self, value, ref):
         # Dotenv producer outputs may quote values. Never evaluate shell syntax.
@@ -144,7 +156,7 @@ class Guard:
                 value = value[1:-1]
         elif value.startswith("'") and value.endswith("'"):
             value = value[1:-1]
-        if value and value.lower() not in {"true", "false", "yes", "no", "on", "off"}:
+        if value and value not in self.public_values and value.lower() not in {"true", "false", "yes", "no", "on", "off"}:
             self.values.setdefault(value, set()).add(ref)
 
     def mask(self, text, name, preferred=()):
@@ -193,6 +205,10 @@ class Guard:
         public = self.sync.MARKER.sub("", text)
         # A reference is public; a credential supplied as its default is not.
         for variable in VARIABLE.finditer(public):
+            default = variable[0][len(variable[1]) + 2:-1]
+            self.sync.require(not any(rx.search(default) for rx in TOKEN_PATTERNS)
+                              and not any(len(v) >= 8 and v in default for v in self.values),
+                              "PRIVATE_VARIABLE_DEFAULT_REFUSED", name)
             if sensitive(variable[1]):
                 self.sync.require(variable[0] in {"${" + variable[1] + "}", "${" + variable[1] + ":-}", "${" + variable[1] + "-}"},
                                   "PRIVATE_VARIABLE_DEFAULT_REFUSED", name)
@@ -277,11 +293,11 @@ class Guard:
                 self.sync.require(False, "PRIVATE_FIELD_NEEDS_EXPLICIT_BINDING", location)
         return new
 
-    def env(self, data, name):
+    def env(self, data, name, private_keys=()):
         result = []
         for key, value in self.sync.env_values(data).items():
-            if key in self.private_keys or sensitive(key):
-                self.sync.require(not value.strip("\"' ") or value.strip("\"' ") in self.values,
+            if key in private_keys or sensitive(key):
+                self.sync.require(not value.strip("\"' ") or value.strip("\"' ") in self.values or value.strip("\"' ") in self.public_values,
                                   "PUBLIC_ENV_PRIVATE_VALUE_MUST_COME_FROM_AGENT", name)
                 continue  # Agent/private env must supply these; no guessed Infisical path.
             self.sync.require(not self.sync.MARKER.search(value), "PUBLIC_ENV_BINDING_USE_PRIVATE_ENV", name)
@@ -372,6 +388,19 @@ def restore_waves(compose, sync):
     return waves
 
 
+def declared_refs(value, sync):
+    refs = set()
+    if isinstance(value, dict):
+        if isinstance(value.get("path"), str) and isinstance(value.get("key"), str):
+            refs.add(value["path"] + "/" + value["key"])
+        for key, row in value.items():
+            if key != "required_values": refs.update(declared_refs(row, sync))
+    elif isinstance(value, list):
+        for row in value: refs.update(declared_refs(row, sync))
+    elif isinstance(value, str): refs.update(sync.MARKER.findall(value))
+    return refs
+
+
 def render(source, baseline, sync, image_reader=None):
     inputs, outputs, directories = {}, {}, {}
     def read(name):
@@ -394,6 +423,16 @@ def render(source, baseline, sync, image_reader=None):
     sync.require(not sync.MARKER.search(text), "COMPOSE_LITERAL_PRIVATE_VALUE_USE_INTERPOLATION")
     outputs["docker-compose.yml"] = guard.scan(text.encode(), "docker-compose.yml")
     services = set(compose["services"])
+    private_by_public = {}
+    for row in compose["services"].values():
+        entries = row.get("env_file", [])
+        if isinstance(entries, (str, dict)): entries = [entries]
+        names = [sync.relative((e if isinstance(e, str) else e.get("path", "")).removeprefix("./")) for e in entries]
+        keys = set()
+        for name in names:
+            if name.startswith(".secrets/") and (source / name).is_file(): keys.update(sync.env_values(read(name)))
+        for name in names:
+            if not name.startswith(".secrets/"): private_by_public.setdefault(name, set()).update(keys)
     plan = copy.deepcopy(guard.plan)
     old_manifest = sync.loads(baseline["config/dr-manifest.yaml"])
     names, skipped = candidates(source, sync)
@@ -406,7 +445,7 @@ def render(source, baseline, sync, image_reader=None):
         if name.startswith("data/") and name.split("/")[1] not in services: continue
         data = read(name)
         if re.fullmatch(r"data/[^/]+/\.env(?:\.example)?", name):
-            safe = guard.env(data, name)
+            safe = guard.env(data, name, private_by_public.get(name, ()))
         else:
             guard.scan(data, name)
             safe = data
@@ -484,6 +523,18 @@ def render(source, baseline, sync, image_reader=None):
     plan["service_folder_exports"] = {n: b for n, b in plan["service_folder_exports"].items() if n not in removed_generated or n in active_generated}
     plan["postgres_bootstrap"]["connections"] = [r for r in plan["postgres_bootstrap"]["connections"] if r["service"] in services]
     plan["files"] = [f for f in plan["files"] if f["destination"] not in removed_generated or f["destination"] in active_generated]
+    obsolete_refs = set()
+    for name in set(guard.plan["env_files"]) - set(plan["env_files"]): obsolete_refs.update(declared_refs(guard.plan["env_files"][name], sync))
+    for name in set(guard.plan["service_folder_exports"]) - set(plan["service_folder_exports"]):
+        obsolete_refs.update(declared_refs(guard.plan["service_folder_exports"][name], sync))
+    for item in guard.plan["files"]:
+        if item["destination"] in removed_generated and item["destination"] not in active_generated:
+            obsolete_refs.update(declared_refs(item, sync))
+            if item.get("template"): obsolete_refs.update(sync.MARKER.findall(baseline[item["template"]].decode()))
+    old_variables = {m[1] for m in VARIABLE.finditer(baseline["docker-compose.yml"].decode())}
+    variables = {m[1] for m in VARIABLE.finditer(text)}
+    for key in old_variables - variables:
+        if key in plan["root_env"]: obsolete_refs.update(declared_refs(plan["root_env"].pop(key), sync))
     # Existing mixed configs are sanitized with their bindings; ordinary strings and code can evolve.
     overlays = {r["file"]: r for r in sync.loads(baseline["config/private-config-overlays.json"])}
     for item in plan["files"]:
@@ -515,11 +566,17 @@ def render(source, baseline, sync, image_reader=None):
             data = old  # Private-only Cloudflare token input; public template remains canonical.
         else:
             data = guard.tree(old.decode(), raw.decode(), name).encode()
+        sync.require(set(sync.MARKER.findall(old.decode())) <= set(sync.MARKER.findall(data.decode())),
+                     "PRIVATE_BINDING_REMOVAL_REVIEW_REQUIRED", name)
         outputs[name] = guard.scan(data, name)
     for item in guard.plan["files"]:
         name = item.get("template")
         if name and name not in {i.get("template") for i in plan["files"]}:
             outputs[name] = None
+    active_refs = declared_refs(plan, sync)
+    for item in plan["files"]:
+        if item.get("template"): active_refs.update(sync.MARKER.findall(outputs[item["template"]].decode()))
+    plan["required_values"] = sorted((set(plan["required_values"]) - (obsolete_refs - active_refs)) | active_refs)
     # Removed public env files are no longer needed by any active service.
     for name in baseline:
         if re.fullmatch(r"data/[^/]+/\.env", name) and name.split("/")[1] in removed:
