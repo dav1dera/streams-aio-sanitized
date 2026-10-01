@@ -45,12 +45,12 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:2cc2d6de0d5ce336dc01af01b237e323e51f49b80eddd9f03998bbdbce25e3b8",
+    "image": "ghcr.io/viren070/aiostreams@sha256:79e34150c9bcd760861c13e92a27a4c15da1328a53e28fab6eaa4e44b5b32ab2",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
   "pgbouncer": {
-    "image": "edoburu/pgbouncer@sha256:4c1ca296ef525f108f5d3552cc337c0c09587cf8dae7f0067fd93349e47dc1cd",
+    "image": "edoburu/pgbouncer@sha256:9c78945868a6a142c7fc40ccd843bbe5a606df163c7ffce4de70e0d628d696a2",
     "platform": "linux/amd64",
     "configured_image": "edoburu/pgbouncer:latest"
   },

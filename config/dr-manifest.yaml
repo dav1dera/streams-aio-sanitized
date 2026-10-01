@@ -26,11 +26,9 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/tailscale/.env",
         ".secrets/tailscale.env",
-        "data/tailscale/data/state",
-        "/dev/net/tun",
-        "/dev/net/tun"
+        "data/tailscale/.env",
+        "data/tailscale/data/state"
       ],
       "OPTIONAL_STATE": [
         "tailscale-node"
@@ -61,8 +59,7 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/portainer/.env",
-        "/var/run/docker.sock"
+        "data/portainer/.env"
       ],
       "OPTIONAL_STATE": [
         "portainer-local"
@@ -74,7 +71,6 @@
     },
     "dnscrypt-proxy": {
       "PUBLIC_REPO_FILES": [
-        "config/dr-templates/dnscrypt-proxy/data/dnscrypt-proxy.toml.template",
         "data/dnscrypt-proxy/.env"
       ],
       "INFISICAL_PATHS": [
@@ -100,9 +96,7 @@
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
         "data/dnscrypt-proxy/.env",
-        "data/dnscrypt-proxy/data",
-        "data/dnscrypt-proxy/data/dnscrypt-proxy.toml",
-        "config/dr-templates/dnscrypt-proxy/data/dnscrypt-proxy.toml.template"
+        "data/dnscrypt-proxy/data"
       ],
       "OPTIONAL_STATE": [
         "dnscrypt-cache"
@@ -113,9 +107,7 @@
       "REQUIRED_STATE": []
     },
     "headscale": {
-      "PUBLIC_REPO_FILES": [
-        "config/dr-templates/headscale/data/config/config.yaml.template"
-      ],
+      "PUBLIC_REPO_FILES": [],
       "INFISICAL_PATHS": [
         "/headscale/DERP_SERVER_IPV4",
         "/headscale/DNS_BASE_DOMAIN",
@@ -145,9 +137,7 @@
       "REQUIRED_BEFORE_COMPOSE_UP": [
         "data/headscale/data/config",
         "data/headscale/data/lib",
-        "data/headscale/data/run",
-        "data/headscale/data/config/config.yaml",
-        "config/dr-templates/headscale/data/config/config.yaml.template"
+        "data/headscale/data/run"
       ],
       "OPTIONAL_STATE": [
         "headscale-enrollments",
@@ -162,9 +152,7 @@
       "REQUIRED_STATE": []
     },
     "headplane": {
-      "PUBLIC_REPO_FILES": [
-        "config/dr-templates/headplane/data/config.yaml.template"
-      ],
+      "PUBLIC_REPO_FILES": [],
       "INFISICAL_PATHS": [
         "/headplane/HEADSCALE_API_KEY",
         "/headplane/INTEGRATION_AGENT_HOST_NAME",
@@ -177,7 +165,8 @@
         "/shared/HEADSCALE_SERVER_URL"
       ],
       "GENERATED_FILES": [
-        "data/headplane/data/config.yaml"
+        "data/headplane/data/config.yaml",
+        "data/headscale/data/config/config.yaml"
       ],
       "RUNTIME_STATE": [
         "data/headplane/data/hp_persist.db"
@@ -192,12 +181,9 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/headplane/data/config.yaml",
         "data/headplane/data",
-        "data/headscale/data/config/config.yaml",
-        "/var/run/docker.sock",
         "data/headplane/data/config.yaml",
-        "config/dr-templates/headplane/data/config.yaml.template"
+        "data/headscale/data/config/config.yaml"
       ],
       "OPTIONAL_STATE": [
         "headplane-local"
@@ -209,11 +195,7 @@
     },
     "npm": {
       "PUBLIC_REPO_FILES": [
-        "config/dr-templates/npm/dns-cloudflare.ini.template",
-        "data/npm/.env",
-        "docs/NPM-RECOVERY.md",
-        "scripts/npm-dr-helper.mjs",
-        "scripts/npm-dr.py"
+        "data/npm/.env"
       ],
       "INFISICAL_PATHS": [
         "/npm/NETWORK_DEFAULT_IPV4_ADDRESS",
@@ -238,11 +220,7 @@
       "REQUIRED_BEFORE_COMPOSE_UP": [
         "data/npm/.env",
         "data/npm/data",
-        "data/npm/data/letsencrypt",
-        "config/dr-templates/npm/dns-cloudflare.ini.template",
-        "config/dr-templates/npm/dns-cloudflare.ini.template",
-        "config/dr-templates/npm/dns-cloudflare.ini.template",
-        "data/npm/data/database.sqlite"
+        "data/npm/data/letsencrypt"
       ],
       "OPTIONAL_STATE": [
         "npm-tls",
@@ -280,8 +258,8 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/cloudflare-ddns/.env",
-        ".secrets/cloudflare-ddns.env"
+        ".secrets/cloudflare-ddns.env",
+        "data/cloudflare-ddns/.env"
       ],
       "OPTIONAL_STATE": [],
       "STATE_UNIT_IDS": [],
@@ -289,13 +267,7 @@
     },
     "aiometadata": {
       "PUBLIC_REPO_FILES": [
-        "config/aio-export-contract.json",
-        "data/aiometadata/.env",
-        "docs/AIO-EXPORT-IMPORT.md",
-        "scripts/aio-dr.py",
-        "config/aio-payload.schema.json",
-        "config/aio-bindings.schema.json",
-        "config/dr-templates/aio/aiometadata-bootstrap.sql"
+        "data/aiometadata/.env"
       ],
       "INFISICAL_PATHS": [
         "/aiometadata/*",
@@ -319,10 +291,9 @@
         "complete explicit provider/account reauthorization"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/aiometadata/.env",
         ".secrets/aiometadata.env",
-        "data/aiometadata/data",
-        ".generated/aio-import-complete.json"
+        "data/aiometadata/.env",
+        "data/aiometadata/data"
       ],
       "OPTIONAL_STATE": [
         "aiometadata-user-config",
@@ -367,8 +338,8 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/mediaflow-proxy-light/.env",
-        ".secrets/mediaflow-proxy-light.env"
+        ".secrets/mediaflow-proxy-light.env",
+        "data/mediaflow-proxy-light/.env"
       ],
       "OPTIONAL_STATE": [
         "redis-data"
@@ -380,13 +351,7 @@
     },
     "aiostreams": {
       "PUBLIC_REPO_FILES": [
-        "config/aio-export-contract.json",
-        "data/aiostreams/.env",
-        "docs/AIO-EXPORT-IMPORT.md",
-        "scripts/aio-dr.py",
-        "config/aio-payload.schema.json",
-        "config/aio-bindings.schema.json",
-        "config/dr-templates/aio/aiostreams-bootstrap.sql"
+        "data/aiostreams/.env"
       ],
       "INFISICAL_PATHS": [
         "/aiostreams/*",
@@ -409,10 +374,9 @@
         "complete explicit provider/account reauthorization"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/aiostreams/.env",
         ".secrets/aiostreams.env",
-        "data/aiostreams/data",
-        ".generated/aio-import-complete.json"
+        "data/aiostreams/.env",
+        "data/aiostreams/data"
       ],
       "OPTIONAL_STATE": [
         "aiostreams-user-config",
@@ -429,7 +393,6 @@
     },
     "pgbouncer": {
       "PUBLIC_REPO_FILES": [
-        "config/dr-templates/pgbouncer/data/pgbouncer.ini.template",
         "data/pgbouncer/.env"
       ],
       "INFISICAL_PATHS": [
@@ -454,13 +417,10 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/pgbouncer/.env",
+        ".generated/pgbouncer/userlist.txt",
         ".secrets/pgbouncer.env",
-        "data/pgbouncer/data/pgbouncer.ini",
-        ".generated/pgbouncer/userlist.txt",
-        ".generated/pgbouncer/userlist.txt",
-        "data/pgbouncer/data/pgbouncer.ini",
-        "config/dr-templates/pgbouncer/data/pgbouncer.ini.template"
+        "data/pgbouncer/.env",
+        "data/pgbouncer/data/pgbouncer.ini"
       ],
       "OPTIONAL_STATE": [],
       "STATE_UNIT_IDS": [],
@@ -468,7 +428,6 @@
     },
     "postgres": {
       "PUBLIC_REPO_FILES": [
-        "config/dr-templates/postgres/init.sql.template",
         "data/postgres/.env",
         "data/postgres/postgresql.conf"
       ],
@@ -501,11 +460,10 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/postgres/.env",
         ".secrets/postgres.env",
+        "data/postgres/.env",
         "data/postgres/init",
-        "data/postgres/postgresql.conf",
-        "config/dr-templates/postgres/init.sql.template"
+        "data/postgres/postgresql.conf"
       ],
       "OPTIONAL_STATE": [
         "postgres-cluster",
@@ -573,19 +531,15 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/watchtower/.env",
-        "/var/run/docker.sock",
         ".generated/watchtower/config.json",
-        ".generated/watchtower/config.json"
+        "data/watchtower/.env"
       ],
       "OPTIONAL_STATE": [],
       "STATE_UNIT_IDS": [],
       "REQUIRED_STATE": []
     },
     "honey": {
-      "PUBLIC_REPO_FILES": [
-        "config/dr-templates/honey/data/config/config.json.template"
-      ],
+      "PUBLIC_REPO_FILES": [],
       "INFISICAL_PATHS": [
         "/honey/NETWORK_DEFAULT_IPV4_ADDRESS",
         "/honey/SERVICES_0_HREF",
@@ -622,9 +576,7 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/honey/data/config",
-        "data/honey/data/config/config.json",
-        "config/dr-templates/honey/data/config/config.json.template"
+        "data/honey/data/config"
       ],
       "OPTIONAL_STATE": [],
       "STATE_UNIT_IDS": [],
@@ -744,9 +696,8 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/oauth2-proxy/.env",
         ".secrets/oauth2-proxy.env",
-        "data/oauth2-proxy/allowed-emails.txt",
+        "data/oauth2-proxy/.env",
         "data/oauth2-proxy/allowed-emails.txt"
       ],
       "OPTIONAL_STATE": [
@@ -759,7 +710,6 @@
     },
     "easyproxy": {
       "PUBLIC_REPO_FILES": [
-        "config/dr-templates/easyproxy/data/config.json.template",
         "data/easyproxy/.env"
       ],
       "INFISICAL_PATHS": [
@@ -784,11 +734,9 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/easyproxy/.env",
         ".secrets/easyproxy.env",
-        "data/easyproxy/data",
-        "data/easyproxy/data/config.json",
-        "config/dr-templates/easyproxy/data/config.json.template"
+        "data/easyproxy/.env",
+        "data/easyproxy/data"
       ],
       "OPTIONAL_STATE": [
         "easyproxy-registration"
@@ -826,8 +774,8 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/streamvix/.env",
-        ".secrets/streamvix.env"
+        ".secrets/streamvix.env",
+        "data/streamvix/.env"
       ],
       "OPTIONAL_STATE": [],
       "STATE_UNIT_IDS": [],
@@ -857,8 +805,8 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/tvvoo/.env",
-        ".secrets/tvvoo.env"
+        ".secrets/tvvoo.env",
+        "data/tvvoo/.env"
       ],
       "OPTIONAL_STATE": [],
       "STATE_UNIT_IDS": [],
@@ -888,8 +836,8 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/aiomanager/.env",
         ".secrets/aiomanager.env",
+        "data/aiomanager/.env",
         "data/aiomanager/data"
       ],
       "OPTIONAL_STATE": [
@@ -917,8 +865,7 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/deunhealth/.env",
-        "/var/run/docker.sock"
+        "data/deunhealth/.env"
       ],
       "OPTIONAL_STATE": [],
       "STATE_UNIT_IDS": [],
@@ -949,9 +896,8 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/gluetun/.env",
         ".secrets/gluetun.env",
-        "/dev/net/tun"
+        "data/gluetun/.env"
       ],
       "OPTIONAL_STATE": [],
       "STATE_UNIT_IDS": [],
@@ -1005,8 +951,8 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/comet/.env",
         ".secrets/comet.env",
+        "data/comet/.env",
         "data/comet/data"
       ],
       "OPTIONAL_STATE": [
@@ -1048,9 +994,9 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/cometnet/.env",
         ".secrets/cometnet.env",
-        "data/comet/data"
+        "data/comet/data",
+        "data/cometnet/.env"
       ],
       "OPTIONAL_STATE": [
         "comet-cache-db",
@@ -1096,8 +1042,8 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/stremthru/.env",
-        ".secrets/stremthru.env"
+        ".secrets/stremthru.env",
+        "data/stremthru/.env"
       ],
       "OPTIONAL_STATE": [
         "stremthru-cache",
@@ -1113,12 +1059,6 @@
     },
     "jackett": {
       "PUBLIC_REPO_FILES": [
-        "config/dr-templates/jackett/data/Jackett/Indexers/animetosho-xyz.json.template",
-        "config/dr-templates/jackett/data/Jackett/Indexers/knaben.json.template",
-        "config/dr-templates/jackett/data/Jackett/Indexers/nyaasi.json.template",
-        "config/dr-templates/jackett/data/Jackett/Indexers/thepiratebay.json.template",
-        "config/dr-templates/jackett/data/Jackett/Indexers/therarbg.json.template",
-        "config/dr-templates/jackett/data/Jackett/ServerConfig.json.template",
         "data/jackett/.env"
       ],
       "INFISICAL_PATHS": [
@@ -1147,19 +1087,7 @@
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
         "data/jackett/.env",
-        "data/jackett/data",
-        "data/jackett/data/Jackett/Indexers/animetosho-xyz.json",
-        "config/dr-templates/jackett/data/Jackett/Indexers/animetosho-xyz.json.template",
-        "data/jackett/data/Jackett/Indexers/knaben.json",
-        "config/dr-templates/jackett/data/Jackett/Indexers/knaben.json.template",
-        "data/jackett/data/Jackett/Indexers/nyaasi.json",
-        "config/dr-templates/jackett/data/Jackett/Indexers/nyaasi.json.template",
-        "data/jackett/data/Jackett/Indexers/thepiratebay.json",
-        "config/dr-templates/jackett/data/Jackett/Indexers/thepiratebay.json.template",
-        "data/jackett/data/Jackett/Indexers/therarbg.json",
-        "config/dr-templates/jackett/data/Jackett/Indexers/therarbg.json.template",
-        "data/jackett/data/Jackett/ServerConfig.json",
-        "config/dr-templates/jackett/data/Jackett/ServerConfig.json.template"
+        "data/jackett/data"
       ],
       "OPTIONAL_STATE": [
         "jackett-runtime"
@@ -1170,23 +1098,7 @@
       "REQUIRED_STATE": []
     },
     "seanime": {
-      "PUBLIC_REPO_FILES": [
-        "config/dr-templates/seanime/data/main/config/config.toml.template",
-        "config/dr-templates/seanime/data/main/config/extensions/aiostreams-plugin.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/always-advanced-search.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/anilist-watch-order.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/animetosho-new.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/aq-anikoto.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/aq-animepahe-beta.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/episodeshistory.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/mangabuddy.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/mangadex.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/mangafreak.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/mangaworld.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/setwatched.json.template",
-        "config/dr-templates/seanime/data/main/config/extensions/subtitle-engine.json.template"
-      ],
+      "PUBLIC_REPO_FILES": [],
       "INFISICAL_PATHS": [
         "/seanime/SERVER_PASSWORD",
         "/shared/SEANIME_SOLVER_URL"
@@ -1222,40 +1134,10 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/seanime/data/main/anime",
-        "data/seanime/data/main/downloads",
         "data/seanime/data/main",
+        "data/seanime/data/main/anime",
         "data/seanime/data/main/config",
-        "data/seanime/data/main/config/config.toml",
-        "config/dr-templates/seanime/data/main/config/config.toml.template",
-        "data/seanime/data/main/config/extensions/aiostreams-plugin.json",
-        "config/dr-templates/seanime/data/main/config/extensions/aiostreams-plugin.json.template",
-        "data/seanime/data/main/config/extensions/always-advanced-search.json",
-        "config/dr-templates/seanime/data/main/config/extensions/always-advanced-search.json.template",
-        "data/seanime/data/main/config/extensions/anilist-watch-order.json",
-        "config/dr-templates/seanime/data/main/config/extensions/anilist-watch-order.json.template",
-        "data/seanime/data/main/config/extensions/animetosho-new.json",
-        "config/dr-templates/seanime/data/main/config/extensions/animetosho-new.json.template",
-        "data/seanime/data/main/config/extensions/aq-anikoto.json",
-        "config/dr-templates/seanime/data/main/config/extensions/aq-anikoto.json.template",
-        "data/seanime/data/main/config/extensions/aq-animepahe-beta.json",
-        "config/dr-templates/seanime/data/main/config/extensions/aq-animepahe-beta.json.template",
-        "data/seanime/data/main/config/extensions/episodeshistory.json",
-        "config/dr-templates/seanime/data/main/config/extensions/episodeshistory.json.template",
-        "data/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json",
-        "config/dr-templates/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json.template",
-        "data/seanime/data/main/config/extensions/mangabuddy.json",
-        "config/dr-templates/seanime/data/main/config/extensions/mangabuddy.json.template",
-        "data/seanime/data/main/config/extensions/mangadex.json",
-        "config/dr-templates/seanime/data/main/config/extensions/mangadex.json.template",
-        "data/seanime/data/main/config/extensions/mangafreak.json",
-        "config/dr-templates/seanime/data/main/config/extensions/mangafreak.json.template",
-        "data/seanime/data/main/config/extensions/mangaworld.json",
-        "config/dr-templates/seanime/data/main/config/extensions/mangaworld.json.template",
-        "data/seanime/data/main/config/extensions/setwatched.json",
-        "config/dr-templates/seanime/data/main/config/extensions/setwatched.json.template",
-        "data/seanime/data/main/config/extensions/subtitle-engine.json",
-        "config/dr-templates/seanime/data/main/config/extensions/subtitle-engine.json.template"
+        "data/seanime/data/main/downloads"
       ],
       "OPTIONAL_STATE": [
         "seanime-preferences",
@@ -1268,27 +1150,7 @@
       "REQUIRED_STATE": []
     },
     "seanime-shared": {
-      "PUBLIC_REPO_FILES": [
-        "config/dr-templates/seanime/data/shared/config/config.toml.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/AnimeUnity.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/Watch-Next.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/aiostreams-plugin.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/always-advanced-search.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/anidream.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/animesaturn.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/animesaturnmirror.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/animetosho-new.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/animeunitymirror.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/animeworld.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/aq-anikoto.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/custom-banner-images.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/episodeshistory.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/picked-for-you.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/setwatched.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/subtitle-engine.json.template",
-        "config/dr-templates/seanime/data/shared/config/extensions/watch-order.json.template"
-      ],
+      "PUBLIC_REPO_FILES": [],
       "INFISICAL_PATHS": [
         "/seanime-shared/AIOSTREAMS_CONFIGURATION_ID",
         "/seanime-shared/AIOSTREAMS_ORIGIN",
@@ -1330,48 +1192,10 @@
         "complete documented first-run enrollment"
       ],
       "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/seanime/data/shared/anime",
-        "data/seanime/data/shared/downloads",
         "data/seanime/data/shared",
+        "data/seanime/data/shared/anime",
         "data/seanime/data/shared/config",
-        "data/seanime/data/shared/config/config.toml",
-        "config/dr-templates/seanime/data/shared/config/config.toml.template",
-        "data/seanime/data/shared/config/extensions/AnimeUnity.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/AnimeUnity.json.template",
-        "data/seanime/data/shared/config/extensions/Watch-Next.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/Watch-Next.json.template",
-        "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/aiostreams-plugin.json.template",
-        "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json.template",
-        "data/seanime/data/shared/config/extensions/always-advanced-search.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/always-advanced-search.json.template",
-        "data/seanime/data/shared/config/extensions/anidream.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/anidream.json.template",
-        "data/seanime/data/shared/config/extensions/animesaturn.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/animesaturn.json.template",
-        "data/seanime/data/shared/config/extensions/animesaturnmirror.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/animesaturnmirror.json.template",
-        "data/seanime/data/shared/config/extensions/animetosho-new.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/animetosho-new.json.template",
-        "data/seanime/data/shared/config/extensions/animeunitymirror.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/animeunitymirror.json.template",
-        "data/seanime/data/shared/config/extensions/animeworld.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/animeworld.json.template",
-        "data/seanime/data/shared/config/extensions/aq-anikoto.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/aq-anikoto.json.template",
-        "data/seanime/data/shared/config/extensions/custom-banner-images.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/custom-banner-images.json.template",
-        "data/seanime/data/shared/config/extensions/episodeshistory.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/episodeshistory.json.template",
-        "data/seanime/data/shared/config/extensions/picked-for-you.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/picked-for-you.json.template",
-        "data/seanime/data/shared/config/extensions/setwatched.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/setwatched.json.template",
-        "data/seanime/data/shared/config/extensions/subtitle-engine.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/subtitle-engine.json.template",
-        "data/seanime/data/shared/config/extensions/watch-order.json",
-        "config/dr-templates/seanime/data/shared/config/extensions/watch-order.json.template"
+        "data/seanime/data/shared/downloads"
       ],
       "OPTIONAL_STATE": [
         "seanime-shared-preferences",
@@ -1408,33 +1232,14 @@
       "SOURCE": "data/tailscale/data/state",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "tailscale",
       "REFERENCE": "/dev/net/tun",
       "TYPE": "HOST_PREREQUISITE",
       "SOURCE": "/dev/net/tun",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "DETAIL": "Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "tailscale",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:tailscale/tailscale:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "tailscale",
-      "REFERENCE": "device:/dev/net/tun",
-      "TYPE": "HOST_PREREQUISITE",
-      "SOURCE": "/dev/net/tun",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "DETAIL": "Existing host device; never generated as a regular file.",
+      "RESTORE_METHOD": "HOST_PREREQUISITE",
       "RESOLVED": true
     },
     {
@@ -1447,28 +1252,10 @@
     },
     {
       "SERVICE": "portainer",
-      "REFERENCE": "/data",
-      "TYPE": "NAMED_VOLUME",
-      "SOURCE": "volume:portainer-data",
-      "RESTORE_METHOD": "DOCKER_NAMED_VOLUME",
-      "RESOLVED": true,
-      "AUTOCREATE_BY_COMPOSE": true
-    },
-    {
-      "SERVICE": "portainer",
       "REFERENCE": "/var/run/docker.sock",
       "TYPE": "HOST_PREREQUISITE",
       "SOURCE": "/var/run/docker.sock",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "DETAIL": "Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "portainer",
-      "REFERENCE": "INFISICAL_PORTAINER_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
+      "RESTORE_METHOD": "HOST_PREREQUISITE",
       "RESOLVED": true
     },
     {
@@ -1489,22 +1276,6 @@
       "RESOLVED": true
     },
     {
-      "SERVICE": "dnscrypt-proxy",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:klutchell/dnscrypt-proxy:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "dnscrypt-proxy",
-      "REFERENCE": "INFISICAL_DNSCRYPT_PROXY_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
       "SERVICE": "headscale",
       "REFERENCE": "/etc/headscale",
       "TYPE": "BIND_MOUNT",
@@ -1520,8 +1291,7 @@
       "SOURCE": "data/headscale/data/lib",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "headscale",
@@ -1530,31 +1300,6 @@
       "SOURCE": "data/headscale/data/run",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "headscale",
-      "REFERENCE": "command",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:headscale/headscale:stable",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "headscale",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:headscale/headscale:stable",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "headscale",
-      "REFERENCE": "INFISICAL_HEADSCALE_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -1562,7 +1307,7 @@
       "REFERENCE": "/etc/headplane/config.yaml",
       "TYPE": "BIND_MOUNT",
       "SOURCE": "data/headplane/data/config.yaml",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
+      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
       "MODE": "rw",
       "RESOLVED": true
     },
@@ -1573,15 +1318,14 @@
       "SOURCE": "data/headplane/data",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "headplane",
       "REFERENCE": "/etc/headscale/config.yaml",
       "TYPE": "BIND_MOUNT",
       "SOURCE": "data/headscale/data/config/config.yaml",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
+      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
       "MODE": "rw",
       "RESOLVED": true
     },
@@ -1590,24 +1334,7 @@
       "REFERENCE": "/var/run/docker.sock",
       "TYPE": "HOST_PREREQUISITE",
       "SOURCE": "/var/run/docker.sock",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "DETAIL": "Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "headplane",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:ghcr.io/tale/headplane:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "headplane",
-      "REFERENCE": "INFISICAL_HEADPLANE_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
+      "RESTORE_METHOD": "HOST_PREREQUISITE",
       "RESOLVED": true
     },
     {
@@ -1625,8 +1352,7 @@
       "SOURCE": "data/npm/data",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "npm",
@@ -1635,31 +1361,6 @@
       "SOURCE": "data/npm/data/letsencrypt",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "npm",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:jc21/nginx-proxy-manager:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "npm",
-      "REFERENCE": "INFISICAL_NPM_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "npm",
-      "REFERENCE": "INFISICAL_NPM_NETWORK_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -1679,14 +1380,6 @@
       "RESOLVED": true
     },
     {
-      "SERVICE": "cloudflare-ddns",
-      "REFERENCE": "INFISICAL_STACK_CLOUDFLARE_DDNS_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
       "SERVICE": "aiometadata",
       "REFERENCE": "data/aiometadata/.env",
       "TYPE": "ENV_FILE",
@@ -1700,8 +1393,7 @@
       "TYPE": "ENV_FILE",
       "SOURCE": ".secrets/aiometadata.env",
       "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true,
-      "DETAIL": "Required declarative input contract is explicit; fresh rendering fails closed when a value is missing. No Infisical provisioning is claimed by source readiness."
+      "RESOLVED": true
     },
     {
       "SERVICE": "aiometadata",
@@ -1710,23 +1402,6 @@
       "SOURCE": "data/aiometadata/data",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "aiometadata",
-      "REFERENCE": "INFISICAL_STACK_AIOMETADATA_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "aiometadata",
-      "REFERENCE": "INFISICAL_STACK_AIOMETADATA_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -1746,22 +1421,6 @@
       "RESOLVED": true
     },
     {
-      "SERVICE": "mediaflow-proxy-light",
-      "REFERENCE": "INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "mediaflow-proxy-light",
-      "REFERENCE": "INFISICAL_STACK_MEDIAFLOW_PROXY_LIGHT_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
       "SERVICE": "aiostreams",
       "REFERENCE": "data/aiostreams/.env",
       "TYPE": "ENV_FILE",
@@ -1775,8 +1434,7 @@
       "TYPE": "ENV_FILE",
       "SOURCE": ".secrets/aiostreams.env",
       "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true,
-      "DETAIL": "Required declarative input contract is explicit; fresh rendering fails closed when a value is missing. No Infisical provisioning is claimed by source readiness."
+      "RESOLVED": true
     },
     {
       "SERVICE": "aiostreams",
@@ -1785,23 +1443,6 @@
       "SOURCE": "data/aiostreams/data",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "aiostreams",
-      "REFERENCE": "INFISICAL_STACK_AIOSTREAMS_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "aiostreams",
-      "REFERENCE": "INFISICAL_STACK_AIOSTREAMS_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -1825,7 +1466,7 @@
       "REFERENCE": "/etc/pgbouncer/pgbouncer.ini",
       "TYPE": "BIND_MOUNT",
       "SOURCE": "data/pgbouncer/data/pgbouncer.ini",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
+      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
       "MODE": "ro",
       "RESOLVED": true
     },
@@ -1834,32 +1475,8 @@
       "REFERENCE": "/etc/pgbouncer/userlist.txt",
       "TYPE": "BIND_MOUNT",
       "SOURCE": ".generated/pgbouncer/userlist.txt",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
+      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
       "MODE": "rw",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "pgbouncer",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:edoburu/pgbouncer:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "pgbouncer",
-      "REFERENCE": "INFISICAL_STACK_PGBOUNCER_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "pgbouncer",
-      "REFERENCE": "INFISICAL_STACK_PGBOUNCER_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -1889,85 +1506,11 @@
     },
     {
       "SERVICE": "postgres",
-      "REFERENCE": "/var/lib/postgresql/data",
-      "TYPE": "NAMED_VOLUME",
-      "SOURCE": "volume:pgdata",
-      "RESTORE_METHOD": "DOCKER_NAMED_VOLUME",
-      "RESOLVED": true,
-      "AUTOCREATE_BY_COMPOSE": true
-    },
-    {
-      "SERVICE": "postgres",
       "REFERENCE": "/var/lib/postgresql/data/postgresql.conf",
       "TYPE": "BIND_MOUNT",
       "SOURCE": "data/postgres/postgresql.conf",
       "RESTORE_METHOD": "TRACKED_PUBLIC",
       "MODE": "rw",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "postgres",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:postgres:18-alpine",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "postgres",
-      "REFERENCE": "INFISICAL_STACK_POSTGRES_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "postgres",
-      "REFERENCE": "INFISICAL_STACK_POSTGRES_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "redis",
-      "REFERENCE": "/data",
-      "TYPE": "NAMED_VOLUME",
-      "SOURCE": "volume:redis-data",
-      "RESTORE_METHOD": "DOCKER_NAMED_VOLUME",
-      "RESOLVED": true,
-      "AUTOCREATE_BY_COMPOSE": true
-    },
-    {
-      "SERVICE": "redis",
-      "REFERENCE": "command",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:redis:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "redis",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:redis:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "redis",
-      "REFERENCE": "INFISICAL_REDIS_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "redis",
-      "REFERENCE": "INFISICAL_REDIS_NETWORK_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -1983,8 +1526,7 @@
       "REFERENCE": "/var/run/docker.sock",
       "TYPE": "HOST_PREREQUISITE",
       "SOURCE": "/var/run/docker.sock",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "DETAIL": "Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.",
+      "RESTORE_METHOD": "HOST_PREREQUISITE",
       "RESOLVED": true
     },
     {
@@ -1992,16 +1534,8 @@
       "REFERENCE": "/config.json",
       "TYPE": "BIND_MOUNT",
       "SOURCE": ".generated/watchtower/config.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
+      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
       "MODE": "ro",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "watchtower",
-      "REFERENCE": "INFISICAL_STACK_WATCHTOWER_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -2014,85 +1548,11 @@
       "RESOLVED": true
     },
     {
-      "SERVICE": "honey",
-      "REFERENCE": "INFISICAL_HONEY_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
       "SERVICE": "teamspeak",
       "REFERENCE": "data/teamspeak/.env",
       "TYPE": "ENV_FILE",
       "SOURCE": "data/teamspeak/.env",
       "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "teamspeak",
-      "REFERENCE": "/var/tsserver",
-      "TYPE": "NAMED_VOLUME",
-      "SOURCE": "volume:teamspeak-data",
-      "RESTORE_METHOD": "DOCKER_NAMED_VOLUME",
-      "RESOLVED": true,
-      "AUTOCREATE_BY_COMPOSE": true
-    },
-    {
-      "SERVICE": "teamspeak",
-      "REFERENCE": "INFISICAL_TEAMSPEAK_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "microwarp",
-      "REFERENCE": "/etc/wireguard",
-      "TYPE": "NAMED_VOLUME",
-      "SOURCE": "volume:warp-data",
-      "RESTORE_METHOD": "DOCKER_NAMED_VOLUME",
-      "RESOLVED": true,
-      "AUTOCREATE_BY_COMPOSE": true
-    },
-    {
-      "SERVICE": "microwarp",
-      "REFERENCE": "INFISICAL_MICROWARP_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "gost",
-      "REFERENCE": "command",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:gogost/gost:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "gost",
-      "REFERENCE": "INFISICAL_GOST_COMMAND_ARG_1",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "gost",
-      "REFERENCE": "INFISICAL_GOST_NETWORK_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "gost",
-      "REFERENCE": "INFISICAL_GOST_NETWORK_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -2116,17 +1576,8 @@
       "REFERENCE": "/etc/oauth2-proxy/allowed-emails.txt",
       "TYPE": "BIND_MOUNT",
       "SOURCE": "data/oauth2-proxy/allowed-emails.txt",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
+      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
       "MODE": "ro",
-      "RESOLVED": true,
-      "DETAIL": "Required declarative input contract is explicit; fresh rendering fails closed when a value is missing. No Infisical provisioning is claimed by source readiness."
-    },
-    {
-      "SERVICE": "oauth2-proxy",
-      "REFERENCE": "INFISICAL_STACK_OAUTH2_PROXY_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -2152,23 +1603,6 @@
       "SOURCE": "data/easyproxy/data",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "easyproxy",
-      "REFERENCE": "INFISICAL_STACK_EASYPROXY_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "easyproxy",
-      "REFERENCE": "INFISICAL_STACK_EASYPROXY_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -2188,22 +1622,6 @@
       "RESOLVED": true
     },
     {
-      "SERVICE": "streamvix",
-      "REFERENCE": "INFISICAL_STACK_STREAMVIX_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "streamvix",
-      "REFERENCE": "INFISICAL_STACK_STREAMVIX_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
       "SERVICE": "tvvoo",
       "REFERENCE": "data/tvvoo/.env",
       "TYPE": "ENV_FILE",
@@ -2216,22 +1634,6 @@
       "REFERENCE": ".secrets/tvvoo.env",
       "TYPE": "ENV_FILE",
       "SOURCE": ".secrets/tvvoo.env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "tvvoo",
-      "REFERENCE": "INFISICAL_STACK_TVVOO_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "tvvoo",
-      "REFERENCE": "INFISICAL_STACK_TVVOO_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
       "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
@@ -2258,23 +1660,6 @@
       "SOURCE": "data/aiomanager/data",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "aiomanager",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:ghcr.io/sonicx161/aiomanager:beta",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "aiomanager",
-      "REFERENCE": "INFISICAL_STACK_AIOMANAGER_DEFAULT_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
     {
@@ -2290,8 +1675,7 @@
       "REFERENCE": "/var/run/docker.sock",
       "TYPE": "HOST_PREREQUISITE",
       "SOURCE": "/var/run/docker.sock",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "DETAIL": "Provided by the new host kernel or Docker daemon; preflight checks existence, never fabricates a socket/device.",
+      "RESTORE_METHOD": "HOST_PREREQUISITE",
       "RESOLVED": true
     },
     {
@@ -2307,31 +1691,6 @@
       "REFERENCE": ".secrets/gluetun.env",
       "TYPE": "ENV_FILE",
       "SOURCE": ".secrets/gluetun.env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "gluetun",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:qmcgaw/gluetun:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "gluetun",
-      "REFERENCE": "device:/dev/net/tun",
-      "TYPE": "HOST_PREREQUISITE",
-      "SOURCE": "/dev/net/tun",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "DETAIL": "Existing host device; never generated as a regular file.",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "gluetun",
-      "REFERENCE": "INFISICAL_STACK_GLUETUN_VPN_NET_IPV4_ADDRESS",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
       "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
       "RESOLVED": true
     },
@@ -2358,8 +1717,7 @@
       "SOURCE": "data/comet/data",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "cometnet",
@@ -2384,23 +1742,6 @@
       "SOURCE": "data/comet/data",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "cometnet",
-      "REFERENCE": "entrypoint",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:g0ldyy/comet:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "cometnet",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:g0ldyy/comet:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
       "RESOLVED": true
     },
     {
@@ -2434,8 +1775,7 @@
       "SOURCE": "data/jackett/data",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "seanime",
@@ -2444,8 +1784,7 @@
       "SOURCE": "data/seanime/data/main/anime",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "seanime",
@@ -2454,8 +1793,7 @@
       "SOURCE": "data/seanime/data/main/downloads",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "seanime",
@@ -2464,8 +1802,7 @@
       "SOURCE": "data/seanime/data/main",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "seanime",
@@ -2474,15 +1811,6 @@
       "SOURCE": "data/seanime/data/main/config",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:umagistr/seanime:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
       "RESOLVED": true
     },
     {
@@ -2492,8 +1820,7 @@
       "SOURCE": "data/seanime/data/shared/anime",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "seanime-shared",
@@ -2502,8 +1829,7 @@
       "SOURCE": "data/seanime/data/shared/downloads",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "seanime-shared",
@@ -2512,8 +1838,7 @@
       "SOURCE": "data/seanime/data/shared",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
+      "RESOLVED": true
     },
     {
       "SERVICE": "seanime-shared",
@@ -2522,996 +1847,6 @@
       "SOURCE": "data/seanime/data/shared/config",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "healthcheck",
-      "TYPE": "IMAGE_EXECUTABLE_OR_ARGUMENTS",
-      "SOURCE": "image:umagistr/seanime:latest",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "stack-network",
-      "REFERENCE": "INFISICAL_STACK_DEFAULT_SUBNET",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "stack-network",
-      "REFERENCE": "INFISICAL_STACK_VPN_NET_SUBNET",
-      "TYPE": "COMPOSE_INTERPOLATION",
-      "SOURCE": ".env",
-      "RESTORE_METHOD": "INFISICAL_AGENT_RENDER",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "postgres",
-      "REFERENCE": "/var/lib/postgresql",
-      "TYPE": "IMAGE_PERSISTENT_VOLUME",
-      "SOURCE": "volume:postgres-cluster",
-      "RESTORE_METHOD": "DOCKER_NAMED_VOLUME",
-      "DETAIL": "Compose creates empty named storage; restoring prior contents is optional.",
-      "RESOLVED": true,
-      "AUTOCREATE_BY_COMPOSE": true
-    },
-    {
-      "SERVICE": "stremthru",
-      "REFERENCE": "/app/data",
-      "TYPE": "IMAGE_PERSISTENT_VOLUME",
-      "SOURCE": "volume:stremthru-data",
-      "RESTORE_METHOD": "DOCKER_NAMED_VOLUME",
-      "DETAIL": "Compose creates empty named storage; restoring prior contents is optional.",
-      "RESOLVED": true,
-      "AUTOCREATE_BY_COMPOSE": true
-    },
-    {
-      "SERVICE": "pgbouncer",
-      "REFERENCE": ".generated/pgbouncer/userlist.txt",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": ".generated/pgbouncer/userlist.txt",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": false,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "watchtower",
-      "REFERENCE": ".generated/watchtower/config.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": ".generated/watchtower/config.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": false,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "dnscrypt-proxy",
-      "REFERENCE": "data/dnscrypt-proxy/data/dnscrypt-proxy.toml",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/dnscrypt-proxy/data/dnscrypt-proxy.toml",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": false,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "dnscrypt-proxy",
-      "REFERENCE": "template:data/dnscrypt-proxy/data/dnscrypt-proxy.toml",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/dnscrypt-proxy/data/dnscrypt-proxy.toml.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "easyproxy",
-      "REFERENCE": "data/easyproxy/data/config.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/easyproxy/data/config.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "easyproxy",
-      "REFERENCE": "template:data/easyproxy/data/config.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/easyproxy/data/config.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "headplane",
-      "REFERENCE": "data/headplane/data/config.yaml",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/headplane/data/config.yaml",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "headplane",
-      "REFERENCE": "template:data/headplane/data/config.yaml",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/headplane/data/config.yaml.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "headscale",
-      "REFERENCE": "data/headscale/data/config/config.yaml",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/headscale/data/config/config.yaml",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "headscale",
-      "REFERENCE": "template:data/headscale/data/config/config.yaml",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/headscale/data/config/config.yaml.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "honey",
-      "REFERENCE": "data/honey/data/config/config.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/honey/data/config/config.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "honey",
-      "REFERENCE": "template:data/honey/data/config/config.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/honey/data/config/config.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "data/jackett/data/Jackett/Indexers/animetosho-xyz.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/jackett/data/Jackett/Indexers/animetosho-xyz.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "template:data/jackett/data/Jackett/Indexers/animetosho-xyz.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/jackett/data/Jackett/Indexers/animetosho-xyz.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "data/jackett/data/Jackett/Indexers/knaben.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/jackett/data/Jackett/Indexers/knaben.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "template:data/jackett/data/Jackett/Indexers/knaben.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/jackett/data/Jackett/Indexers/knaben.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "data/jackett/data/Jackett/Indexers/nyaasi.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/jackett/data/Jackett/Indexers/nyaasi.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "template:data/jackett/data/Jackett/Indexers/nyaasi.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/jackett/data/Jackett/Indexers/nyaasi.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "data/jackett/data/Jackett/Indexers/thepiratebay.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/jackett/data/Jackett/Indexers/thepiratebay.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "template:data/jackett/data/Jackett/Indexers/thepiratebay.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/jackett/data/Jackett/Indexers/thepiratebay.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "data/jackett/data/Jackett/Indexers/therarbg.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/jackett/data/Jackett/Indexers/therarbg.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "template:data/jackett/data/Jackett/Indexers/therarbg.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/jackett/data/Jackett/Indexers/therarbg.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "data/jackett/data/Jackett/ServerConfig.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/jackett/data/Jackett/ServerConfig.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "jackett",
-      "REFERENCE": "template:data/jackett/data/Jackett/ServerConfig.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/jackett/data/Jackett/ServerConfig.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "pgbouncer",
-      "REFERENCE": "data/pgbouncer/data/pgbouncer.ini",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/pgbouncer/data/pgbouncer.ini",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": false,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "pgbouncer",
-      "REFERENCE": "template:data/pgbouncer/data/pgbouncer.ini",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/pgbouncer/data/pgbouncer.ini.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/config.toml",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/config.toml",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/config.toml",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/config.toml.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/aiostreams-plugin.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/aiostreams-plugin.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/aiostreams-plugin.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/aiostreams-plugin.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/always-advanced-search.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/always-advanced-search.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/always-advanced-search.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/always-advanced-search.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/anilist-watch-order.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/anilist-watch-order.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/anilist-watch-order.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/anilist-watch-order.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/animetosho-new.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/animetosho-new.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/animetosho-new.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/animetosho-new.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/aq-anikoto.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/aq-anikoto.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/aq-anikoto.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/aq-anikoto.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/aq-animepahe-beta.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/aq-animepahe-beta.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/aq-animepahe-beta.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/aq-animepahe-beta.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/episodeshistory.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/episodeshistory.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/episodeshistory.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/episodeshistory.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/hide-anime-spoilers-seanime.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/mangabuddy.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/mangabuddy.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/mangabuddy.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/mangabuddy.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/mangadex.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/mangadex.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/mangadex.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/mangadex.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/mangafreak.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/mangafreak.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/mangafreak.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/mangafreak.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/mangaworld.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/mangaworld.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/mangaworld.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/mangaworld.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/setwatched.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/setwatched.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/setwatched.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/setwatched.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "data/seanime/data/main/config/extensions/subtitle-engine.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/main/config/extensions/subtitle-engine.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime",
-      "REFERENCE": "template:data/seanime/data/main/config/extensions/subtitle-engine.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/main/config/extensions/subtitle-engine.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/config.toml",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/config.toml",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/config.toml",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/config.toml.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/AnimeUnity.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/AnimeUnity.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/AnimeUnity.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/AnimeUnity.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/Watch-Next.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/Watch-Next.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/Watch-Next.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/Watch-Next.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/aiostreams-plugin.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/always-advanced-search.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/always-advanced-search.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/always-advanced-search.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/always-advanced-search.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/anidream.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/anidream.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/anidream.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/anidream.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/animesaturn.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/animesaturn.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/animesaturn.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/animesaturn.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/animesaturnmirror.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/animesaturnmirror.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/animesaturnmirror.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/animesaturnmirror.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/animetosho-new.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/animetosho-new.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/animetosho-new.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/animetosho-new.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/animeunitymirror.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/animeunitymirror.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/animeunitymirror.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/animeunitymirror.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/animeworld.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/animeworld.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/animeworld.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/animeworld.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/aq-anikoto.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/aq-anikoto.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/aq-anikoto.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/aq-anikoto.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/custom-banner-images.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/custom-banner-images.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/custom-banner-images.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/custom-banner-images.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/episodeshistory.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/episodeshistory.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/episodeshistory.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/episodeshistory.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/picked-for-you.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/picked-for-you.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/picked-for-you.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/picked-for-you.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/setwatched.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/setwatched.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/setwatched.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/setwatched.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/subtitle-engine.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/subtitle-engine.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/subtitle-engine.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/subtitle-engine.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "data/seanime/data/shared/config/extensions/watch-order.json",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/seanime/data/shared/config/extensions/watch-order.json",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": true,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "seanime-shared",
-      "REFERENCE": "template:data/seanime/data/shared/config/extensions/watch-order.json",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/seanime/data/shared/config/extensions/watch-order.json.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "oauth2-proxy",
-      "REFERENCE": "data/oauth2-proxy/allowed-emails.txt",
-      "TYPE": "GENERATED_CONFIG",
-      "SOURCE": "data/oauth2-proxy/allowed-emails.txt",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "APP_OWNED": false,
-      "RESOLVED": true,
-      "DETAIL": "Required declarative input contract is explicit; fresh rendering fails closed when a value is missing. No Infisical provisioning is claimed by source readiness."
-    },
-    {
-      "SERVICE": "postgres",
-      "REFERENCE": "data/postgres/init/init.sql",
-      "TYPE": "FRESH_CLUSTER_BOOTSTRAP",
-      "SOURCE": "data/postgres/init/init.sql",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "postgres",
-      "REFERENCE": "template:init.sql",
-      "TYPE": "CONFIG_TEMPLATE",
-      "SOURCE": "config/dr-templates/postgres/init.sql.template",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "aiometadata",
-      "REFERENCE": "DATABASE_URI",
-      "TYPE": "ENV_RUNTIME_FILE",
-      "SOURCE": "data/aiometadata/data",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "aiostreams",
-      "REFERENCE": "DATABASE_URI",
-      "TYPE": "ENV_RUNTIME_FILE",
-      "SOURCE": "data/aiostreams/data",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "comet",
-      "REFERENCE": "PUBLIC_API_TOKEN_FILE",
-      "TYPE": "ENV_RUNTIME_FILE",
-      "SOURCE": "data/comet/data",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "easyproxy",
-      "REFERENCE": "CONFIG_DIR",
-      "TYPE": "ENV_RUNTIME_FILE",
-      "SOURCE": "data/easyproxy/data",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "oauth2-proxy",
-      "REFERENCE": "OAUTH2_PROXY_AUTHENTICATED_EMAILS_FILE",
-      "TYPE": "ENV_IMAGE_PATH",
-      "SOURCE": "container:/etc/oauth2-proxy/allowed-emails.txt",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "tailscale",
-      "REFERENCE": "TS_STATE_DIR",
-      "TYPE": "ENV_RUNTIME_FILE",
-      "SOURCE": "data/tailscale/data/state",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "RESOLVED": true,
-      "DETAIL": "Prepare writable empty storage; apply per-state classification rather than requiring a whole-mount backup."
-    },
-    {
-      "SERVICE": "tvvoo",
-      "REFERENCE": "PROXY_PATH",
-      "TYPE": "ENV_IMAGE_PATH",
-      "SOURCE": "container:/proxy/hls/manifest.m3u8",
-      "RESTORE_METHOD": "IMAGE_INTERNAL",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "npm",
-      "REFERENCE": "minimal required NPM database",
-      "TYPE": "REQUIRED_USER_STATE",
-      "SOURCE": "data/npm/data/database.sqlite",
-      "RESTORE_METHOD": "RUNTIME_BACKUP_RESTORE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "npm",
-      "REFERENCE": "TLS reissuance helper",
-      "TYPE": "BOOTSTRAP_SCRIPT",
-      "SOURCE": "scripts/npm-dr.py",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "npm",
-      "REFERENCE": "NPM certificate/association implementation",
-      "TYPE": "BOOTSTRAP_SCRIPT",
-      "SOURCE": "scripts/npm-dr-helper.mjs",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "aiostreams",
-      "REFERENCE": "logical config export/import with fixed identity bindings",
-      "TYPE": "LOGICAL_EXPORT_BOOTSTRAP",
-      "SOURCE": "scripts/aio-dr.py",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "RESOLVED": true,
-      "DETAIL": "Consumes an external PRIVATE_DR_PAYLOAD plus /dr/AIO_PROFILE_BINDINGS; no whole runtime database required."
-    },
-    {
-      "SERVICE": "aiometadata",
-      "REFERENCE": "logical user config export/import with fixed identity bindings",
-      "TYPE": "LOGICAL_EXPORT_BOOTSTRAP",
-      "SOURCE": "scripts/aio-dr.py",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "RESOLVED": true,
-      "DETAIL": "Consumes an external PRIVATE_DR_PAYLOAD plus /dr/AIO_PROFILE_BINDINGS; no whole runtime database required."
-    },
-    {
-      "SERVICE": "aiostreams",
-      "REFERENCE": "logical import schema",
-      "TYPE": "BOOTSTRAP_SCHEMA",
-      "SOURCE": "config/dr-templates/aio/aiostreams-bootstrap.sql",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "aiometadata",
-      "REFERENCE": "logical import schema",
-      "TYPE": "BOOTSTRAP_SCHEMA",
-      "SOURCE": "config/dr-templates/aio/aiometadata-bootstrap.sql",
-      "RESTORE_METHOD": "TRACKED_SANITIZED_TEMPLATE",
       "RESOLVED": true
     }
   ],
@@ -3597,55 +1932,43 @@
   ],
   "restore_waves": [
     [
-      "postgres",
-      "redis"
-    ],
-    [
-      "pgbouncer"
-    ],
-    [
-      "gluetun"
-    ],
-    [
-      "headscale"
-    ],
-    [
-      "headplane"
-    ],
-    [
-      "comet"
-    ],
-    [
-      "cometnet",
-      "stremthru",
-      "jackett",
-      "seanime",
-      "seanime-shared"
-    ],
-    [
-      "tailscale",
-      "portainer",
+      "aiomanager",
+      "cloudflare-ddns",
+      "deunhealth",
       "dnscrypt-proxy",
-      "npm",
+      "gluetun",
+      "headscale",
       "honey",
-      "teamspeak",
+      "mediaflow-proxy-light",
       "microwarp",
-      "cloudflare-ddns"
+      "portainer",
+      "postgres",
+      "redis",
+      "tailscale",
+      "teamspeak",
+      "watchtower"
     ],
     [
-      "gost",
       "aiometadata",
       "aiostreams",
-      "mediaflow-proxy-light",
-      "oauth2-proxy",
       "easyproxy",
+      "gost",
+      "headplane",
+      "jackett",
+      "npm",
+      "pgbouncer",
+      "seanime",
+      "seanime-shared",
       "streamvix",
-      "tvvoo",
-      "aiomanager"
+      "tvvoo"
     ],
     [
-      "deunhealth",
-      "watchtower"
+      "comet",
+      "oauth2-proxy",
+      "stremthru"
+    ],
+    [
+      "cometnet"
     ]
   ],
   "validation": {
@@ -4395,5 +2718,6 @@
     "script": "scripts/verify-agent-dr-mappings.py",
     "scope": "Read-only; outputs folder, destination and key names. Does not provision or restart Agent.",
     "source_readiness_gate": false
-  }
+  },
+  "public_sync_note": "New private targets require the restored Infisical Agent. Paths are inventoried; Infisical folder mappings are never guessed."
 }

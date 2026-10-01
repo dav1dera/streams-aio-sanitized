@@ -1,0 +1,205 @@
+{
+  "schema": 1,
+  "services": [
+    "aiomanager",
+    "aiometadata",
+    "aiostreams",
+    "cloudflare-ddns",
+    "comet",
+    "cometnet",
+    "deunhealth",
+    "dnscrypt-proxy",
+    "easyproxy",
+    "gluetun",
+    "gost",
+    "headplane",
+    "headscale",
+    "honey",
+    "jackett",
+    "mediaflow-proxy-light",
+    "microwarp",
+    "npm",
+    "oauth2-proxy",
+    "pgbouncer",
+    "portainer",
+    "postgres",
+    "redis",
+    "seanime",
+    "seanime-shared",
+    "streamvix",
+    "stremthru",
+    "tailscale",
+    "teamspeak",
+    "tvvoo",
+    "watchtower"
+  ],
+  "empty_directories": [
+    {
+      "path": "data/tailscale/data/state",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0700"
+    },
+    {
+      "path": "data/dnscrypt-proxy/data",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/headscale/data/config",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/headscale/data/lib",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/headscale/data/run",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/headplane/data",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/npm/data",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0775"
+    },
+    {
+      "path": "data/npm/data/letsencrypt",
+      "uid": 0,
+      "gid": 0,
+      "mode": "0775"
+    },
+    {
+      "path": "data/aiometadata/data",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/aiostreams/data",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/postgres/init",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/honey/data/config",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/easyproxy/data",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/aiomanager/data",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/comet/data",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/jackett/data",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/seanime/data/main/anime",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/seanime/data/main/downloads",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/seanime/data/main",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/seanime/data/main/config",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/seanime/data/shared/anime",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/seanime/data/shared/downloads",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/seanime/data/shared",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/seanime/data/shared/config",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0775"
+    }
+  ],
+  "root_env_variables_from_restored_agent": [],
+  "private_env_targets": [
+    ".secrets/aiomanager.env",
+    ".secrets/aiometadata.env",
+    ".secrets/aiostreams.env",
+    ".secrets/cloudflare-ddns.env",
+    ".secrets/comet.env",
+    ".secrets/cometnet.env",
+    ".secrets/easyproxy.env",
+    ".secrets/gluetun.env",
+    ".secrets/mediaflow-proxy-light.env",
+    ".secrets/oauth2-proxy.env",
+    ".secrets/pgbouncer.env",
+    ".secrets/postgres.env",
+    ".secrets/streamvix.env",
+    ".secrets/stremthru.env",
+    ".secrets/tailscale.env",
+    ".secrets/tvvoo.env"
+  ],
+  "private_env_targets_from_restored_agent": [],
+  "unclassified_files_excluded": 22,
+  "database_policy": "fresh_application_state_restore_infisical",
+  "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup"
+}
