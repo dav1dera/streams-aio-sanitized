@@ -201,6 +201,93 @@ class PublicExportTests(unittest.TestCase):
         result = sync.loads(self.render()["config/dr-templates/" + name.removeprefix("data/") + ".template"])
         self.assertEqual(next(r["value"] for r in result if r["id"] == "apikey"), "@@INFISICAL:/jackett/ANIMETOSHO_XYZ_API_KEY@@")
 
+    def honey(self):
+        name = "data/honey/data/config/config.json"
+        return name, sync.loads((self.source / name).read_bytes())
+
+    def test_honey_anonymized_names_keep_all_positional_private_bindings(self):
+        name, value = self.honey()
+        template = "config/dr-templates/honey/data/config/config.json.template"
+        old = sync.loads(self.public[template])
+        for index, row in enumerate(value["services"]):
+            if row["name"] == "Service " + str(index + 1):
+                row["name"] = "SYNTHETIC_LOCAL_LABEL_" + str(index)
+            row["desc"] = "SYNTHETIC_LOCAL_DESCRIPTION_" + str(index)
+        value["ui"].update(name="SYNTHETIC_LOCAL_DASHBOARD", desc="SYNTHETIC_LOCAL_DESCRIPTION")
+        value["ui"]["blur"] = not old["ui"]["blur"]
+        self.write(name, json.dumps(value).encode())
+        changes = self.render()
+        data = changes[template]
+        result = sync.loads(data)
+        self.assertEqual(set(sync.MARKER.findall(data.decode())), set(sync.MARKER.findall(self.public[template].decode())))
+        self.assertEqual([row["name"] for row in result["services"]], [row["name"] for row in old["services"]])
+        self.assertEqual([row["desc"] for row in result["services"]], [row["desc"] for row in old["services"]])
+        self.assertEqual(result["ui"]["name"], old["ui"]["name"])
+        self.assertEqual(result["ui"]["blur"], value["ui"]["blur"])
+        self.assertNotIn(b"SYNTHETIC_LOCAL_", data)
+        self.assertNotIn(b"SYNTHETIC_PRIVATE_", data)
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_honey_bound_icon_is_collected_before_canonical_identity_defaults(self):
+        name, value = self.honey()
+        value["services"][11]["name"] = "SYNTHETIC_LOCAL_LABEL"
+        private_icon = "https://synthetic-private.invalid/logo.png"
+        value["services"][11]["icon"] = private_icon
+        self.write(name, json.dumps(value).encode())
+        self.write("docs/new.md", ("Unlabeled " + private_icon).encode())
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE") as error:
+            self.render()
+        self.assertNotIn(private_icon, str(error.exception))
+
+    def test_honey_unbound_identity_defaults_stay_private_and_settings_follow(self):
+        name, value = self.honey()
+        template = "config/dr-templates/honey/data/config/config.json.template"
+        old = sync.loads(self.public[template])
+        value["services"][2]["name"] = "SYNTHETIC_LOCAL_LABEL"
+        value["services"][2]["href"] = "https://synthetic-private.invalid/dashboard"
+        value["services"][2]["icon"] = "https://synthetic-private.invalid/icon.png"
+        value["services"][2]["ping"] = True
+        self.write(name, json.dumps(value).encode())
+        result = sync.loads(self.render()[template])
+        self.assertEqual(result["services"][2]["href"], old["services"][2]["href"])
+        self.assertEqual(result["services"][2]["icon"], old["services"][2]["icon"])
+        self.assertTrue(result["services"][2]["ping"])
+        self.assertNotIn("synthetic-private.invalid", json.dumps(result))
+
+    def test_honey_malformed_rows_do_not_bypass_layout_checks(self):
+        name, original = self.honey()
+        for replacement in (None, [], "invalid"):
+            with self.subTest(replacement=replacement):
+                value = copy.deepcopy(original)
+                value["services"][0] = replacement
+                self.write(name, json.dumps(value).encode())
+                with self.assertRaisesRegex(sync.Refused, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED"): self.render()
+
+    def test_honey_positional_layout_change_requires_review(self):
+        name, original = self.honey()
+        for action in ("add", "remove", "reorder"):
+            with self.subTest(action=action):
+                value = copy.deepcopy(original)
+                if action == "add": value["services"].append({"name": "New", "desc": "", "href": "#", "icon": ""})
+                elif action == "remove": value["services"].pop(0)
+                else: value["services"][3], value["services"][9] = value["services"][9], value["services"][3]
+                self.write(name, json.dumps(value).encode())
+                with self.assertRaisesRegex(sync.Refused, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED"): self.render()
+
+    def test_honey_anonymized_name_does_not_allow_removed_binding_or_new_credential(self):
+        name, original = self.honey()
+        value = copy.deepcopy(original)
+        value["services"][0]["name"] = "SYNTHETIC_LOCAL_LABEL"
+        value["services"][0].pop("href")
+        self.write(name, json.dumps(value).encode())
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_BINDING_REMOVAL_REVIEW_REQUIRED"): self.render()
+        value = copy.deepcopy(original)
+        value["services"][0]["name"] = "SYNTHETIC_LOCAL_LABEL"
+        value["services"][0]["api_key"] = "unrecognized_private_literal"
+        self.write(name, json.dumps(value).encode())
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_FIELD_NEEDS_EXPLICIT_BINDING"): self.render()
+
     def test_public_config_scripts_docs_and_deleted_files_follow_source(self):
         self.write("config/public/new-container.json", b'{"workers":4,"theme":"dark"}\n')
         self.write("scripts/start-new.sh", b"#!/bin/sh\nexit 0\n")

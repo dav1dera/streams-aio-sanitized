@@ -499,6 +499,36 @@ def live_json_template(item, data, sync):
     return sync.yaml_load(data) if item["destination"].endswith((".yaml", ".yml")) else sync.loads(data)
 
 
+def json_template_trees(item, old, raw, sync):
+    before, after = sync.loads(old), live_json_template(item, raw, sync)
+    if item["destination"] != "data/honey/data/config/config.json":
+        return before, after
+    name = item["template"]
+    # Honey's reviewed SERVICES_<index> bindings use positions. Its anonymized
+    # display names are not IDs: normalize them before the generic name matcher
+    # and before collecting private values. Never overwrite a bound icon first.
+    sync.require(isinstance(before, dict) and isinstance(after, dict)
+                 and isinstance(before.get("services"), list) and isinstance(after.get("services"), list)
+                 and len(before["services"]) == len(after["services"]), "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+    after = copy.deepcopy(after)
+    for index, (old_row, new_row) in enumerate(zip(before["services"], after["services"])):
+        sync.require(isinstance(old_row, dict) and isinstance(new_row, dict)
+                     and isinstance(new_row.get("name"), str), "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+        generic = old_row.get("name") == "Service " + str(index + 1)
+        sync.require(generic or new_row["name"] == old_row.get("name"), "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+        for key in ("name", "desc", "icon", "href"):
+            value = old_row.get(key)
+            preserved = key != "href" or value in ("#", "")
+            if key in new_row and isinstance(value, str) and preserved and not sync.MARKER.search(value):
+                new_row[key] = value
+    if isinstance(before.get("ui"), dict) and isinstance(after.get("ui"), dict):
+        for key in ("name", "desc", "icon"):
+            value = before["ui"].get(key)
+            if key in after["ui"] and isinstance(value, str) and not sync.MARKER.search(value):
+                after["ui"][key] = value
+    return before, after
+
+
 def render(source, baseline, sync, image_reader=None):
     inputs, outputs, directories = {}, {}, {}
     def read(name):
@@ -507,7 +537,7 @@ def render(source, baseline, sync, image_reader=None):
     for item in guard.plan["files"]:
         if not item.get("template") or not (source / item["destination"]).is_file(): continue
         old, new = baseline[item["template"]], read(item["destination"])
-        if item["format"] == "json": old, new = sync.loads(old), live_json_template(item, new, sync)
+        if item["format"] == "json": old, new = json_template_trees(item, old, new, sync)
         elif item["format"] == "toml": old, new = sync.tomllib.loads(old.decode()), sync.tomllib.loads(new.decode())
         else: old, new = old.decode(), new.decode()
         guard.bindings(old, new)
@@ -642,7 +672,7 @@ def render(source, baseline, sync, image_reader=None):
             sync.require(False, "ACTIVE_TEMPLATE_SOURCE_MISSING", name)
         old, raw = baseline[name], read(dest)
         if item["format"] == "json":
-            a, b = sync.loads(old), live_json_template(item, raw, sync)
+            a, b = json_template_trees(item, old, raw, sync)
             omitted = set(overlays.get(dest, {}).get("omit_runtime_identity_fields", []))
             if isinstance(b, dict): b = {k: v for k, v in b.items() if k not in omitted}
             if isinstance(a, list) and isinstance(b, list):
@@ -650,13 +680,6 @@ def render(source, baseline, sync, image_reader=None):
                 for row in b:
                     if isinstance(row, dict) and row.get("type") == "hiddendata" and row.get("id") in {"cookieheader", "lasterror"}: row["value"] = ""
             result = guard.tree(a, b, name)
-            if dest == "data/honey/data/config/config.json" and isinstance(result, dict):
-                for key in ("name", "desc", "icon"):
-                    if key in a.get("ui", {}): result.setdefault("ui", {})[key] = a["ui"][key]
-                for i, row in enumerate(result.get("services", [])):
-                    if i < len(a.get("services", [])):
-                        for key in ("name", "desc", "icon"):
-                            if key in a["services"][i]: row[key] = a["services"][i][key]
             data = (json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False) + "\n").encode()
         elif item["format"] == "toml":
             data = toml_dump(guard.tree(sync.tomllib.loads(old.decode()), sync.tomllib.loads(raw.decode()), name), sync)
