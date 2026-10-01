@@ -3,6 +3,7 @@
 This is a second export policy, reusing the existing verified GitHub transport.
 Unknown runtime files stay private. This is not a general-purpose secret oracle.
 """
+import ast
 import copy
 import json
 import os
@@ -29,6 +30,9 @@ TEXT_SUFFIXES = {".md", ".txt", ".sh", ".py", ".js", ".mjs", ".ts", ".json", ".y
 SENSITIVE_KEY = re.compile(r"(?:^|[_-])(?:password|passwd|passphrase|secret|token|apikey|api_key|authkey|auth_key|cookie|credential|credentials|private_key|client_secret|authorization|connection_string)(?:$|[_-])", re.I)
 SAFE_KEY_END = re.compile(r"(?:enabled|disabled|enable|disable|required|optional|secure|httponly|samesite|refresh|max_age|login|ttl|timeout|length|algorithm|method|mode|type|expiry|expiration|duration|interval|name|header_name|file|path)$", re.I)
 VARIABLE = re.compile(r"\$\{([A-Z][A-Z0-9_]*)(?:(?::[-?+]|[-?+])[^}]*)?\}")
+EXAMPLE_REFERENCE = re.compile(r"INFISICAL:/[A-Za-z0-9_/-]+")
+SQL_CREDENTIAL = re.compile(r"\b(?:password|identified\s+by)\s+['\"][^'\"]+['\"]", re.I)
+PY_DYNAMIC = object()
 TOKEN_PATTERNS = (re.compile(r"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{50,})"),
                   re.compile(r"AKIA[0-9A-Z]{16}"), re.compile(r"xox[baprs]-[A-Za-z0-9-]{20,}"),
                   re.compile(r"eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}"),
@@ -39,6 +43,30 @@ TOKEN_PATTERNS = (re.compile(r"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0
 def sensitive(key):
     key = re.sub(r"([a-z])([A-Z])", r"\1_\2", str(key))
     return bool(SENSITIVE_KEY.search(key)) and not SAFE_KEY_END.search(key)
+
+
+def public_reference(value, sync):
+    return isinstance(value, str) and bool(sync.MARKER.fullmatch(value)
+                                          or EXAMPLE_REFERENCE.fullmatch(value) or VARIABLE.fullmatch(value))
+
+
+def python_literal(node):
+    # Static syntax inspection only: never import or execute application code.
+    if isinstance(node, ast.Constant): return node.value
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        left, right = python_literal(node.left), python_literal(node.right)
+        if type(left) is type(right) and isinstance(left, (str, bytes)): return left + right
+    if isinstance(node, ast.JoinedStr) and all(isinstance(row, ast.Constant) and isinstance(row.value, str) for row in node.values):
+        return "".join(row.value for row in node.values)
+    return PY_DYNAMIC
+
+
+def python_target_sensitive(node):
+    if isinstance(node, ast.Name): return sensitive(node.id)
+    if isinstance(node, ast.Attribute): return sensitive(node.attr)
+    if isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant): return sensitive(node.slice.value)
+    if isinstance(node, (ast.Tuple, ast.List)): return any(python_target_sensitive(row) for row in node.elts)
+    return False
 
 
 def allowed(name):
@@ -231,6 +259,13 @@ class Guard:
 
     def scan(self, data, name, assignments=True):
         text = decode(data, self.sync, name)
+        kind = name.removesuffix(".example").removesuffix(".template")
+        python = None
+        if assignments and kind.endswith(".py"):
+            try:
+                python = ast.parse(text, filename="<public-python>")
+            except (SyntaxError, ValueError):
+                raise self.sync.Refused("PYTHON_SOURCE_INVALID " + name) from None
         self.sync.require(not any(p in data for p in self.sync.PRIVATE), "PRIVATE_IDENTITY_REFUSED", name)
         self.sync.require(not re.search(r"-----BEGIN (?:[A-Z]+ )*PRIVATE KEY-----|PuTTY-User-Key-File:\s*\d", text),
                           "PRIVATE_IDENTITY_REFUSED", name)
@@ -254,32 +289,53 @@ class Guard:
                                   for value in matches), "CREDENTIAL_PATTERN_REFUSED", name)
         self.sync.require("-- PostgreSQL database dump" not in text and "-- MySQL dump" not in text,
                           "DATABASE_DUMP_REFUSED", name)
-        self.sync.require(not re.search(r"\b(?:password|identified\s+by)\s+['\"][^'\"]+['\"]", public, re.I),
-                          "SQL_CREDENTIAL_REFUSED", name)
+        sql_text = public
+        if python is not None:
+            # Inspect static SQL string contents, rather than Python quote syntax
+            # surrounding expressions such as ' PASSWORD ' + sql_literal(value).
+            sql_text = "\n".join(value for node in ast.walk(python)
+                                 if isinstance(value := python_literal(node), str))
+        self.sync.require(not SQL_CREDENTIAL.search(sql_text), "SQL_CREDENTIAL_REFUSED", name)
         private = VARIABLE.sub("", self.sync.MARKER.sub("", self.private_projection(text, name)))
         for value in self.values:
             self.sync.require(len(value) < 8 or value not in private, "PRIVATE_VALUE_IN_PUBLIC_FILE", name)
         # Detect literal credential assignments even in otherwise ordinary text/code.
-        if assignments and name.endswith((".json", ".json.template", ".yaml", ".yaml.template", ".yml", ".yml.template")):
-            obj = self.sync.loads(data) if name.endswith((".json", ".json.template")) else self.sync.yaml_load(data)
+        structured = assignments and kind.endswith((".json", ".yaml", ".yml", ".toml"))
+        if structured:
+            obj = (self.sync.loads(data) if kind.endswith(".json") else
+                   self.sync.tomllib.loads(text) if kind.endswith(".toml") else self.sync.yaml_load(data))
             def inspect(row):
                 if isinstance(row, dict):
                     pairs = list(row.items())
                     if isinstance(row.get("id"), str) and "value" in row: pairs.append((row["id"], row["value"]))
                     for key, value in pairs:
                         if sensitive(key) and type(value) not in (dict, list, bool, type(None)):
-                            self.sync.require(value == "" or isinstance(value, str) and (self.sync.MARKER.search(value) or VARIABLE.fullmatch(value)),
+                            self.sync.require(value == "" or public_reference(value, self.sync),
                                               "LITERAL_CREDENTIAL_REFUSED", name)
                         inspect(value)
                 elif isinstance(row, list):
                     for value in row: inspect(value)
             inspect(obj)
-        for line in public.splitlines() if assignments else ():
+        if python is not None:
+            def credential(node):
+                value = python_literal(node)
+                if value is PY_DYNAMIC or value is None or isinstance(value, bool): return
+                if isinstance(value, bytes): value = value.decode("utf-8", errors="replace")
+                self.sync.require(value == "" or public_reference(value, self.sync), "LITERAL_CREDENTIAL_REFUSED", name)
+            for node in ast.walk(python):
+                if isinstance(node, ast.Assign) and any(python_target_sensitive(t) for t in node.targets): credential(node.value)
+                elif isinstance(node, (ast.AnnAssign, ast.AugAssign, ast.NamedExpr)) and python_target_sensitive(node.target): credential(node.value)
+                elif isinstance(node, ast.Dict):
+                    for key, value in zip(node.keys, node.values):
+                        if isinstance(key, ast.Constant) and isinstance(key.value, str) and sensitive(key.value): credential(value)
+                elif isinstance(node, ast.keyword) and node.arg and sensitive(node.arg): credential(node.value)
+        for line in public.splitlines() if assignments and python is None and not structured else ():
             match = re.match(r"\s*(?:(?:export|const|let|var)\s+)?[\"']?([A-Za-z][A-Za-z0-9_-]*)[\"']?\s*[:=]\s*(.*?)\s*[,;]?$", line)
             if match and sensitive(match[1]):
                 value = match[2].strip("\"' ")
                 self.sync.require(not value or value in {"null", "None", "true", "false", "True", "False", "PUBLIC_BINDING", "PUBLIC_VARIABLE", "{}", "[]"}
-                                  or re.fullmatch(r"(?:os\.)?(?:getenv|environ|process\.env).*", value),
+                                  or re.fullmatch(r"(?:os\.)?(?:getenv|environ|process\.env).*", value)
+                                  or EXAMPLE_REFERENCE.fullmatch(value),
                                   "LITERAL_CREDENTIAL_REFUSED", name)
         return data
 

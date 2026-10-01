@@ -211,6 +211,95 @@ class PublicExportTests(unittest.TestCase):
         (self.source / "docs/local-recovery.md").unlink()
         self.assertIsNone(self.render()["docs/local-recovery.md"])
 
+    def test_existing_public_examples_scripts_and_docs_pass_content_checks(self):
+        names = []
+        for path in sorted(ROOT.rglob("*")):
+            if not path.is_file(): continue
+            name = path.relative_to(ROOT).as_posix()
+            if export.allowed(name) and not name.startswith("data/") and name != "docker-compose.yml":
+                data = path.read_bytes()
+                self.public[name] = data
+                self.write(name, data)
+                names.append(name)
+        guard = export.Guard(self.source, self.public, sync, lambda name: sync.read_file(self.source, name))
+        for name in names:
+            with self.subTest(name=name):
+                guard.scan(self.public[name], name)
+        self.render()  # Check discovery and final publication checks with the full public tree.
+
+    def test_infisical_example_reference_is_not_a_literal_credential(self):
+        name = "config/templates/headplane.yaml.example"
+        data = (ROOT / name).read_bytes()
+        self.write(name, data)
+        self.assertIn(name, self.render())
+
+    def test_structured_example_references_with_comments_are_supported(self):
+        files = {"config/templates/new.yaml.example": b"cookie_secret: INFISICAL:/headplane/SERVER_COOKIE_SECRET # reference only\n",
+                 "config/templates/new.json.example": b'{"cookie_secret":"@@INFISICAL:/headplane/SERVER_COOKIE_SECRET@@"}\n',
+                 "config/templates/new.toml.example": b'cookie_secret = "${COOKIE_SECRET}" # reference only\n'}
+        for name, data in files.items(): self.write(name, data)
+        changes = self.render()
+        for name in files: self.assertIn(name, changes)
+
+    def test_inline_toml_example_cannot_hide_credentials(self):
+        self.write("config/templates/new.toml.example", b'server = { cookie_secret = "unrecognized_private_literal" }\n')
+        with self.assertRaisesRegex(sync.Refused, "LITERAL_CREDENTIAL_REFUSED"): self.render()
+
+    def test_example_file_with_real_or_disguised_credentials_still_blocks(self):
+        cases = (b"cookie_secret: unrecognized_private_literal\n",
+                 b'cookie_secret: "INFISICAL:/headplane/SERVER_COOKIE_SECRET extra_private_literal"\n',
+                 b'cookie_secret: "@@INFISICAL:/headplane/SERVER_COOKIE_SECRET@@extra_private_literal"\n',
+                 b'cookie_secret: "${COOKIE_SECRET}extra_private_literal"\n',
+                 b"cookie_secret: INFISICAL:/headplane/ghp_" + b"a" * 36 + b"\n")
+        for data in cases:
+            with self.subTest(data=data[:15]):
+                self.write("config/templates/new.yaml.example", data)
+                with self.assertRaises(sync.Refused): self.render()
+
+    def test_one_line_yaml_and_json_examples_cannot_hide_credentials(self):
+        for name, data in (("config/templates/new.yaml.example", b"server: {cookie_secret: unrecognized_private_literal}\n"),
+                           ("config/templates/new.json.example", b'{"server":{"cookie_secret":"unrecognized_private_literal"}}\n')):
+            with self.subTest(name=name):
+                self.write(name, data)
+                with self.assertRaisesRegex(sync.Refused, "LITERAL_CREDENTIAL_REFUSED"): self.render()
+                (self.source / name).unlink()
+
+    def test_known_private_value_cannot_be_hidden_in_example_reference(self):
+        value = next(iter(sync.env_values((self.source / ".secrets/comet.env").read_bytes()).values()))
+        self.write("config/templates/new.yaml.example", ("api_key: INFISICAL:/shared/" + value + "\n").encode())
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE") as error:
+            self.render()
+        self.assertNotIn(value, str(error.exception))
+
+    def test_python_dynamic_secret_reads_and_sql_builders_are_not_executed_or_refused(self):
+        code = (b"password = identity['password']\nsecret = values['/shared/SECRET_KEY']\n"
+                b"lines.append('ALTER ROLE ' + role + ' PASSWORD ' + sql_literal(secret))\n"
+                b"raise RuntimeError('APPLICATION_SOURCE_MUST_NEVER_EXECUTE')\n")
+        self.write("scripts/new-public.py", code)
+        self.assertIn("scripts/new-public.py", self.render())
+
+    def test_python_literal_credentials_in_assignments_dictionaries_and_calls_block(self):
+        cases = (b"password = 'unrecognized_private_literal'\n",
+                 b"password: str = 'unrecognized_private_literal'\n",
+                 b"password = 'unrecognized_' + 'private_literal'\n",
+                 b"password = b'unrecognized_private_literal'\n",
+                 b"password = f'unrecognized_private_literal'\n",
+                 b"settings['api_key'] = 'unrecognized_private_literal'\n",
+                 b"settings.password = 'unrecognized_private_literal'\n",
+                 b"config = {'server': {'api_key': 'unrecognized_private_literal'}}\n",
+                 b"connect(password='unrecognized_private_literal')\n")
+        for code in cases:
+            with self.subTest(code=code[:15]):
+                self.write("scripts/new-public.py", code)
+                with self.assertRaisesRegex(sync.Refused, "LITERAL_CREDENTIAL_REFUSED") as error: self.render()
+                self.assertNotIn("unrecognized_private_literal", str(error.exception))
+
+    def test_python_sql_with_literal_password_still_blocks(self):
+        for code in (b'''sql = "CREATE ROLE example PASSWORD 'private-literal';"\n''',
+                     b'''sql = "CREATE ROLE example PASSWORD '" + "private-literal" + "';"\n'''):
+            self.write("scripts/new-public.py", code)
+            with self.assertRaisesRegex(sync.Refused, "SQL_CREDENTIAL_REFUSED"): self.render()
+
     def test_manual_github_edit_is_preserved_when_source_is_unchanged(self):
         self.write("docs/local-recovery.md", b"Local initial version\n")
         self.apply(self.render())
