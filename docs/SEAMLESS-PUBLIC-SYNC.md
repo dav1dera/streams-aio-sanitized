@@ -123,6 +123,18 @@ with the same safe YAML loader as the strict mode, masks its Infisical bindings,
 and writes the public JSON template. Duplicate keys, aliases and unsafe YAML tags
 remain refused; files declared as `.json` still require valid JSON.
 
+Honey's existing dashboard has positional `SERVICES_<index>` Infisical bindings.
+Its public `Service N` labels intentionally differ from private display names;
+they are normalized before array matching and private-value collection. Reviewed
+names, descriptions, public icons and placeholder links keep their canonical
+public defaults. Bound links and icons retain their Infisical references, and
+other public settings follow the local source. Honey row additions/removals and
+changes to the positions of its named public anchors require explicit review
+(`HONEY_BOUND_LAYOUT_REVIEW_REQUIRED`). Keep its positional bindings in sync when
+reordering anonymized rows; their display labels are not stable identifiers.
+Missing private fields remain refused. Other applications still match array rows
+by their reviewed IDs or names; this exception applies only to Honey's template.
+
 ## Disaster recovery scope
 
 Application databases can restart empty. Public files plus the empty-directory
