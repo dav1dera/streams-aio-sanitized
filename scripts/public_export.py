@@ -108,13 +108,23 @@ class Guard:
         self.values = {}
         # Common settings already declared public are not evidence of a leak.
         self.public_values = set()
+        self.reviewed_healthchecks = {}
+        compose = sync.yaml_load(baseline["docker-compose.yml"])
+        for service, row in compose["services"].items():
+            test = row.get("healthcheck", {}).get("test")
+            path = ("services", service, "healthcheck", "test")
+            if isinstance(test, str):
+                self.reviewed_healthchecks[path] = test
+            elif isinstance(test, list):
+                for index, value in enumerate(test):
+                    if isinstance(value, str): self.reviewed_healthchecks[(*path, index)] = value
         def literals(row):
             if isinstance(row, dict):
                 for key, value in row.items(): literals(value)
             elif isinstance(row, list):
                 for value in row: literals(value)
             elif isinstance(row, str) and not sync.MARKER.search(row): self.public_values.add(row)
-        literals(sync.yaml_load(baseline["docker-compose.yml"]))
+        literals(compose)
         for name, data in baseline.items():
             if name.endswith("/.env"):
                 self.public_values.update(sync.env_values(data).values())
@@ -197,6 +207,28 @@ class Guard:
                     found = re.findall(re.escape(left) + "(.{1,4096}?)" + re.escape(right), new, re.S)
                     if len(found) == 1: self.remember(found[0], marker[1])
 
+    def private_projection(self, text, name):
+        if name != "docker-compose.yml":
+            return text
+        # Exempt only the exact reviewed scalar in its original healthcheck field.
+        # YAML source spans preserve all other text, including comments. Removing
+        # a matching substring globally would also hide leaks in newly added fields.
+        self.sync.yaml_load(text)
+        node = self.sync.yaml.compose(text, Loader=self.sync.UniqueLoader)
+        spans = []
+        def visit(row, path=()):
+            if isinstance(row, self.sync.yaml.nodes.MappingNode):
+                for key, value in row.value: visit(value, (*path, key.value))
+            elif isinstance(row, self.sync.yaml.nodes.SequenceNode):
+                for index, value in enumerate(row.value): visit(value, (*path, index))
+            elif isinstance(row, self.sync.yaml.nodes.ScalarNode) and row.tag == "tag:yaml.org,2002:str":
+                if path in self.reviewed_healthchecks and row.value == self.reviewed_healthchecks[path]:
+                    spans.append((row.start_mark.index, row.end_mark.index))
+        visit(node)
+        for start, end in sorted(spans, reverse=True):
+            text = text[:start] + '""' + text[end:]
+        return text
+
     def scan(self, data, name, assignments=True):
         text = decode(data, self.sync, name)
         self.sync.require(not any(p in data for p in self.sync.PRIVATE), "PRIVATE_IDENTITY_REFUSED", name)
@@ -224,8 +256,9 @@ class Guard:
                           "DATABASE_DUMP_REFUSED", name)
         self.sync.require(not re.search(r"\b(?:password|identified\s+by)\s+['\"][^'\"]+['\"]", public, re.I),
                           "SQL_CREDENTIAL_REFUSED", name)
+        private = VARIABLE.sub("", self.sync.MARKER.sub("", self.private_projection(text, name)))
         for value in self.values:
-            self.sync.require(len(value) < 8 or value not in public, "PRIVATE_VALUE_IN_PUBLIC_FILE", name)
+            self.sync.require(len(value) < 8 or value not in private, "PRIVATE_VALUE_IN_PUBLIC_FILE", name)
         # Detect literal credential assignments even in otherwise ordinary text/code.
         if assignments and name.endswith((".json", ".json.template", ".yaml", ".yaml.template", ".yml", ".yml.template")):
             obj = self.sync.loads(data) if name.endswith((".json", ".json.template")) else self.sync.yaml_load(data)
@@ -288,6 +321,8 @@ class Guard:
                     for i, (before, value) in enumerate(self.aligned(prior, new))]
         self.sync.require(type(new) in (str, bool, int, float, type(None)), "PUBLIC_TYPE_REFUSED", location)
         if isinstance(new, str):
+            if name == "docker-compose.yml" and path in self.reviewed_healthchecks and new == self.reviewed_healthchecks[path]:
+                return new  # Existing public healthcheck; new/changed fields still undergo masking.
             new = self.mask(new, location)
             if path and sensitive(path[-1]) and new and not self.sync.MARKER.search(new) and not VARIABLE.search(new):
                 self.sync.require(False, "PRIVATE_FIELD_NEEDS_EXPLICIT_BINDING", location)
