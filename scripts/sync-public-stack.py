@@ -171,13 +171,15 @@ def normalize_indexer_runtime(old, new, name):
 
 
 def normalize_animetosho_mirror(old, new, name):
-    # The existing DR contract uses the author's feed for this legacy shared
-    # provider. Admit only the documented mirror substitution, never new code.
+    # Freeze the reviewed public profile in strict mode. Seamless exports can
+    # already have recorded the documented mirror; admit only that substitution.
     canonical = "https://feed.animetosho.net/feed/json"
     legacy = "https://feed.animetosho.xyz/feed/json"
+    profile = old["userConfig"]["fields"][0].get("default")
     require(old["userConfig"]["fields"][0] == {"type": "text", "name": "jsonURL",
-            "label": "Feed URL", "default": canonical}
-            and isinstance(old["payload"], str) and old["payload"].count(canonical) == 1,
+            "label": "Feed URL", "default": profile} and profile in (canonical, legacy)
+            and isinstance(old["payload"], str)
+            and old["payload"].replace(legacy, canonical).count(canonical) == 1,
             "PROVIDER_BASELINE_REVIEW_REQUIRED", name)
     require(isinstance(new, dict) and isinstance(new.get("userConfig"), dict)
             and isinstance(new["userConfig"].get("fields"), list)
@@ -186,10 +188,10 @@ def normalize_animetosho_mirror(old, new, name):
     require(new["userConfig"]["fields"][0].get("default") in (canonical, legacy),
             "PROVIDER_FEED_REVIEW_REQUIRED", name + ":/userConfig/fields/0/default")
     require(isinstance(new.get("payload"), str)
-            and new["payload"].replace(legacy, canonical) == old["payload"],
+            and new["payload"].replace(legacy, canonical) == old["payload"].replace(legacy, canonical),
             "PROVIDER_CODE_REVIEW_REQUIRED", name + ":/payload")
     result = copy.deepcopy(new)
-    result["userConfig"]["fields"][0]["default"] = canonical
+    result["userConfig"]["fields"][0]["default"] = profile
     result["payload"] = old["payload"]
     return result
 

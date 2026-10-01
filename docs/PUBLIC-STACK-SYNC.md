@@ -66,15 +66,16 @@ schema checks. Container values, extra rows and new fields still block. The API
 key binding and reviewed boolean options continue through their existing rules.
 See [Jackett's configuration model](https://github.com/Jackett/Jackett/blob/d72fd263a7d6268e737c636d5f229caa140ca5aa/src/Jackett.Common/Models/IndexerConfig/ConfigurationData.cs).
 
-The existing fresh-host contract for the shared Seanime AnimeTosho provider
-retains the author's public feed instead of its legacy mirror. The exporter
-accepts that exact known mirror substitution in `jsonURL` and the single feed
-literal in the otherwise identical reviewed payload, and keeps the public
-author feed in both places. This exception applies only to the existing shared
-template, leaves the live provider unchanged, and does not capture the legacy
-mirror choice for recovery. Query strings, URL credentials, unknown endpoints,
-metadata changes and any other code changes still stop publication. This follows
-the existing [template security review](DISASTER-RECOVERY.md).
+The strict mode for the shared Seanime AnimeTosho provider preserves the reviewed
+public feed profile. It accepts only the exact known substitution between the
+author feed and its legacy mirror in `jsonURL` and the single feed literal in
+otherwise identical reviewed code. A public baseline already updated by seamless
+mode can contain either known profile; strict mode keeps that baseline rather
+than rejecting it or changing its recovery choice. This exception applies only
+to the existing shared template and leaves the live provider unchanged. Query
+strings, URL credentials, unknown endpoints, metadata changes and any other code
+changes still stop strict-mode publication. Seamless behavior is described in
+[SEAMLESS-PUBLIC-SYNC.md](SEAMLESS-PUBLIC-SYNC.md).
 
 The worker collects independent template validation failures before stopping,
 so one check can identify the affected files together. It logs reviewed paths
