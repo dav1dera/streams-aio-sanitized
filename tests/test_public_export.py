@@ -133,6 +133,14 @@ class PublicExportTests(unittest.TestCase):
         self.assertIn("updated public extension logic", result["payload"])
         self.assertNotIn("SYNTHETIC_PRIVATE_", result["payload"])
 
+    def test_reordered_indexer_fields_preserve_private_binding_by_id(self):
+        name = "data/jackett/data/Jackett/Indexers/animetosho-xyz.json"
+        value = sync.loads((self.source / name).read_bytes())
+        value.reverse()
+        self.write(name, json.dumps(value).encode())
+        result = sync.loads(self.render()["config/dr-templates/" + name.removeprefix("data/") + ".template"])
+        self.assertEqual(next(r["value"] for r in result if r["id"] == "apikey"), "@@INFISICAL:/jackett/ANIMETOSHO_XYZ_API_KEY@@")
+
     def test_public_config_scripts_docs_and_deleted_files_follow_source(self):
         self.write("config/public/new-container.json", b'{"workers":4,"theme":"dark"}\n')
         self.write("scripts/start-new.sh", b"#!/bin/sh\nexit 0\n")

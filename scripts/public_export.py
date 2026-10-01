@@ -156,12 +156,25 @@ class Guard:
             text = text.replace(value, "@@INFISICAL:" + next(iter(choices)) + "@@")
         return text
 
+    def aligned(self, old, new):
+        # Config rows (Jackett IDs, extension field names) may be inserted/reordered.
+        # Position alone must not attach an old private binding to a different row.
+        for key in ("id", "name"):
+            if old and all(isinstance(row, dict) and isinstance(row.get(key), str) for row in old + new) and not any(self.sync.MARKER.search(row[key]) for row in old):
+                before = {row[key]: row for row in old}
+                after = {row[key]: row for row in new}
+                if len(before) == len(old) and len(after) == len(new):
+                    return [(before.get(row[key]), row) for row in new]
+        if self.sync.MARKER.search(json.dumps(old)):
+            self.sync.require(len(old) == len(new), "BOUND_ARRAY_LAYOUT_REVIEW_REQUIRED")
+        return [(old[i] if i < len(old) else None, row) for i, row in enumerate(new)]
+
     def bindings(self, old, new):
         """Collect only explicitly bound values before scanning any public candidate."""
         if isinstance(old, dict) and isinstance(new, dict):
             for key in old.keys() & new.keys(): self.bindings(old[key], new[key])
         elif isinstance(old, list) and isinstance(new, list):
-            for a, b in zip(old, new): self.bindings(a, b)
+            for a, b in self.aligned(old, new): self.bindings(a, b)
         elif isinstance(old, str) and isinstance(new, (str, int, float)) and not isinstance(new, bool):
             marker = self.sync.MARKER.fullmatch(old)
             if marker: self.remember(str(new), marker[1])
@@ -255,8 +268,8 @@ class Guard:
             return {key: self.tree(prior.get(key), value, name, (*path, key)) for key, value in new.items()}
         if isinstance(new, list):
             prior = old if isinstance(old, list) else []
-            return [self.tree(prior[i] if i < len(prior) else None, value, name, (*path, i))
-                    for i, value in enumerate(new)]
+            return [self.tree(before, value, name, (*path, i))
+                    for i, (before, value) in enumerate(self.aligned(prior, new))]
         self.sync.require(type(new) in (str, bool, int, float, type(None)), "PUBLIC_TYPE_REFUSED", location)
         if isinstance(new, str):
             new = self.mask(new, location)
@@ -545,6 +558,12 @@ def render(source, baseline, sync, image_reader=None):
         outputs[name] = guard.scan((json.dumps(value, indent=2, ensure_ascii=False) + "\n").encode(), name, assignments=False)
     owned = {n: h for n, h in owned.items() if outputs.get(n, b"") is not None}
     outputs[INVENTORY] = (json.dumps({"schema": 1, "files": owned, "source_hashes": source_hashes}, indent=2, sort_keys=True) + "\n").encode()
+    # Recheck the complete candidate against the complete binding corpus.
+    # Values learned in later templates must also protect earlier files.
+    generated = {INVENTORY, LAYOUT, "config/image-lock.json", "config/compose.dr.yaml",
+                 "config/dr-render-plan.json", "config/dr-manifest.yaml"}
+    for name, data in outputs.items():
+        if data is not None: guard.scan(data, name, assignments=name not in generated)
     sync.require(all(sync.read_file(source, n) == value for n, value in inputs.items()), "SOURCE_CHANGED_DURING_EXPORT")
     sync.require(candidates(source, sync)[0] == names, "PUBLIC_FILE_LIST_CHANGED_DURING_EXPORT")
     sync.require(image_reader(source, compose, old_locks) == locks, "IMAGES_CHANGED_DURING_EXPORT")
