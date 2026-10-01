@@ -72,6 +72,12 @@ to the existing reviewed PostgreSQL recovery volume override require a review.
 Private env keys are classified per consuming service, so an Agent setting for
 one service cannot hide another service's public tuning. Public constants already
 declared in the baseline are not treated as evidence of a credential leak.
+An unchanged Compose healthcheck scalar already public at that same service and
+field remains public even if a private input contains part of its local URL or
+command. This approval is limited to that exact scalar and field: changed
+healthchecks, new services, other fields, comments and other files still undergo
+private-value checks. Credential patterns and literal credential assignments are
+checked even in approved healthchecks; private values are not globally ignored.
 Config rows are aligned by stable public IDs/names when available; reordering
 does not move private bindings to another row. Removing a private binding or
 changing an unidentified bound array still requires an explicit contract review.

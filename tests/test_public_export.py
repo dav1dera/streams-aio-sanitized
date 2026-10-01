@@ -233,6 +233,53 @@ class PublicExportTests(unittest.TestCase):
         changes = self.render()
         self.assertIn(b"LOG_LEVEL=debug", changes["data/comet/.env"])
 
+    def healthcheck_collision(self):
+        name = ".secrets/oauth2-proxy.env"
+        rows = sync.env_values((self.source / name).read_bytes())
+        rows["OAUTH2_PROXY_UPSTREAMS"] = "http://127.0.0.1"
+        self.write(name, ("\n".join(k + "=" + v for k, v in rows.items()) + "\n").encode())
+
+    def test_unchanged_reviewed_healthchecks_with_private_substring_do_not_block(self):
+        self.healthcheck_collision()
+        self.write("data/comet/.env", b"FASTAPI_WORKERS=8\n")
+        changes = self.render()
+        original = sync.yaml_load(self.public["docker-compose.yml"])
+        compose = sync.yaml_load(changes.get("docker-compose.yml", self.public["docker-compose.yml"]))
+        for service in ("tailscale", "seanime", "seanime-shared"):
+            self.assertEqual(compose["services"][service]["healthcheck"], original["services"][service]["healthcheck"])
+        self.assertIn(b"FASTAPI_WORKERS=8", changes["data/comet/.env"])
+
+    def test_changed_healthcheck_with_known_private_substring_still_blocks(self):
+        self.healthcheck_collision()
+        self.compose(lambda rows: rows["tailscale"]["healthcheck"]["test"].__setitem__(4, "http://127.0.0.1:9002/healthz?changed=1"))
+        with self.assertRaisesRegex(sync.Refused, "COMPOSE_LITERAL_PRIVATE_VALUE_USE_INTERPOLATION"):
+            self.render()
+
+    def test_new_service_cannot_inherit_reviewed_healthcheck_exception(self):
+        self.healthcheck_collision()
+        self.compose(lambda rows: rows.update(added={"image": "example/new:1", "healthcheck": copy.deepcopy(rows["seanime"]["healthcheck"])}))
+        with self.assertRaisesRegex(sync.Refused, "COMPOSE_LITERAL_PRIVATE_VALUE_USE_INTERPOLATION"):
+            self.render()
+
+    def test_healthcheck_approval_does_not_allow_private_substring_in_other_file(self):
+        self.healthcheck_collision()
+        self.write("docs/unknown.md", b"http://127.0.0.1:9002/healthz\n")
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+            self.render()
+
+    def test_private_scan_healthcheck_exception_is_scoped_to_scalar_at_same_path(self):
+        guard = export.Guard(self.source, self.public, sync, lambda name: sync.read_file(self.source, name))
+        guard.remember("http://127.0.0.1", "/oauth2-proxy/OAUTH2_PROXY_UPSTREAMS")
+        self.assertIn("http://127.0.0.1", guard.values)
+        baseline_compose = self.public["docker-compose.yml"]
+        guard.scan(baseline_compose, "docker-compose.yml")
+        changed = sync.yaml_load(baseline_compose)
+        changed["services"]["comet"]["labels"].append("http://127.0.0.1:9002/healthz")
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+            guard.scan(sync.yaml.safe_dump(changed).encode(), "docker-compose.yml")
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+            guard.scan(baseline_compose + b"\n# private: http://127.0.0.1\n", "docker-compose.yml")
+
     def test_runtime_trees_and_suspicious_names_are_never_published(self):
         for name in ("data/new/db/config.json", "data/new/state", "data/new/public/auth.sqlite", "config/public/credentials.json", "secrets/unfamiliar.txt", "docs/session.json"):
             self.write(name, b"SYNTHETIC_UNPUBLISHED_PRIVATE")
