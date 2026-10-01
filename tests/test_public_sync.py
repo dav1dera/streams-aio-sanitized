@@ -208,9 +208,35 @@ class PublicSyncTests(unittest.TestCase):
         path.write_text(json.dumps(value), encoding="utf-8")
         result = sync.loads(self.render()[name])
         self.assertIs(result["userConfig"]["requiresConfig"], True)
-        self.assertEqual(result["userConfig"]["fields"][0]["default"], canonical)
+        self.assertEqual(result["userConfig"]["fields"][0]["default"], old["userConfig"]["fields"][0]["default"])
         self.assertEqual(result["payload"], old["payload"])
         self.assertNotIn(SECRET, json.dumps(result))
+
+    def test_strict_mirror_roundtrip_preserves_either_reviewed_public_baseline(self):
+        name = "config/dr-templates/seanime/data/shared/config/extensions/animetosho-new.json.template"
+        canonical = "https://feed.animetosho.net/feed/json"
+        legacy = "https://feed.animetosho.xyz/feed/json"
+        original = sync.loads(self.public[name])
+        for old_profile in (canonical, legacy):
+            old = copy.deepcopy(original)
+            old["userConfig"]["fields"][0]["default"] = old_profile
+            old["payload"] = old["payload"].replace(legacy, canonical).replace(canonical, old_profile)
+            for new_profile in (canonical, legacy):
+                new = copy.deepcopy(old)
+                new["userConfig"]["fields"][0]["default"] = new_profile
+                new["payload"] = new["payload"].replace(legacy, canonical).replace(canonical, new_profile)
+                new["userConfig"]["requiresConfig"] = True
+                before = copy.deepcopy(new)
+                result = sync.normalize_animetosho_mirror(old, new, name)
+                self.assertEqual(result["payload"], old["payload"])
+                self.assertEqual(result["userConfig"]["fields"][0]["default"], old_profile)
+                self.assertIs(result["userConfig"]["requiresConfig"], True)
+                self.assertEqual(new, before)
+                new["payload"] += "// " + SECRET
+                with self.assertRaises(sync.Refused) as error:
+                    sync.normalize_animetosho_mirror(old, new, name)
+                self.assertIn("PROVIDER_CODE_REVIEW_REQUIRED", str(error.exception))
+                self.assertNotIn(SECRET, str(error.exception))
 
     def test_provider_mirror_rule_refuses_private_urls_new_code_and_other_metadata(self):
         path = self.source / "data/seanime/data/shared/config/extensions/animetosho-new.json"

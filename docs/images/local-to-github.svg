@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="790" viewBox="0 0 1280 790" role="img" aria-labelledby="title desc">
+  <title id="title">Il percorso della configurazione: locale verso GitHub</title>
+  <desc id="desc">La GUI Infisical alimenta l'Agent e i file privati dello stack. L'esportatore pubblica la configurazione ammessa su GitHub; un processo separato cifra i backup NPM, Agent e Infisical e conserva cinque release private.</desc>
+  <defs>
+    <marker id="blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="m0 0 8 4-8 4" fill="#7cb2ff"/></marker>
+    <marker id="green" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="m0 0 8 4-8 4" fill="#7cf3ca"/></marker>
+    <marker id="gold" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="m0 0 8 4-8 4" fill="#e9c992"/></marker>
+  </defs>
+  <rect width="1280" height="790" rx="24" fill="#0d1726"/>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <text x="44" y="53" font-size="25" font-weight="700" fill="#f3f6fb">Tre flussi, un solo stack locale</text>
+    <text x="44" y="82" font-size="17" fill="#9cacc4">Il pubblico segue il deployment. Il privato segue Infisical.</text>
+    <g fill="none" stroke-width="2.5">
+      <path d="M304 178H360" stroke="#7cf3ca" marker-end="url(#green)"/>
+      <path d="M610 178H666" stroke="#7cf3ca" marker-end="url(#green)"/>
+      <path d="M796 244V282H174V306" stroke="#7cf3ca" marker-end="url(#green)"/>
+      <path d="M304 399H360" stroke="#7cb2ff" marker-end="url(#blue)"/>
+      <path d="M610 399H666" stroke="#7cb2ff" marker-end="url(#blue)"/>
+      <path d="M304 529H334V610H360" stroke="#e9c992" marker-end="url(#gold)"/>
+      <path d="M610 610H666" stroke="#e9c992" marker-end="url(#gold)"/>
+    </g>
+    <rect x="44" y="112" width="260" height="132" rx="14" fill="#122c2a" stroke="#2c6255"/>
+    <text x="64" y="142" font-size="12" font-weight="600" letter-spacing="1.4" fill="#7cf3ca">SECRET</text>
+    <text x="64" y="178" font-size="24" font-weight="600" fill="#f3f6fb">Infisical · GUI</text>
+    <text x="64" y="209" font-size="17" fill="#c3d7d1">Cartelle, valori e permessi</text>
+    <rect x="370" y="112" width="240" height="132" rx="14" fill="#122c2a" stroke="#2c6255"/>
+    <text x="390" y="142" font-size="12" font-weight="600" letter-spacing="1.4" fill="#7cf3ca">DISTRIBUZIONE</text>
+    <text x="390" y="178" font-size="24" font-weight="600" fill="#f3f6fb">Agent</text>
+    <text x="390" y="209" font-size="17" fill="#c3d7d1">Template + destinazioni</text>
+    <rect x="676" y="112" width="556" height="132" rx="14" fill="#122c2a" stroke="#2c6255"/>
+    <text x="698" y="142" font-size="12" font-weight="600" letter-spacing="1.4" fill="#7cf3ca">SOLO SULLA VM</text>
+    <text x="698" y="178" font-size="24" font-weight="600" fill="#f3f6fb">File privati locali</text>
+    <text x="698" y="209" font-size="17" fill="#c3d7d1">.env root · .secrets · configurazioni generate</text>
+    <rect x="44" y="316" width="260" height="362" rx="14" fill="#142336" stroke="#40526a"/>
+    <text x="64" y="346" font-size="12" font-weight="600" letter-spacing="1.4" fill="#9cacc4">ORIGINE DELLE MODIFICHE</text>
+    <text x="64" y="384" font-size="25" font-weight="700" fill="#f3f6fb">Stack locale</text>
+    <text x="64" y="419" font-size="17" fill="#c3cfdf">Compose + env pubblici</text>
+    <text x="64" y="447" font-size="17" fill="#c3cfdf">Script + config dichiarative</text>
+    <path d="M64 470H284" stroke="#30435b"/>
+    <text x="64" y="505" font-size="17" fill="#c3cfdf">File privati generati</text>
+    <text x="64" y="533" font-size="17" fill="#c3cfdf">Dati runtime locali</text>
+    <rect x="64" y="561" width="220" height="91" rx="10" fill="#0d1726"/>
+    <text x="78" y="590" font-size="14" fill="#9cacc4">Database e cache delle app:</text>
+    <text x="78" y="615" font-size="16" font-weight="600" fill="#d6e0ed">ripartenza vuota prevista</text>
+    <text x="78" y="638" font-size="13" fill="#9cacc4">secondo il piano DR</text>
+    <rect x="370" y="316" width="240" height="166" rx="14" fill="#142b45" stroke="#31527c"/>
+    <text x="390" y="347" font-size="12" font-weight="600" letter-spacing="1.4" fill="#7cb2ff">~15 MINUTI</text>
+    <text x="390" y="384" font-size="24" font-weight="600" fill="#f3f6fb">Esportatore</text>
+    <text x="390" y="417" font-size="17" fill="#c3cfdf">Selezione + controlli</text>
+    <text x="390" y="446" font-size="16" fill="#c3cfdf">SHA256 di rilettura</text>
+    <rect x="676" y="316" width="556" height="166" rx="14" fill="#142b45" stroke="#31527c"/>
+    <text x="698" y="347" font-size="12" font-weight="600" letter-spacing="1.4" fill="#7cb2ff">GITHUB · REPOSITORY PUBBLICO</text>
+    <text x="698" y="384" font-size="24" font-weight="600" fill="#f3f6fb">streams-aio-sanitized</text>
+    <text x="698" y="417" font-size="17" fill="#c3cfdf">Configurazione ammessa + image lock + manifest</text>
+    <text x="698" y="446" font-size="16" fill="#c3cfdf">Commit delle differenze · directory da ricreare vuote</text>
+    <rect x="370" y="544" width="240" height="134" rx="14" fill="#2b2830" stroke="#655a47"/>
+    <text x="390" y="574" font-size="12" font-weight="600" letter-spacing="1.4" fill="#e9c992">SETTIMANALE</text>
+    <text x="390" y="610" font-size="24" font-weight="600" fill="#f3f6fb">Backup + age</text>
+    <text x="390" y="643" font-size="16" fill="#d6cebc">NPM · Agent · Infisical</text>
+    <rect x="676" y="544" width="556" height="134" rx="14" fill="#2b2830" stroke="#655a47"/>
+    <text x="698" y="574" font-size="12" font-weight="600" letter-spacing="1.4" fill="#e9c992">GITHUB · REPOSITORY PRIVATO</text>
+    <text x="698" y="610" font-size="24" font-weight="600" fill="#f3f6fb">streams-aio-dr · Releases</text>
+    <text x="698" y="643" font-size="17" fill="#d6cebc">Artifact cifrati · checksum · massimo 5 release DR</text>
+    <path d="M44 712H1232" stroke="#2b3c51"/>
+    <text x="44" y="748" font-size="16" fill="#9cacc4">RIPRISTINO</text>
+    <text x="163" y="748" font-size="17" fill="#d6e0ed">Infisical + Agent → clone pubblico → inizializzazione → avvio dei servizi</text>
+  </g>
+</svg>

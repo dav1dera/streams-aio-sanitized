@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="420" viewBox="0 0 1280 420" role="img" aria-labelledby="title desc">
+  <title id="title">Streams AIO — modifica in locale, conserva su GitHub</title>
+  <desc id="desc">Configurazione pubblica sincronizzata ogni circa quindici minuti, secret in Infisical e cinque release di backup cifrate con age.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101e32"/><stop offset="1" stop-color="#09111f"/></linearGradient>
+    <linearGradient id="line"><stop stop-color="#7cf3ca"/><stop offset="1" stop-color="#7cb2ff"/></linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#20324b" stroke-opacity=".35"/></pattern>
+  </defs>
+  <rect width="1280" height="420" rx="24" fill="url(#bg)"/>
+  <rect width="1280" height="420" rx="24" fill="url(#grid)"/>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <rect x="48" y="38" width="252" height="32" rx="16" fill="#182c3b" stroke="#284553"/>
+    <circle cx="67" cy="54" r="4" fill="#7cf3ca"/>
+    <text x="81" y="60" font-size="13" font-weight="600" letter-spacing="1.4" fill="#b9dfd5">LOCALE → GITHUB</text>
+    <text x="48" y="150" font-size="68" font-weight="700" letter-spacing="-2.2" fill="#f3f6fb">streams<tspan fill="#7cf3ca"> / </tspan>aio</text>
+    <text x="50" y="199" font-size="25" fill="#d6e0ed">Modifica in locale. Conserva su GitHub.</text>
+    <text x="50" y="235" font-size="18" fill="#9cacc4">Compose, impostazioni e un percorso di disaster recovery.</text>
+    <g transform="translate(948 74)">
+      <path d="M42 10 122 56 122 148 42 194 -38 148 -38 56Z" fill="#162b40" stroke="#7cb2ff" stroke-width="2"/>
+      <path d="M-38 56 42 102 122 56M42 102V194" fill="none" stroke="#7cb2ff" stroke-width="2"/>
+      <path d="M85 0 165 46 165 138 126 161" fill="none" stroke="#294863" stroke-width="2"/>
+      <path d="M-38 104 42 150 122 104" fill="none" stroke="#294863" stroke-width="2"/>
+      <rect x="-70" y="133" width="146" height="43" rx="12" fill="#112923" stroke="#7cf3ca"/>
+      <path d="m-49 153 7 7 13-15" fill="none" stroke="#7cf3ca" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="-19" y="160" font-size="15" font-weight="600" fill="#bdf8e4">VERIFICATO</text>
+    </g>
+    <path d="M48 270H1232" stroke="url(#line)" stroke-opacity=".45"/>
+    <g transform="translate(48 297)">
+      <rect width="364" height="80" rx="13" fill="#132336" stroke="#26394e"/>
+      <text x="22" y="28" font-size="12" font-weight="600" letter-spacing="1.3" fill="#9cacc4">CONFIGURAZIONE PUBBLICA</text>
+      <text x="22" y="58" font-size="24" font-weight="600" fill="#7cb2ff">~15 minuti</text>
+      <text x="182" y="57" font-size="15" fill="#d6e0ed">solo file ammessi</text>
+    </g>
+    <g transform="translate(438 297)">
+      <rect width="364" height="80" rx="13" fill="#132336" stroke="#26394e"/>
+      <text x="22" y="28" font-size="12" font-weight="600" letter-spacing="1.3" fill="#9cacc4">CONFIGURAZIONE PRIVATA</text>
+      <text x="22" y="58" font-size="24" font-weight="600" fill="#7cf3ca">Infisical</text>
+      <text x="142" y="57" font-size="15" fill="#d6e0ed">GUI + Agent</text>
+    </g>
+    <g transform="translate(828 297)">
+      <rect width="404" height="80" rx="13" fill="#132336" stroke="#26394e"/>
+      <text x="22" y="28" font-size="12" font-weight="600" letter-spacing="1.3" fill="#9cacc4">BACKUP DR CIFRATO</text>
+      <text x="22" y="58" font-size="24" font-weight="600" fill="#e9c992">5 release</text>
+      <text x="154" y="57" font-size="15" fill="#d6e0ed">age · settimanale</text>
+    </g>
+  </g>
+</svg>
