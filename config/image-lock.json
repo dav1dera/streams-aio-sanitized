@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:79e34150c9bcd760861c13e92a27a4c15da1328a53e28fab6eaa4e44b5b32ab2",
+    "image": "ghcr.io/viren070/aiostreams@sha256:4bc967c8e77e80d065f63f7b29e013c00b044033638354f3170921e68f53ddc8",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -90,12 +90,12 @@
     "configured_image": "gogost/gost:latest"
   },
   "oauth2-proxy": {
-    "image": "quay.io/oauth2-proxy/oauth2-proxy@sha256:b1b2021fe8f4004573e8d690dec6c7bb29cc44364572cf8510a05bf3a0ae2ded",
+    "image": "quay.io/oauth2-proxy/oauth2-proxy@sha256:8498b0d0ef0a7b29686414000a08aee467f02d0299c9ed1e006a8f33fc017916",
     "platform": "linux/amd64",
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:d99e71bded5035a143d8d056fcb0fe010db018cfb0f217098cf6c0ddd35e8d45",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:d847cd7ffb01d52793f3f0cb13584c161693ea5a7cb812248f3830da5f81a74e",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
