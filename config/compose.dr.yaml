@@ -88,7 +88,7 @@
       "platform": "linux/amd64"
     },
     "tvvoo": {
-      "image": "qwertyuiop8899/tvvoo@sha256:8eb3936d38f55314b62b74475394afc910507a65121b3b45551b48251b3d4be1",
+      "image": "qwertyuiop8899/tvvoo@sha256:fc408f45a2c33ec917056300b192cbc61cb3ae61740c85d281336095db4c81c2",
       "platform": "linux/amd64"
     },
     "aiomanager": {
