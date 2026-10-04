@@ -29,7 +29,7 @@
       "platform": "linux/amd64"
     },
     "aiometadata": {
-      "image": "ghcr.io/cedya77/aiometadata@sha256:a5e78b71c86a40c0a62d4cea77c9a354b089e579d86a15e307de63393c721733",
+      "image": "ghcr.io/cedya77/aiometadata@sha256:9bff687d7f213e401475951cb0be882eeec45d919e0659a2a7dc58d9b329c67e",
       "platform": "linux/amd64"
     },
     "mediaflow-proxy-light": {
@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:f70e833de8fcd02e8b3db6b8547cd28a6b4802ab1daaf29480d476f053f6e6f3",
+      "image": "ghcr.io/viren070/aiostreams@sha256:754ff8adeaee95d31ff88ef7478f40a647f944092b4588861c6fccfe9d1659d6",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -72,7 +72,7 @@
       "platform": "linux/amd64"
     },
     "gost": {
-      "image": "gogost/gost@sha256:e1ff429eb07d5f820ed08b2593599f63d03b9f670631d9394b7bf5e068fb9e4c",
+      "image": "gogost/gost@sha256:55f05a58541f69bd7aa5fb9ee24fda12669430fb71489496473ecf15c32bcc8e",
       "platform": "linux/amd64"
     },
     "oauth2-proxy": {
@@ -80,7 +80,7 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:eda96fe2331067156a7c071f080927c89b7840ea30b53a892e30fa74b826e7cf",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:212c93d6ceb056a0d2bb96a45135f84c72a7024d9353628969cf04e0527f6775",
       "platform": "linux/amd64"
     },
     "streamvix": {
