@@ -28,7 +28,6 @@
   "schema": 1,
   "source_hashes": {
     ".env.example": "037f86e4e12e246d502e913e7333f5bddd322c37ede2a2e937778b282a56d2dd",
-    "AUDIT-SCOPE.md": "b18c87b414429952114039df6f246c423e7db1d1b3cd245586339a1087f80b61",
     "README.md": "6cf16b1eff78e1417700b9e6520f9032c41fd7095db7453e8196567f3af09b0d",
     "config/templates/headplane.yaml.example": "fcf0e83260c0036e505d128033680003b9f20d1134cc7b2f64c06c2684e2bb2f",
     "config/templates/headscale.yaml.example": "021311b3069a090892b61975943b085e31c2c42e2f331f3a6eced40318e4e162",
