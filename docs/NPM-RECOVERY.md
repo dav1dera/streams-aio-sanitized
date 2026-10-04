@@ -1,19 +1,17 @@
-# NPM: one database, newly issued TLS
+# NPM · database conservato, TLS riemesso
+
+[← Procedura unica DR](DISASTER-RECOVERY.md)
+
+Il backup SQLite coerente è già prodotto dal job privato e caricato cifrato come `npm-database.sqlite.age` nelle release DR. Questa guida descrive il helper di ripristino sul **nuovo host**. Il helper è legato a NPM 2.16.0; un digest aggiornato dal sync non ne certifica automaticamente la compatibilità. La riemissione reale su un replacement non è ancora stata provata.
 
 The only mandatory runtime recovery artifact for this component is
 `data/npm/data/database.sqlite`. Store a **consistent single-file SQLite
-snapshot** in the separate encrypted DR layer. Do not commit it or import it
+snapshot** as the age artifact in the private DR release. Do not commit it or import it
 into Infisical. A raw copy while SQLite is writing is not a consistent snapshot;
 if WAL is in use, use a supported SQLite backup/snapshot operation during the
-separate backup job. No database snapshot was created by this audit.
+separate backup job. The scheduled private backup now creates the consistent SQLite snapshot; this recovery helper does not create backups.
 
-The inspected database passed `PRAGMA integrity_check`, is 405,504 bytes (396 KiB),
-is owned by numeric UID/GID 1000:1000 and is under the `/data` bind. Its existing
-mode is `0674`; this audit did not change it. Restore the replacement artifact
-with restrictive mode `0600`, preserving the intended numeric owner/group.
-The size is the observed SQLite file size, not a promise about future encrypted
-archive sizes. Its users, authentication records, routing, forwarding, access
-lists and certificate metadata make it a sensitive artifact.
+Restore the artifact with mode `0600` and the numeric UID/GID expected by the recovered deployment (1000:1000 in the original reference). Do not use the size or mode observed during the initial audit as a restore requirement. Users, authentication records, routing, access lists and certificate metadata make this database private.
 
 `data/npm/data/letsencrypt/**` is optional runtime state. The replacement may
 start with an empty certificate directory. No certificate/private key, ACME
@@ -24,9 +22,10 @@ its local JWT signing key; old login sessions then expire.
 
 The restored database supplies the single wildcard's domain names, certificate
 owner/contact, provider settings and proxy associations. The canonical
-`/shared/CLOUDFLARE_API_TOKEN` supplies the DNS credential. Its value was compared
-read-only with NPM's current certificate metadata and matched. There is no
-service-scoped duplicate and no Infisical Certificate Management integration.
+`/shared/CLOUDFLARE_API_TOKEN` supplies the DNS credential. The original read-only
+audit confirmed the canonical mapping; verify that the recovered token still has
+the required DNS permissions. There is no service-scoped duplicate and no
+Infisical Certificate Management integration.
 
 NPM 2.16.0 uses its Certbot implementation to perform Let's Encrypt Cloudflare
 DNS-01 issuance. The recovery helper calls that implementation inside the pinned
@@ -42,13 +41,15 @@ NPM SQLite artifact at its declared path, **before starting NPM**. Exclude all
 old generated nginx configuration, logs and certificate trees from the default
 flow.
 
-```sh
-sudo python3 -B scripts/npm-dr.py prepare --target "$PWD"
+The following block continues the unique DR procedure; `DR_PY` is its absolute virtualenv interpreter.
+
+```bash
+sudo "$DR_PY" -B scripts/npm-dr.py prepare --target "$PWD"
 # Start NPM on this replacement host only, after ordinary Compose preflight.
 docker compose up -d npm
-sudo python3 -B scripts/npm-dr.py reissue --target "$PWD"
+sudo "$DR_PY" -B scripts/npm-dr.py reissue --target "$PWD"
 # After the upstream applications are running:
-sudo python3 -B scripts/npm-dr.py verify --target "$PWD"
+sudo "$DR_PY" -B scripts/npm-dr.py verify --target "$PWD"
 ```
 
 These commands were prepared, not run against the deployment. `prepare` refuses
@@ -79,7 +80,7 @@ reachability assumptions. The final `verify` also requests HTTPS for enabled
 hosts; upstream 5xx responses fail, while redirects and access-policy 4xx
 responses are accepted. Private names, tokens and library errors are suppressed.
 
-The wrapper does not start/restart containers. Its future reissue operation
+The wrapper does not start/restart containers. Its reissue operation
 necessarily reloads nginx inside the replacement NPM container after successful
 validation. No live reload or issuance was performed during preparation.
 
@@ -89,7 +90,8 @@ Offline tests cover quarantine/idempotence, live-target and mount refusal,
 unchanged forwarding/access policy, successful issuance, unchanged/new certificate
 IDs, association repair, retry without reissuance, failure without enabling
 hosts, and TLS/HTTPS verifier logic. The relevant NPM implementation files were
-compared byte-for-byte with the running image and the version-pinned upstream.
+compared byte-for-byte during the original audit with the then-running image and
+the version-pinned upstream. That evidence does not certify later image changes.
 Network issuance, Cloudflare permissions, Let's Encrypt quota, DNS propagation
 and actual replacement-host HTTPS remain unexecuted. Script readiness is not a
 claim that a new certificate has already been issued.

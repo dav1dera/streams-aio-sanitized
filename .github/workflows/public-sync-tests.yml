@@ -12,5 +12,15 @@ jobs:
       - uses: actions/checkout@v4
       - run: python3 -m pip install 'PyYAML==6.0.3'
       - run: python3 -B -m unittest discover -s tests -p 'test_public_*.py' -v
-      - run: python3 -m py_compile scripts/sync-public-stack.py scripts/public_export.py scripts/install-public-sync-policy.py
+      - run: python3 -m py_compile scripts/sync-public-stack.py scripts/public_export.py scripts/install-public-sync-policy.py scripts/install-local-guides.py
       - run: bash -n scripts/verify-public-sync-systemd.sh
+  recovery-preparation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m pip install -r scripts/requirements-dr.txt
+      - run: python3 -B -m unittest discover -s tests -p 'test_agent_mappings.py' -v
+      - run: python3 -B -m unittest discover -s tests -p 'test_aio_dr.py' -v
+      - run: python3 -B tests/check_npm_prepare.py
+      - run: node --experimental-vm-modules tests/check_npm_helper.mjs
+      - run: python3 -B tests/test_fresh_tree.py

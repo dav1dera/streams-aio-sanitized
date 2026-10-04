@@ -178,3 +178,11 @@ The verifier runs the service and checks both its result and active timer. The
 15-minute public timer remains; encrypted DR retains its weekly schedule. Keep
 the existing worker/state directories and authentication. Do not pull the public
 repo into the live source or replace application directories with the worker.
+
+## Local documentation and recovery guide
+
+The deployment source remains authoritative for stack changes. GitHub does not pull the VM: its systemd worker publishes local changes every approximately 15 minutes. The initial unchanged-source protection may leave older local docs while preserving a newer GitHub edition.
+
+To adopt the final guides locally, use [the README documentation-only update](../README.md#tenere-le-guide-locali-allineate). The helper backs up replaced local docs outside both checkouts and copies only its fixed guide/image inventory. It does not pull the public Compose into the running deployment. Subsequent local document edits use the normal export policy. The guide installer itself is reserved repository tooling.
+
+The current single recovery runbook is [DISASTER-RECOVERY.md](DISASTER-RECOVERY.md). Verified backup/publication is separate from a complete replacement-host restore drill.

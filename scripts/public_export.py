@@ -18,7 +18,7 @@ RESERVED = {INVENTORY, LAYOUT, ".gitignore", ".github", "systemd",
             "config/private-config-overlays.json", "config/image-lock.json", "config/compose.dr.yaml",
             "scripts/sync-public-stack.py", "scripts/public_export.py",
             "scripts/verify-public-sync-systemd.sh", "scripts/requirements-public-sync.txt",
-            "scripts/install-public-sync-policy.py",
+            "scripts/install-public-sync-policy.py", "scripts/install-local-guides.py",
             "docs/PUBLIC-STACK-SYNC.md", "docs/SEAMLESS-PUBLIC-SYNC.md"}
 PRIVATE_DIRS = {".git", ".secrets", ".generated", ".private-dr", ".ssh", ".gnupg", ".aws",
                 "__pycache__", "node_modules", ".venv", "venv", "secrets", "private", "credentials",
