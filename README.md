@@ -227,14 +227,35 @@ La sequenza di ripristino collega i due repository:
 2. Ripristina Infisical e il suo database/configurazione; recupera l'Agent e le credenziali di bootstrap.
 3. Prepara un clone pubblico su un **host nuovo**, installa le dipendenze e fornisci gli input privati dichiarati.
 4. Genera una volta env/configurazioni, crea le directory vuote e inizializza i database applicativi previsti.
-5. Ripristina il database NPM e gli eventuali payload logici AIO; valida Compose e avvia i servizi nell'ordine previsto.
+5. Ripristina il database NPM e i payload logici AIO richiesti dal preflight completo attuale; valida Compose e avvia i servizi nell'ordine previsto.
 6. Completa enrollment, autorizzazioni e riemissione TLS richiesti dai servizi; riattiva i timer dopo la verifica.
 
-Gli strumenti `dr.py init/render/prepare-state` e gli importatori sono per il nuovo host; rifiutano destinazioni già inizializzate. La procedura dettagliata è in [BOOTSTRAP.md](docs/BOOTSTRAP.md), [DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md), [NPM-RECOVERY.md](docs/NPM-RECOVERY.md) e [AIO-EXPORT-IMPORT.md](docs/AIO-EXPORT-IMPORT.md).
+Gli strumenti `dr.py init/render/prepare-state` e gli importatori sono per il nuovo host; rifiutano destinazioni già inizializzate. La procedura unica è in [DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md), con checklist e approfondimenti collegati.
 
 La ripartenza vuota di cache, sessioni e database ricostruibili è prevista. I file runtime unici aggiunti in futuro, come media personali, richiedono una scelta di backup dedicata. I flussi AIOStreams/AIOMetadata esistenti mantengono i loro contratti di export/import.
 
 I test usano input sintetici e la prima sincronizzazione reale è stata verificata. Questo non costituisce una prova completa di ripristino su un host nuovo; la disponibilità degli input privati va verificata separatamente.
+
+## Tenere le guide locali allineate
+
+La cartella `/home/pi/streams-aio` è il riferimento per le modifiche dello stack. Ogni circa 15 minuti **la VM pubblica su GitHub**: GitHub non esegue un pull della VM. Le modifiche fatte qui sul repo non entrano automaticamente nella copia locale delle guide.
+
+Per installare queste guide finalizzate nel deployment, aggiorna **solo il clone separato del worker**, poi copia i documenti con il helper. Esegui come `pi`, senza sudo:
+
+```bash
+SYNC_HOME=/home/pi/.local/share/streams-aio-public-sync
+git -C "$SYNC_HOME/tooling" pull --ff-only &&
+"$SYNC_HOME/venv/bin/python" -B "$SYNC_HOME/tooling/scripts/install-local-guides.py" \
+  --source /home/pi/streams-aio &&
+"$SYNC_HOME/venv/bin/python" -B "$SYNC_HOME/tooling/scripts/install-local-guides.py" \
+  --source /home/pi/streams-aio --apply
+```
+
+Il primo comando del helper confronta soltanto; `--apply` copia README, guide elencate e due immagini. Salva i documenti locali sostituiti in una cartella privata sotto `~/.local/state/streams-aio-guide-updates/` e verifica gli SHA256 rileggendo gli output. Non tocca Compose, env, secret, runtime, policy, altri script, Git o container. Rifiuta symlink e backup dentro i clone. Un secondo passaggio identico non riscrive nulla. Se un processo viene interrotto, conserva la copia di sicurezza; una lock residua richiede prima di verificare che il processo precedente sia terminato.
+
+Da quel momento modifica le guide nella copia locale: le modifiche ammesse seguiranno il normale locale → GitHub. Per future modifiche editoriali fatte direttamente su GitHub ripeti esplicitamente questo aggiornamento, dopo aver confrontato le note locali da conservare. Non fare un pull dell'intero repo pubblico dentro il deployment attivo.
+
+La guida principale per ricostruire il sistema è **[DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md)**; [BOOTSTRAP.md](docs/BOOTSTRAP.md) è la sua checklist. Le pagine NPM e AIO documentano i contratti specifici. Gli ultimi passaggi non ancora provati su VM nuove sono dichiarati nella guida, senza presentarli come già verificati.
 
 ## Domande frequenti
 
@@ -254,7 +275,7 @@ I test usano input sintetici e la prima sincronizzazione reale è stata verifica
 | [Seamless public sync](docs/SEAMLESS-PUBLIC-SYNC.md) | Regole complete della modalità attiva e limiti della selezione |
 | [Public stack sync](docs/PUBLIC-STACK-SYNC.md) | Modalità precedente a schema fisso e dettagli del trasporto |
 | [Bootstrap](docs/BOOTSTRAP.md) | Prerequisiti di un deployment nuovo |
-| [Disaster recovery](docs/DISASTER-RECOVERY.md) | Stato ricostruibile, input privati e strumenti di ripristino |
+| [Disaster recovery](docs/DISASTER-RECOVERY.md) | Guida unica: release, Infisical, bootstrap fresh, NPM/AIO, avvio e verifiche |
 | [NPM recovery](docs/NPM-RECOVERY.md) | Proxy, database NPM e riemissione TLS |
 | [AIO export/import](docs/AIO-EXPORT-IMPORT.md) | Payload logici AIOStreams/AIOMetadata |
 | [Manifest DR](config/dr-manifest.yaml) · [Layout pubblico](config/public-stack-layout.json) | Servizi, riferimenti e directory da ricreare |

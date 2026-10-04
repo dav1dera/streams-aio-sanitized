@@ -1,10 +1,12 @@
-# Private logical AIO recovery payloads
+# AIO · contratto di export/import logico esistente
 
-AIOStreams and AIOMetadata SQLite databases are **OPTIONAL_RUNTIME_STATE**.
-Their logical exports are **PRIVATE_DR_PAYLOAD**, supplied separately from this
-repository. Keep them encrypted with SOPS/age in the future `streams-aio-dr`
-repository. This job does not create that repository, extract/decrypt credentials
-from live databases, obtain real exports or provision new Infisical values.
+[← Procedura unica DR](DISASTER-RECOVERY.md)
+
+AIOStreams/AIOMetadata mantengono il percorso precedente, senza modifiche al codice o al flusso applicativo in questo aggiornamento. I loro SQLite sono opzionali come backup; il percorso completo attuale ricostruisce database nuovi da payload logici privati e richiede il marker dell'importazione AIO nel preflight.
+
+Le release automatiche `streams-aio-dr` **esistono già**, ma contengono soltanto NPM, Agent e Infisical. Non contengono automaticamente questi payload AIO. Conserva gli export separatamente cifrati e recuperabili prima di perdere l'host originale; disponibilità degli export e di `/dr/AIO_PROFILE_BINDINGS` va verificata, non presunta.
+
+L'adapter resta legato ad AIOStreams 2.35.3 e AIOMetadata 3.3.0. L'aggiornamento automatico dei digest delle immagini pubbliche non prova la compatibilità di una versione successiva con questo importer. Non aggirare i controlli di versione e non falsificare il marker.
 
 The public repository contains the importer, schemas, examples and private-field
 mapping contract. A DR-ready consumer does not imply the private inputs already
@@ -41,7 +43,7 @@ Do not change the pinned application images without retesting the adapter.
 | `/aiostreams/SECRET_KEY` | Existing Infisical key | Existing encrypted-password URLs remain usable with the same password and UUID |
 | `/aiostreams/TRUSTED_UUIDS` | Existing service environment when configured | AIOStreams trust policy; never promoted from an untrusted export flag |
 
-`/dr/AIO_PROFILE_BINDINGS` is a **new declared input**, not a key this job imported.
+`/dr/AIO_PROFILE_BINDINGS` is a declared private input; the backup/publishing job does not create it. Verify that it exists in the recovered Infisical project.
 Existing canonical secrets may be referenced with `{"ref":"/shared/KEY_NAME"}`
 instead of duplicated. Other referenced paths must be among the folders rendered
 by `config/dr-render-plan.json`; add an explicit input folder if needed.
@@ -103,12 +105,13 @@ snapshot rendering, `dr.py render`, and `dr.py prepare-state` first. The Agent
 renders `/dr` to a private snapshot; it never writes AIO runtime databases.
 
 Supply the decrypted bundle **outside the public clone**, mode 0600, preferably
-in private temporary storage. Decryption of future SOPS/age input belongs to the
-separate DR layer. Do not supply values on command lines.
+in private temporary storage. Decryption belongs to the existing separate private AIO recovery path, outside Git. Do not supply values on command lines.
 
-```sh
-python3 -B scripts/aio-dr.py validate --target "$PWD" --payload "$AIO_DR_PAYLOAD"
-sudo python3 -B scripts/aio-dr.py import --target "$PWD" --payload "$AIO_DR_PAYLOAD"
+Continue the unique DR procedure with its `DR_PY` absolute virtualenv interpreter:
+
+```bash
+"$DR_PY" -B scripts/aio-dr.py validate --target "$PWD" --payload "$AIO_DR_PAYLOAD"
+sudo "$DR_PY" -B scripts/aio-dr.py import --target "$PWD" --payload "$AIO_DR_PAYLOAD"
 ```
 
 The importer checks the resolved Compose image, database URI and bind layout;

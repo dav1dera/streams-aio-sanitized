@@ -288,4 +288,4 @@ Conserva il codice di errore e i percorsi mostrati. Per chiedere assistenza bast
 
 I database applicativi ricostruibili e le cache possono ripartire vuoti. Un nuovo servizio con preferenze presenti soltanto nel suo database richiede una scelta esplicita: ricrearle manualmente oppure aggiungere un export dichiarativo/backup dedicato. La sincronizzazione non estrae automaticamente ogni impostazione dalle GUI delle applicazioni.
 
-Continua con [BOOTSTRAP.md](BOOTSTRAP.md), [DISASTER-RECOVERY.md](DISASTER-RECOVERY.md), [NPM-RECOVERY.md](NPM-RECOVERY.md) e [AIO-EXPORT-IMPORT.md](AIO-EXPORT-IMPORT.md). Gli esempi operativi non sostituiscono una prova di ripristino su un host nuovo.
+Per ripartire continua con la [procedura unica DR](DISASTER-RECOVERY.md); per allineare queste guide al deployment usa il [helper del README](../README.md#tenere-le-guide-locali-allineate). Gli esempi operativi non sostituiscono una prova di ripristino su un host nuovo.

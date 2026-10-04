@@ -1,79 +1,41 @@
-# Fresh-deployment prerequisites
+# Bootstrap · checklist per un host nuovo
 
-Current readiness and the repository-contained preparation tools are described
-in [DISASTER-RECOVERY.md](DISASTER-RECOVERY.md). The source consumer is verified using synthetic inputs. This does not mean real
-private payloads or newly declared Infisical keys have already been provisioned.
+[← README](../README.md) · **[Procedura unica di ripristino](DISASTER-RECOVERY.md)**
 
+Questa pagina raccoglie i prerequisiti. Per l'ordine dei comandi segui la guida unica: non usare questo elenco come un secondo installer e non eseguire gli strumenti fresh sullo stack già attivo.
 
-This repository supplies public Compose declarations, service environment
-templates and field mappings. It is not a state backup or a complete
-one-command installer. No checkout of the previous private repository is
-required. The following inputs must be provisioned separately:
+## Tre fonti, con compiti diversi
 
-- An Infisical project/environment containing the required private values,
-  an authenticated renderer and its private bootstrap credentials.
-- The root `.env` variables listed in `.env.example`, plus the service files
-  named in Compose under `.secrets/`. Preserve the public-first/private-second
-  environment-file order. Never commit the rendered values.
-- Generated declarative files referenced by Compose under `.generated/`,
-  with ownership and permissions appropriate for each consuming process.
-- The reviewed skeletons and extension implementations in `config/dr-templates/`.
-  Recovered template security reviews are complete. Supply the required private inputs before deployment. Application identities
-  remain outside the repository.
+- **Stack locale:** Compose, impostazioni pubbliche e file dichiarativi attivi. Il timer sulla VM li esporta verso GitHub circa ogni 15 minuti.
+- **Infisical:** secret e impostazioni private; l'Agent nativo li distribuisce nei file locali. Cartella GUI, mapping Agent e riferimento Compose sono tre parti dello stesso collegamento.
+- **Release DR privata:** cinque artifact age di NPM, Agent e Infisical, più manifest/checksum. Massimo cinque release gestite; nessuna private age key nel repo.
 
-`config/private-config-overlays.json` identifies the approved private fields
-and their Infisical destinations for the mixed configuration files. It is a
-field-mapping description, not an executable bootstrap tool. It does not
-contain credentials or an application-state backup.
+Il clone pubblico da solo non ricrea autenticazione, secret, Infisical o il database NPM. La clonazione GitHub si usa per **recuperare** un host nuovo; durante l'uso quotidiano la configurazione segue locale → GitHub.
 
-## Required one-shot bootstrap behavior
+## Prima di iniziare
 
-Honey, Headscale/Headplane, Jackett and Seanime can own or rewrite their local
-configuration. Do not configure a continuous renderer to overwrite those live
-files. The bundled one-shot initializer must:
+| Prerequisito | Verifica |
+| --- | --- |
+| Accesso GitHub recuperabile senza Infisical perso | Accesso al repo pubblico e privato |
+| Identity age esterna | Una release può essere decifrata in storage privato |
+| Infisical recuperato | Progetto/ambiente e autenticazione funzionanti |
+| Agent e template privati recenti | Mapping e percorsi corrispondono al commit pubblico scelto |
+| Host compatibile | Python 3.11+, Docker/Compose, Git, gh, venv, ACL, CLI Infisical |
+| Versioni e architettura delle immagini | Digest disponibili e contratti NPM/AIO compatibili |
+| NPM SQLite coerente | Artifact della release verificato, NPM ancora spento |
+| Payload AIO dichiarati | Export esterni e binding Infisical per il preflight completo attuale |
+| Bootstrap infrastrutturale | Reti, DNS, UID/GID e accessi coerenti con il nuovo host |
 
-1. Require explicit fresh skeleton and destination paths. Reject live runtime
-   directories as sources and reject identical source/destination paths.
-2. Refuse the entire operation if any destination configuration exists,
-   including a symlink, before authentication or writes.
-3. Resolve only approved declarative fields. Do not import runtime identity,
-   sessions, indexer hidden data, databases or certificates into Infisical.
-4. Validate all outputs before creating files, reject symlink parents and use
-   exclusive file creation with no symlink following. Never overwrite files.
-5. Apply explicit ownership, permissions and required ACLs for each process.
+## Configurazioni generate una volta
 
-`scripts/dr.py` provides the fresh-target guard and one-shot rendering. It
-refuses missing private inputs and invalid allowlists. It never starts
-containers or overwrites initialized application configuration.
+`dr.py init` marca soltanto una destinazione vuota. `render --mode fresh` crea env privati, configurazioni e SQL di bootstrap dopo aver verificato gli input; `prepare-state` crea directory vuote con permessi/ownership dichiarati. Non avviano container e non sovrascrivono configurazioni esistenti.
 
-## Validation scope
+Honey, Headscale/Headplane, Jackett e Seanime possono riscrivere la propria configurazione: inizializzali una volta. Non impostare l'Agent per sovrascriverli continuamente. Un target privato nuovo deve essere collegato esplicitamente all'Agent; un database nuovo sul PostgreSQL condiviso deve avere anche il suo bootstrap dichiarato.
 
-After provisioning real private inputs, validate with:
+L'ordine degli env è pubblico prima, privato dopo. `environment:` prevale su entrambi. Cambiare un secret distribuito non aggiorna da solo l'ambiente del container già avviato, salvo un hook di ricreazione esplicitamente configurato.
 
-```sh
-docker compose --profile all config --quiet
-```
+## Cosa si ricrea vuoto
 
-The publication audit uses a temporary copy and synthetic private inputs for
-Compose schema/interpolation validation. That test does not prove a fresh
-application startup or the availability of real credentials. Never initialize
-or replace existing state merely to validate these configuration templates.
+Database applicativi dichiarati come ricostruibili, cache, sessioni e runtime possono ripartire vuoti. Infisical e NPM hanno gli artifact necessari per il modello scelto. Gli AIO mantengono il percorso logico esistente; il preflight completo richiede i suoi input separati. Media personali e configurazioni nuove salvate solo nel DB richiedono una scelta di backup propria.
 
-## Quick redeploy is the default
-
-Use `scripts/dr.py render --mode fresh`, followed by `prepare-state` and
-`preflight`. Empty bind directories and automatically created Docker volumes are
-normal inputs. Comet/CometNet caches, Redis sessions, rebuildable indices and
-optional runtime identities do not require backups. Do not run these commands
-on an initialized deployment.
-
-The manifest separates REQUIRED_USER_STATE from OPTIONAL_RUNTIME_STATE and
-DISPOSABLE_STATE. NPM's database is the only required runtime backup artifact;
-restore it before NPM startup, then use `npm-dr.py` to reissue TLS and restore
-proxy associations. No existing TLS or node identity is mandatory.
-
-AIOStreams/AIOMetadata use logical configuration export/import with private
-bindings from Infisical. Their SQLite files are optional. Supply PRIVATE_DR_PAYLOAD outside this clone
-and run the fresh-only importer; no source DB extraction is required. Fresh Headscale/Tailscale
-enrollment and administrator setup are normal first-use procedures. See the
-DR guide and the NPM/AIO-specific procedures for exact scope and consequences.
+Concludi con validazione Compose, avvio per dipendenze, NPM/TLS, accessi/enrollment e verifica dei timer come nella [guida unica](DISASTER-RECOVERY.md). Una validazione sintetica non dimostra il funzionamento di un host ricostruito con credenziali reali.
