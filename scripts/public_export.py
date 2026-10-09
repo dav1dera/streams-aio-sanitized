@@ -237,7 +237,8 @@ class Guard:
 
     def private_projection(self, text, name):
         if name in {"README.md", "docs/DISASTER-RECOVERY.md", "docs/SEAMLESS-PUBLIC-SYNC.md",
-                    "docs/PUBLIC-STACK-SYNC.md"}:
+                    "docs/PUBLIC-STACK-SYNC.md", "scripts/bootstrap-new-vm.sh",
+                    "scripts/recover-new-vm.py", "scripts/sync-public-stack.py"}:
             # A public repository owner can also be a private integration's
             # username. Exempt only complete, already published repository URLs,
             # never the username itself or a different path/query/credential URL.
