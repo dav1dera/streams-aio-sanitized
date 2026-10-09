@@ -59,6 +59,38 @@ def fixture(root, public):
 
 
 class PublicExportTests(unittest.TestCase):
+    def repository_url_guard(self):
+        root = "https://github.com/" + sync.REPOSITORY
+        text = ("[badge](" + root + "/actions/workflows/public-sync-tests.yml/badge.svg)\n"
+                "git clone " + root + ".git\n").encode()
+        self.public["README.md"] = text
+        guard = export.Guard(self.source, self.public, sync, lambda name: (self.source / name).read_bytes())
+        owner = sync.REPOSITORY.split("/")[0]
+        guard.remember(owner, "/stremthru/STREMTHRU_AUTH_ADMIN")
+        guard.remember(owner, "/stremthru/STREMTHRU_INTEGRATION_GITHUB_USER")
+        return guard, text, owner, root
+
+    def test_published_repository_urls_do_not_taint_private_username(self):
+        guard, text, owner, root = self.repository_url_guard()
+        self.assertIn(owner, guard.values)
+        guard.scan(text, "README.md")
+
+    def test_repository_url_exception_never_exempts_username_or_other_file(self):
+        guard, text, owner, root = self.repository_url_guard()
+        for data, name in ((text + owner.encode(), "README.md"), (text, "docs/new.md"),
+                           (text + (root + ".git\n").encode(), "README.md")):
+            with self.subTest(name=name, length=len(data)):
+                with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+                    guard.scan(data, name)
+
+    def test_repository_url_exception_requires_complete_url(self):
+        guard, text, owner, root = self.repository_url_guard()
+        for suffix in ("?token=extra", "/unreviewed", "@untrusted.example", "SECRET", "#extra"):
+            with self.subTest(suffix=suffix):
+                changed = text.replace((root + ".git").encode(), (root + ".git" + suffix).encode())
+                with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+                    guard.scan(changed, "README.md")
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
@@ -627,3 +659,4 @@ class IgnoreInstallerTests(unittest.TestCase):
 
 
 if __name__ == "__main__": unittest.main()
+
