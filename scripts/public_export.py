@@ -236,6 +236,23 @@ class Guard:
                     if len(found) == 1: self.remember(found[0], marker[1])
 
     def private_projection(self, text, name):
+        if name == "README.md":
+            # A public repository owner can also be a private integration's
+            # username. Exempt only complete, already published repository URLs,
+            # never the username itself or a different path/query/credential URL.
+            root = "https://github.com/" + self.sync.REPOSITORY
+            urls = (root + "/actions/workflows/public-sync-tests.yml/badge.svg",
+                    root + "/actions/workflows/public-sync-tests.yml", root + ".git", root)
+            pattern = re.compile(r"(?<![A-Za-z0-9_:/@])(?:" + "|".join(map(re.escape, urls))
+                                 + r")(?![A-Za-z0-9_./?%#@:&=+~-])")
+            prior = self.baseline.get(name, b"").decode()
+            remaining = {url: len([m for m in pattern.finditer(prior) if m[0] == url]) for url in urls}
+            def project(match):
+                if remaining[match[0]]:
+                    remaining[match[0]] -= 1
+                    return "<published-repository-url>"
+                return match[0]
+            return pattern.sub(project, text)
         if name != "docker-compose.yml":
             return text
         # Exempt only the exact reviewed scalar in its original healthcheck field.
@@ -746,3 +763,4 @@ def render(source, baseline, sync, image_reader=None):
     sync.require(candidates(source, sync)[0] == names, "PUBLIC_FILE_LIST_CHANGED_DURING_EXPORT")
     sync.require(image_reader(source, compose, old_locks) == locks, "IMAGES_CHANGED_DURING_EXPORT")
     return {n: data for n, data in outputs.items() if data != baseline.get(n)}
+
