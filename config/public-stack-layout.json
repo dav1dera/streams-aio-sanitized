@@ -199,7 +199,7 @@
     ".secrets/tvvoo.env"
   ],
   "private_env_targets_from_restored_agent": [],
-  "unclassified_files_excluded": 22,
+  "unclassified_files_excluded": 26,
   "database_policy": "fresh_application_state_restore_infisical",
   "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup"
 }

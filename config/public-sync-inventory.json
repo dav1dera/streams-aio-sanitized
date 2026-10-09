@@ -1,5 +1,6 @@
 {
   "files": {
+    "README.md": "37475ba727811da2bb4e3f2525f3f8c55934201609f1ac7aaa73709052f4cc21",
     "data/aiomanager/.env": "30f5f9513199b3234a541301855b61e39334039cc9b7feeededd8648ac8fcb0c",
     "data/aiometadata/.env": "9435a7de8ed46cde8dca354a41f916994d5c5d416abbeabfb5e52a4e5610a262",
     "data/aiostreams/.env": "11489d6a929759201f8186edf613f62f8a93b9513ce0a60e095eba245f60ed6d",
@@ -23,12 +24,17 @@
     "data/tailscale/.env": "46e809bf89203d82258490145a7fd576e67ef6346c1d961e7aa5fbecaec351c6",
     "data/teamspeak/.env": "f8f9e0f2dc5baed2087a6af42eb462a8b48354ee817547e98a1867eb06957bc4",
     "data/tvvoo/.env": "0c219edcbe2939b4403a3073ebe455877d63f6759aec579a4a1fd0bb8e69f507",
-    "data/watchtower/.env": "66e7f924fbfc1675a7c1e138e6827545c451dafb9415f73ed1df9b4d54ef7f61"
+    "data/watchtower/.env": "66e7f924fbfc1675a7c1e138e6827545c451dafb9415f73ed1df9b4d54ef7f61",
+    "docs/AIO-EXPORT-IMPORT.md": "84855ca8947ffa7cdad03c60375059f93eeb116919e4c6842a47ca6cc9c02512",
+    "docs/BOOTSTRAP.md": "b2f4d5f8ea980da499de423d81ec31d0d7dcf6e56389e0487a924cb861a48cd6",
+    "docs/DISASTER-RECOVERY.md": "ea3e12c336e4d3e166c136494218c618c8628af9438a6e9d760db6993b150c8f",
+    "docs/NPM-RECOVERY.md": "2d56359aeb10b924efd8051f8ecaff103d926edfb16215c2ac9d086f649eab1f"
   },
   "schema": 1,
   "source_hashes": {
     ".env.example": "037f86e4e12e246d502e913e7333f5bddd322c37ede2a2e937778b282a56d2dd",
-    "README.md": "6cf16b1eff78e1417700b9e6520f9032c41fd7095db7453e8196567f3af09b0d",
+    "AUDIT-SCOPE.md": "62e8bd48de58350b41d657982dec75cd47b2327cc41b21bff8e1583d3e26a7ca",
+    "README.md": "37475ba727811da2bb4e3f2525f3f8c55934201609f1ac7aaa73709052f4cc21",
     "config/templates/headplane.yaml.example": "fcf0e83260c0036e505d128033680003b9f20d1134cc7b2f64c06c2684e2bb2f",
     "config/templates/headscale.yaml.example": "021311b3069a090892b61975943b085e31c2c42e2f331f3a6eced40318e4e162",
     "data/aiomanager/.env": "30f5f9513199b3234a541301855b61e39334039cc9b7feeededd8648ac8fcb0c",
@@ -55,10 +61,11 @@
     "data/teamspeak/.env": "f8f9e0f2dc5baed2087a6af42eb462a8b48354ee817547e98a1867eb06957bc4",
     "data/tvvoo/.env": "0c219edcbe2939b4403a3073ebe455877d63f6759aec579a4a1fd0bb8e69f507",
     "data/watchtower/.env": "66e7f924fbfc1675a7c1e138e6827545c451dafb9415f73ed1df9b4d54ef7f61",
-    "docs/AIO-EXPORT-IMPORT.md": "f8887b6759f117610e3ae68f9bcfd27e4366db11c29e8bcab89c97b0cfc0f871",
-    "docs/BOOTSTRAP.md": "a5207d24c3b32fed761d1d9f6266e81a15ab05231a4788c1be863097e82bb006",
-    "docs/DISASTER-RECOVERY.md": "b579ebc0c539a1f7697e4035fdd9d4741b25f84fdbc26d0f8dbed954e5db75ac",
-    "docs/NPM-RECOVERY.md": "fd54b43e2498346c780a295c558cd0963fbb55b1e1b60d33a396f0c9d6d7fafe",
+    "docs/AIO-EXPORT-IMPORT.md": "84855ca8947ffa7cdad03c60375059f93eeb116919e4c6842a47ca6cc9c02512",
+    "docs/BOOTSTRAP.md": "b2f4d5f8ea980da499de423d81ec31d0d7dcf6e56389e0487a924cb861a48cd6",
+    "docs/DISASTER-RECOVERY.md": "ea3e12c336e4d3e166c136494218c618c8628af9438a6e9d760db6993b150c8f",
+    "docs/ESEMPI-PRATICI.md": "0964c0a1be2cbf67b8fd2ab24f5b38f1136a3b478cdae6aa81a01abd9a0e93fb",
+    "docs/NPM-RECOVERY.md": "2d56359aeb10b924efd8051f8ecaff103d926edfb16215c2ac9d086f649eab1f",
     "scripts/aio-dr.py": "8ff3aef7cef554b16308aff7f08ac96d69012b7f07adf5397b97b5111af8ff3b",
     "scripts/dr.py": "e20a65c8273c5a16eb55adce8cfbc9f51d9971cea43f1731a2caec935519b059",
     "scripts/npm-dr-helper.mjs": "ec87d93bfa7c2c719047a8a728de5bb7a30022fecbd904d02437d97a9023b8bf",

@@ -5,7 +5,7 @@
       "platform": "linux/amd64"
     },
     "portainer": {
-      "image": "portainer/portainer-ce@sha256:4d616db18cfeb5dd41a69c0958bc825c84483ea9cde1106eb82a5d26f3bd8b0e",
+      "image": "portainer/portainer-ce@sha256:03f94a406496dc84d37b552795fc424ccad8d0d7200353b6a82915f6e8f73ab0",
       "platform": "linux/amd64"
     },
     "dnscrypt-proxy": {
@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:754ff8adeaee95d31ff88ef7478f40a647f944092b4588861c6fccfe9d1659d6",
+      "image": "ghcr.io/viren070/aiostreams@sha256:bcb643691a40e1024ff101ad356935fad1a77a878fb5def5e6663cedf05dc741",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -52,11 +52,11 @@
       "platform": "linux/amd64"
     },
     "redis": {
-      "image": "redis@sha256:718f745deb7dfefeac6eed7041fc7ec9476b50e61b247932682457c41adafa0e",
+      "image": "redis@sha256:2c2dff791878316e3b083188be0d578423b24813cdda5de0e80ea4f7b3e6bfd6",
       "platform": "linux/amd64"
     },
     "watchtower": {
-      "image": "nickfedor/watchtower@sha256:2f8f2a9bd21a195b3b650409532a20f6aada8ef5834f00d0d7a999dee0779a81",
+      "image": "nickfedor/watchtower@sha256:45b54f6dc15227cfb38dbb826f2881aa0f56aaf0c255cdbb38bd80e598bdca9a",
       "platform": "linux/amd64"
     },
     "honey": {
@@ -80,15 +80,15 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:212c93d6ceb056a0d2bb96a45135f84c72a7024d9353628969cf04e0527f6775",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:9b64eaccee664ea7b05a39afbee3321aaa56a5be4e78bd2fb7457f5bd8a3e646",
       "platform": "linux/amd64"
     },
     "streamvix": {
-      "image": "qwertyuiop8899/streamvix@sha256:192a23280b4cbdcc46f592eab2cb3997d19bf45c08f32475e52867717a845ccd",
+      "image": "qwertyuiop8899/streamvix@sha256:8ac6ace2fe07004f997f6d6451c5f77ef3870f6f5bcc3abd9420e9fc40542134",
       "platform": "linux/amd64"
     },
     "tvvoo": {
-      "image": "qwertyuiop8899/tvvoo@sha256:fc408f45a2c33ec917056300b192cbc61cb3ae61740c85d281336095db4c81c2",
+      "image": "qwertyuiop8899/tvvoo@sha256:f8798651ab092bb915e08692c579fdab240cf0ba606c9f49663b74162c292697",
       "platform": "linux/amd64"
     },
     "aiomanager": {
