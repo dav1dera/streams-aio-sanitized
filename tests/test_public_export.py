@@ -96,7 +96,7 @@ class PublicExportTests(unittest.TestCase):
         dr_repository = sync.REPOSITORY.rsplit("/", 1)[0] + "/streams-aio-dr"
         dr_root = "https://github.com/" + dr_repository
         for name in ("docs/DISASTER-RECOVERY.md", "docs/SEAMLESS-PUBLIC-SYNC.md",
-                     "docs/PUBLIC-STACK-SYNC.md"):
+                     "docs/PUBLIC-STACK-SYNC.md", "scripts/bootstrap-new-vm.sh"):
             data = ("`" + sync.REPOSITORY + "`\n--repo " + dr_repository + "\n"
                     + dr_root + "/releases\n" + dr_root + ".git\n"
                     + dr_root + "/blob/main/README.md\n").encode()
@@ -108,6 +108,15 @@ class PublicExportTests(unittest.TestCase):
                 with self.subTest(name=name, extra=extra):
                     with self.assertRaisesRegex(sync.Refused, "(?:PRIVATE_VALUE_IN_PUBLIC_FILE|CREDENTIAL_PATTERN_REFUSED)"):
                         guard.scan(data + extra.encode(), name)
+
+    def test_published_python_repository_constants_stay_public_but_new_values_do_not(self):
+        guard, text, owner, root = self.repository_url_guard()
+        for name in ("scripts/recover-new-vm.py", "scripts/sync-public-stack.py"):
+            data = ("REPOSITORY = " + repr(sync.REPOSITORY) + "\n").encode()
+            self.public[name] = data
+            guard.scan(data, name)
+            with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+                guard.scan(data + ("ADMIN = " + repr(owner) + "\n").encode(), name)
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
