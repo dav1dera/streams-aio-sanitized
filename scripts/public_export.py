@@ -236,13 +236,18 @@ class Guard:
                     if len(found) == 1: self.remember(found[0], marker[1])
 
     def private_projection(self, text, name):
-        if name == "README.md":
+        if name in {"README.md", "docs/DISASTER-RECOVERY.md", "docs/SEAMLESS-PUBLIC-SYNC.md",
+                    "docs/PUBLIC-STACK-SYNC.md"}:
             # A public repository owner can also be a private integration's
             # username. Exempt only complete, already published repository URLs,
             # never the username itself or a different path/query/credential URL.
             root = "https://github.com/" + self.sync.REPOSITORY
+            dr_repository = self.sync.REPOSITORY.rsplit("/", 1)[0] + "/streams-aio-dr"
+            dr_root = "https://github.com/" + dr_repository
             urls = (root + "/actions/workflows/public-sync-tests.yml/badge.svg",
-                    root + "/actions/workflows/public-sync-tests.yml", root + ".git", root)
+                    root + "/actions/workflows/public-sync-tests.yml", root + ".git", root,
+                    dr_root + "/blob/main/README.md", dr_root + "/releases", dr_root + ".git",
+                    self.sync.REPOSITORY, dr_repository)
             pattern = re.compile(r"(?<![A-Za-z0-9_:/@])(?:" + "|".join(map(re.escape, urls))
                                  + r")(?![A-Za-z0-9_./?%#@:&=+~-])")
             prior = self.baseline.get(name, b"").decode()

@@ -91,6 +91,24 @@ class PublicExportTests(unittest.TestCase):
                 with self.assertRaisesRegex(sync.Refused, "(?:PRIVATE_VALUE_IN_PUBLIC_FILE|CREDENTIAL_PATTERN_REFUSED)"):
                     guard.scan(changed, "README.md")
 
+    def test_reviewed_guides_only_exempt_existing_complete_repository_references(self):
+        guard, text, owner, root = self.repository_url_guard()
+        dr_repository = sync.REPOSITORY.rsplit("/", 1)[0] + "/streams-aio-dr"
+        dr_root = "https://github.com/" + dr_repository
+        for name in ("docs/DISASTER-RECOVERY.md", "docs/SEAMLESS-PUBLIC-SYNC.md",
+                     "docs/PUBLIC-STACK-SYNC.md"):
+            data = ("`" + sync.REPOSITORY + "`\n--repo " + dr_repository + "\n"
+                    + dr_root + "/releases\n" + dr_root + ".git\n"
+                    + dr_root + "/blob/main/README.md\n").encode()
+            self.public[name] = data
+            guard.scan(data, name)
+            for extra in (owner, dr_repository, dr_root + "/releases?private=value",
+                          dr_repository + "/unreviewed", "x/" + dr_repository,
+                          dr_repository + "@untrusted.example"):
+                with self.subTest(name=name, extra=extra):
+                    with self.assertRaisesRegex(sync.Refused, "(?:PRIVATE_VALUE_IN_PUBLIC_FILE|CREDENTIAL_PATTERN_REFUSED)"):
+                        guard.scan(data + extra.encode(), name)
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
@@ -659,4 +677,3 @@ class IgnoreInstallerTests(unittest.TestCase):
 
 
 if __name__ == "__main__": unittest.main()
-
