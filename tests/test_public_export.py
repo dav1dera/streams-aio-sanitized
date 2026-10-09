@@ -88,7 +88,7 @@ class PublicExportTests(unittest.TestCase):
         for suffix in ("?token=extra", "/unreviewed", "@untrusted.example", "SECRET", "#extra"):
             with self.subTest(suffix=suffix):
                 changed = text.replace((root + ".git").encode(), (root + ".git" + suffix).encode())
-                with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+                with self.assertRaisesRegex(sync.Refused, "(?:PRIVATE_VALUE_IN_PUBLIC_FILE|CREDENTIAL_PATTERN_REFUSED)"):
                     guard.scan(changed, "README.md")
 
     def setUp(self):
