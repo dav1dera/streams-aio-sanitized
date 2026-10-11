@@ -519,7 +519,7 @@ class PublicExportTests(unittest.TestCase):
         rows = sync.env_values((self.source / name).read_bytes())
         # The bare loopback URL is now ordinary StremThru configuration. Keep
         # this synthetic collision confined to the reviewed healthcheck scalar.
-        rows["OAUTH2_PROXY_UPSTREAMS"] = "http://127.0.0.1:9002/healthz"
+        rows["OAUTH2_PROXY_UPSTREAMS"] = "http://127.0.0.1:9002"
         self.write(name, ("\n".join(k + "=" + v for k, v in rows.items()) + "\n").encode())
 
     def test_unchanged_reviewed_healthchecks_with_private_substring_do_not_block(self):
