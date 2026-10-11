@@ -869,6 +869,7 @@
   ],
   "required_values": [
     "/aiomanager/DATABASE_URL",
+    "/aiostreams/BASE_URL",
     "/aiostreams/SECRET_KEY",
     "/comet/ADMIN_DASHBOARD_PASSWORD",
     "/comet/AIOSTREAMS_USER_UUID_AND_PASSWORD",
