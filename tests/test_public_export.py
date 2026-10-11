@@ -216,11 +216,12 @@ class PublicExportTests(unittest.TestCase):
 
     def test_removed_service_root_secret_reference_is_not_required_for_restore(self):
         old = sync.loads(self.public["config/dr-render-plan.json"])
-        self.compose(lambda rows: rows.pop("portainer"))
+        self.assertIn("${INFISICAL_GOST_COMMAND_ARG_1", self.public["docker-compose.yml"].decode())
+        self.compose(lambda rows: rows.pop("gost"))
         changes = self.render()
         plan = sync.loads(changes["config/dr-render-plan.json"])
         compose = changes.get("docker-compose.yml", self.public["docker-compose.yml"]).decode()
-        obsolete = [key for key in old["root_env"] if "PORTAINER" in key and "${" + key + "}" not in compose]
+        obsolete = [key for key in old["root_env"] if key == "INFISICAL_GOST_COMMAND_ARG_1" and "${" + key not in compose]
         self.assertTrue(obsolete)
         for key in obsolete:
             self.assertNotIn(key, plan["root_env"])
@@ -686,3 +687,5 @@ class IgnoreInstallerTests(unittest.TestCase):
 
 
 if __name__ == "__main__": unittest.main()
+
+

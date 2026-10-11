@@ -160,6 +160,51 @@ class PublicSyncTests(unittest.TestCase):
             self.render()
         self.assertNotIn(SECRET, str(error.exception))
 
+    def test_existing_compose_network_literals_follow_valid_changes(self):
+        old = sync.yaml_load(self.public["docker-compose.yml"])
+        old["services"]["portainer"]["networks"]["default"]["ipv4_address"] = "192.0.2.10"
+        old["networks"]["default"]["ipam"]["config"][0]["subnet"] = "192.0.2.0/24"
+        self.public["docker-compose.yml"] = sync.yaml.safe_dump(old, sort_keys=False).encode()
+        new = copy.deepcopy(old)
+        new["services"]["portainer"]["networks"]["default"]["ipv4_address"] = "198.51.100.10"
+        new["networks"]["default"]["ipam"]["config"][0]["subnet"] = "198.51.100.0/24"
+        (self.source / "docker-compose.yml").write_text(sync.yaml.safe_dump(new, sort_keys=False), encoding="utf-8")
+        result = sync.yaml_load(self.render()["docker-compose.yml"])
+        self.assertEqual(result["services"]["portainer"]["networks"]["default"]["ipv4_address"], "198.51.100.10")
+        self.assertEqual(result["networks"]["default"]["ipam"]["config"][0]["subnet"], "198.51.100.0/24")
+
+    def test_network_literal_changes_require_valid_public_baseline_and_exact_path(self):
+        address_path = ("services", "portainer", "networks", "default", "ipv4_address")
+        subnet_path = ("networks", "default", "ipam", "config", 0, "subnet")
+        cases = [
+            ("${INFISICAL_NETWORK:?Required}", "192.0.2.10", address_path, "docker-compose.yml"),
+            (SECRET, "192.0.2.10", address_path, "docker-compose.yml"),
+            ("192.0.2.10", "198.51.100.10", ("services", "portainer", "ipv4_address"), "docker-compose.yml"),
+            ("192.0.2.10", "198.51.100.10", address_path, "config/private.json"),
+            ("192.0.2.0/24", "198.51.100.0/24", ("networks", "default", "subnet"), "docker-compose.yml"),
+        ]
+        for old, new, path, name in cases:
+            with self.subTest(path=path, name=name):
+                with self.assertRaises(sync.Refused) as error:
+                    sync.approved_scalar(old, new, name + ":" + sync.pointer(path), path)
+                self.assertNotIn(SECRET, str(error.exception))
+        self.assertIsNone(sync.compose_network_kind("docker-compose.yml:/", (*subnet_path[:4], True, "subnet")))
+
+    def test_network_literal_changes_reject_credentials_and_non_ipv4_values(self):
+        cases = [
+            ("192.0.2.10", ("services", "portainer", "networks", "default", "ipv4_address"),
+             [SECRET, "https://user:password@example.test", "${PRIVATE_ADDRESS}", "2001:db8::1", "192.0.2.10/24", 123, True]),
+            ("192.0.2.0/24", ("networks", "default", "ipam", "config", 0, "subnet"),
+             [SECRET, "198.51.100.10/24", "2001:db8::/64", "198.51.100.0", "198.51.100.0/99", 123, None]),
+        ]
+        for old, path, invalid in cases:
+            for new in invalid:
+                with self.subTest(path=path, new_type=type(new).__name__):
+                    with self.assertRaises(sync.Refused) as error:
+                        sync.approved_scalar(old, new, "docker-compose.yml:" + sync.pointer(path), path)
+                    self.assertIn("INVALID_PUBLIC_NETWORK_LITERAL", str(error.exception))
+                    self.assertNotIn(SECRET, str(error.exception))
+
     def test_unknown_env_key_and_private_value_in_public_field_block(self):
         path = self.source / "data/comet/.env"
         original = path.read_bytes()

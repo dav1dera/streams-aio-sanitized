@@ -8,6 +8,7 @@ import base64
 import copy
 import datetime as dt
 import hashlib
+import ipaddress
 import json
 import math
 import os
@@ -100,6 +101,33 @@ def pointer(path):
     return "/" + "/".join(str(p).replace("~", "~0").replace("/", "~1") for p in path)
 
 
+def compose_network_kind(location, path):
+    """Only existing Compose network fields may follow public literal changes."""
+    if not location.startswith("docker-compose.yml:/"):
+        return None
+    if (len(path) == 5 and path[0] == "services" and path[2] == "networks"
+            and isinstance(path[1], str) and isinstance(path[3], str)
+            and path[4] == "ipv4_address"):
+        return "address"
+    if (len(path) == 6 and path[0] == "networks" and isinstance(path[1], str)
+            and path[2:4] == ("ipam", "config")
+            and type(path[4]) is int and path[4] >= 0 and path[5] == "subnet"):
+        return "subnet"
+    return None
+
+
+def valid_network_literal(value, kind):
+    if not isinstance(value, str):
+        return False
+    try:
+        if kind == "address":
+            ipaddress.IPv4Address(value)
+            return True
+        return "/" in value and ipaddress.ip_network(value, strict=True).version == 4
+    except ValueError:
+        return False
+
+
 def approved_scalar(old, new, location, path=()):
     if isinstance(old, str) and MARKER.search(old):
         if MARKER.fullmatch(old):
@@ -114,6 +142,10 @@ def approved_scalar(old, new, location, path=()):
     if isinstance(old, str) and old.startswith("${INFISICAL_"):
         require(new == old, "COMPOSE_PRIVATE_REFERENCE_CHANGED", location)
         return old
+    network_kind = compose_network_kind(location, path)
+    if network_kind is not None and valid_network_literal(old, network_kind):
+        require(valid_network_literal(new, network_kind), "INVALID_PUBLIC_NETWORK_LITERAL", location)
+        return new
     require(type(new) is type(old), "FIELD_TYPE_CHANGED", location)
     if type(old) is bool:
         return new
