@@ -203,6 +203,18 @@ def decode(data, sync, name):
         raise sync.Refused("NON_UTF8_PUBLIC_FILE " + name) from None
 
 
+def env_literal(value):
+    # Compare dotenv literals consistently; never evaluate shell/interpolation.
+    if value.startswith('"') and value.endswith('"'):
+        try:
+            return json.loads(value)
+        except ValueError:
+            return value[1:-1]
+    if value.startswith("'") and value.endswith("'"):
+        return value[1:-1]
+    return value
+
+
 class Guard:
     def __init__(self, source, baseline, sync, read):
         self.sync, self.read = sync, read
@@ -230,7 +242,7 @@ class Guard:
         literals(compose)
         for name, data in baseline.items():
             if name.endswith("/.env"):
-                self.public_values.update(sync.env_values(data).values())
+                self.public_values.update(env_literal(value) for value in sync.env_values(data).values())
         for item in self.plan["files"]:
             if item.get("template") and item["format"] == "json": literals(sync.loads(baseline[item["template"]]))
         for name, bindings in self.plan["env_files"].items():
@@ -262,13 +274,7 @@ class Guard:
 
     def remember(self, value, ref):
         # Dotenv producer outputs may quote values. Never evaluate shell syntax.
-        if value.startswith('"') and value.endswith('"'):
-            try:
-                value = json.loads(value)
-            except ValueError:
-                value = value[1:-1]
-        elif value.startswith("'") and value.endswith("'"):
-            value = value[1:-1]
+        value = env_literal(value)
         if value and value not in self.public_values and value.lower() not in {"true", "false", "yes", "no", "on", "off"}:
             self.values.setdefault(value, set()).add(ref)
 
