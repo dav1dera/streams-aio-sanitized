@@ -99,8 +99,20 @@ class PublicExportTests(unittest.TestCase):
         text = ("[badge](" + root + "/actions/workflows/public-sync-tests.yml/badge.svg)\n"
                 "git clone " + root + ".git\n").encode()
         self.public["README.md"] = text
-        guard = export.Guard(self.source, self.public, sync, lambda name: (self.source / name).read_bytes())
         owner = sync.REPOSITORY.split("/")[0]
+        # This fixture tests a private username which happens to be a repository
+        # owner, rather than the separately reviewed public integration username.
+        # Remove only that exact literal from the fixture's public ENV corpus.
+        for name, data in list(self.public.items()):
+            if not name.endswith("/.env"):
+                continue
+            rows = sync.env_values(data)
+            for key, value in rows.items():
+                if value in {owner, json.dumps(owner), "'" + owner + "'"}:
+                    rows[key] = "SYNTHETIC_DIFFERENT_PUBLIC_OWNER"
+            self.public[name] = ("\n".join(key + "=" + value for key, value in rows.items()) + "\n").encode()
+        guard = export.Guard(self.source, self.public, sync, lambda name: (self.source / name).read_bytes())
+        self.assertNotIn(owner, guard.public_values)
         guard.remember(owner, "/stremthru/STREMTHRU_AUTH_ADMIN")
         guard.remember(owner, "/stremthru/STREMTHRU_INTEGRATION_GITHUB_USER")
         return guard, text, owner, root
@@ -169,6 +181,50 @@ class PublicExportTests(unittest.TestCase):
 
     def tearDown(self):
         self.tmp.cleanup()
+
+    def test_quoted_reviewed_public_env_literal_is_not_tainted_by_private_alias(self):
+        name = "data/stremthru/.env"
+        literal = "SYNTHETIC_ALREADY_PUBLIC_ACCOUNT"
+        reviewed = ("PUBLIC_ACCOUNT=" + json.dumps(literal) + "\n").encode()
+        self.public[name] = reviewed
+        self.write(name, reviewed)
+        self.write(".secrets/collision.env", ("PRIVATE_ALIAS=" + literal + "\n").encode())
+        guard = export.Guard(self.source, self.public, sync, lambda path: (self.source / path).read_bytes())
+        self.assertIn(literal, guard.public_values)
+        self.assertNotIn(literal, guard.values)
+        self.assertEqual(guard.env(reviewed, name), reviewed)
+
+    def test_public_env_literal_normalization_matches_private_quote_semantics(self):
+        name = "data/stremthru/.env"
+        # The same established parser handles escaped quotes and backslashes;
+        # dollar syntax stays literal and is never evaluated or expanded.
+        cases = [(json.dumps('public "quoted" \\ path $$DOLLAR $SHELL'),
+                  'public "quoted" \\ path $$DOLLAR $SHELL'),
+                 ("'public single $$DOLLAR $SHELL'", 'public single $$DOLLAR $SHELL'),
+                 ('"public invalid\\q $$DOLLAR"', 'public invalid\\q $$DOLLAR')]
+        for index, (raw, literal) in enumerate(cases):
+            with self.subTest(case=index):
+                reviewed = ("PUBLIC_SETTING=" + raw + "\n").encode()
+                self.public[name] = reviewed
+                guard = export.Guard(self.source, self.public, sync, lambda path: (self.source / path).read_bytes())
+                guard.remember(raw, "/synthetic/PRIVATE_ALIAS")
+                self.assertEqual(export.env_literal(raw), literal)
+                self.assertIn(literal, guard.public_values)
+                self.assertNotIn(literal, guard.values)
+                self.assertEqual(guard.env(reviewed, name), reviewed)
+
+    def test_public_quote_whitelist_does_not_allow_different_private_literal(self):
+        name = "data/stremthru/.env"
+        self.public[name] = b'PUBLIC_ACCOUNT="SYNTHETIC_ALREADY_PUBLIC_ACCOUNT"\n'
+        private = "SYNTHETIC_DIFFERENT_PRIVATE_ACCOUNT"
+        self.write(".secrets/collision.env", ("PRIVATE_ALIAS=" + json.dumps(private) + "\n").encode())
+        guard = export.Guard(self.source, self.public, sync, lambda path: (self.source / path).read_bytes())
+        self.assertIn(private, guard.values)
+        for key in ("PUBLIC_ACCOUNT", "NEW_PUBLIC_SETTING"):
+            with self.subTest(key=key):
+                with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE") as error:
+                    guard.env((key + "=" + json.dumps(private) + "\n").encode(), name)
+                self.assertNotIn(private, str(error.exception))
 
     def test_live_compose_comments_never_enter_public_formatting(self):
         secret = next(iter(sync.env_values((self.source / ".secrets/comet.env").read_bytes()).values()))
@@ -552,8 +608,8 @@ class PublicExportTests(unittest.TestCase):
 
     def test_private_scan_healthcheck_exception_is_scoped_to_scalar_at_same_path(self):
         guard = export.Guard(self.source, self.public, sync, lambda name: sync.read_file(self.source, name))
-        guard.remember("http://127.0.0.1", "/oauth2-proxy/OAUTH2_PROXY_UPSTREAMS")
-        self.assertIn("http://127.0.0.1", guard.values)
+        guard.remember("http://127.0.0.1:9002", "/oauth2-proxy/OAUTH2_PROXY_UPSTREAMS")
+        self.assertIn("http://127.0.0.1:9002", guard.values)
         baseline_compose = self.public["docker-compose.yml"]
         guard.scan(baseline_compose, "docker-compose.yml")
         changed = sync.yaml_load(baseline_compose)
@@ -561,7 +617,7 @@ class PublicExportTests(unittest.TestCase):
         with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
             guard.scan(sync.yaml.safe_dump(changed).encode(), "docker-compose.yml")
         with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
-            guard.scan(baseline_compose + b"\n# private: http://127.0.0.1\n", "docker-compose.yml")
+            guard.scan(baseline_compose + b"\n# private: http://127.0.0.1:9002\n", "docker-compose.yml")
 
     def test_runtime_trees_and_suspicious_names_are_never_published(self):
         for name in ("data/new/db/config.json", "data/new/state", "data/new/public/auth.sqlite", "config/public/credentials.json", "secrets/unfamiliar.txt", "docs/session.json"):
