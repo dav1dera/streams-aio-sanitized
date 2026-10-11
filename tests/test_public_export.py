@@ -99,8 +99,20 @@ class PublicExportTests(unittest.TestCase):
         text = ("[badge](" + root + "/actions/workflows/public-sync-tests.yml/badge.svg)\n"
                 "git clone " + root + ".git\n").encode()
         self.public["README.md"] = text
-        guard = export.Guard(self.source, self.public, sync, lambda name: (self.source / name).read_bytes())
         owner = sync.REPOSITORY.split("/")[0]
+        # This fixture tests a private username which happens to be a repository
+        # owner, rather than the separately reviewed public integration username.
+        # Remove only that exact literal from the fixture's public ENV corpus.
+        for name, data in list(self.public.items()):
+            if not name.endswith("/.env"):
+                continue
+            rows = sync.env_values(data)
+            for key, value in rows.items():
+                if value in {owner, json.dumps(owner), "'" + owner + "'"}:
+                    rows[key] = "SYNTHETIC_DIFFERENT_PUBLIC_OWNER"
+            self.public[name] = ("\n".join(key + "=" + value for key, value in rows.items()) + "\n").encode()
+        guard = export.Guard(self.source, self.public, sync, lambda name: (self.source / name).read_bytes())
+        self.assertNotIn(owner, guard.public_values)
         guard.remember(owner, "/stremthru/STREMTHRU_AUTH_ADMIN")
         guard.remember(owner, "/stremthru/STREMTHRU_INTEGRATION_GITHUB_USER")
         return guard, text, owner, root
@@ -596,8 +608,8 @@ class PublicExportTests(unittest.TestCase):
 
     def test_private_scan_healthcheck_exception_is_scoped_to_scalar_at_same_path(self):
         guard = export.Guard(self.source, self.public, sync, lambda name: sync.read_file(self.source, name))
-        guard.remember("http://127.0.0.1", "/oauth2-proxy/OAUTH2_PROXY_UPSTREAMS")
-        self.assertIn("http://127.0.0.1", guard.values)
+        guard.remember("http://127.0.0.1:9002", "/oauth2-proxy/OAUTH2_PROXY_UPSTREAMS")
+        self.assertIn("http://127.0.0.1:9002", guard.values)
         baseline_compose = self.public["docker-compose.yml"]
         guard.scan(baseline_compose, "docker-compose.yml")
         changed = sync.yaml_load(baseline_compose)
@@ -605,7 +617,7 @@ class PublicExportTests(unittest.TestCase):
         with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
             guard.scan(sync.yaml.safe_dump(changed).encode(), "docker-compose.yml")
         with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
-            guard.scan(baseline_compose + b"\n# private: http://127.0.0.1\n", "docker-compose.yml")
+            guard.scan(baseline_compose + b"\n# private: http://127.0.0.1:9002\n", "docker-compose.yml")
 
     def test_runtime_trees_and_suspicious_names_are_never_published(self):
         for name in ("data/new/db/config.json", "data/new/state", "data/new/public/auth.sqlite", "config/public/credentials.json", "secrets/unfamiliar.txt", "docs/session.json"):
