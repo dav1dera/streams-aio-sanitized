@@ -16,13 +16,13 @@
     {
       "name": "Service 1",
       "desc": "",
-      "href": "@@INFISICAL:/honey/SERVICES_0_HREF@@",
+      "href": "https://192.168.178.2:8006/#",
       "icon": "https://avatars.githubusercontent.com/u/2678585?s=200&v=4"
     },
     {
       "name": "Service 2",
       "desc": "",
-      "href": "@@INFISICAL:/honey/SERVICES_1_HREF@@",
+      "href": "https://192.168.178.100:8007/#",
       "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/proxmox-backup-server.svg"
     },
     {
@@ -34,7 +34,7 @@
     {
       "name": "Portainer",
       "desc": "",
-      "href": "@@INFISICAL:/honey/SERVICES_3_HREF@@",
+      "href": "http://192.168.178.11:9000",
       "icon": "https://avatars.githubusercontent.com/u/22225832?s=200&v=4"
     },
     {
@@ -58,7 +58,7 @@
     {
       "name": "Service 8",
       "desc": "",
-      "href": "@@INFISICAL:/honey/SERVICES_7_HREF@@",
+      "href": "http://192.168.178.12:90/",
       "icon": "https://avatars.githubusercontent.com/u/8361145?s=200&v=4"
     },
     {
@@ -76,13 +76,13 @@
     {
       "name": "Jackett",
       "desc": "",
-      "href": "@@INFISICAL:/honey/SERVICES_10_HREF@@",
+      "href": "http://192.168.178.11:9117",
       "icon": "@@INFISICAL:/honey/SERVICES_10_ICON@@"
     },
     {
       "name": "Service 12",
       "desc": "",
-      "href": "@@INFISICAL:/honey/SERVICES_11_HREF@@",
+      "href": "http://192.168.178.11:8888",
       "icon": "@@INFISICAL:/honey/SERVICES_11_ICON@@"
     },
     {
@@ -94,19 +94,19 @@
     {
       "name": "Service 14",
       "desc": "",
-      "href": "@@INFISICAL:/honey/SERVICES_13_HREF@@",
+      "href": "http://192.168.178.11:81",
       "icon": "https://avatars.githubusercontent.com/u/88089605?s=200&v=4"
     },
     {
       "name": "Stremthru",
       "desc": "",
-      "href": "@@INFISICAL:/honey/SERVICES_14_HREF@@",
+      "href": "http://192.168.178.11:9090",
       "icon": "https://cdn-icons-png.flaticon.com/512/7334/7334113.png"
     },
     {
       "name": "Service 16",
       "desc": "dnscrypt-proxy",
-      "href": "@@INFISICAL:/honey/SERVICES_15_HREF@@",
+      "href": "http://192.168.178.11:8280",
       "icon": "https://avatars.githubusercontent.com/u/34526273?s=200&v=4"
     },
     {
@@ -142,7 +142,7 @@
     {
       "name": "Service 22",
       "desc": "",
-      "href": "@@INFISICAL:/honey/SERVICES_21_HREF@@",
+      "href": "http://192.168.178.25:8080/",
       "icon": "https://avatars.githubusercontent.com/u/9978589?s=200&v=4"
     }
   ]

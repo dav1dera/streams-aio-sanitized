@@ -2,13 +2,13 @@
   "id": "aiostreams-torrent-provider",
   "name": "AIOStreams",
   "version": "0.10.2",
-  "manifestURI": "@@INFISICAL:/seanime-shared/AIOSTREAMS_ORIGIN@@/seanime/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoidGFFY2lDUHpjeW5rN1k2d1VYTGwxQT09IiwiZSI6IjlaL3R5VXZCcDdzcytPNXJFeWFweEE9PSIsInQiOiJhIn0/v/drugo/extensions/aiostreams-torrent-provider.json",
+  "manifestURI": "https://aiostreams.self-stremiopi.org/seanime/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoidGFFY2lDUHpjeW5rN1k2d1VYTGwxQT09IiwiZSI6IjlaL3R5VXZCcDdzcytPNXJFeWFweEE9PSIsInQiOiJhIn0/v/drugo/extensions/aiostreams-torrent-provider.json",
   "language": "javascript",
   "type": "anime-torrent-provider",
   "description": "AIOStreams bridge for Seanime anime torrent search.",
   "author": "Viren070",
   "icon": "https://cdn.jsdelivr.net/gh/selfhst/icons/png/aiostreams-light.png",
-  "website": "@@INFISICAL:/seanime-shared/AIOSTREAMS_ORIGIN@@/stremio/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoidGFFY2lDUHpjeW5rN1k2d1VYTGwxQT09IiwiZSI6IjlaL3R5VXZCcDdzcytPNXJFeWFweEE9PSIsInQiOiJhIn0/configure",
+  "website": "https://aiostreams.self-stremiopi.org/stremio/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoidGFFY2lDUHpjeW5rN1k2d1VYTGwxQT09IiwiZSI6IjlaL3R5VXZCcDdzcytPNXJFeWFweEE9PSIsInQiOiJhIn0/configure",
   "readme": "https://docs.aiostreams.viren070.me/guides/seanime",
   "notes": "You need an existing AIOStreams instance and configuration to use this plugin.",
   "lang": "multi",
@@ -20,7 +20,7 @@
         "type": "text",
         "name": "manifestUrl",
         "label": "AIOStreams Manifest URL",
-        "default": "@@INFISICAL:/seanime-shared/AIOSTREAMS_ORIGIN@@/stremio/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoidGFFY2lDUHpjeW5rN1k2d1VYTGwxQT09IiwiZSI6IjlaL3R5VXZCcDdzcytPNXJFeWFweEE9PSIsInQiOiJhIn0/v/drugo/manifest.json"
+        "default": "https://aiostreams.self-stremiopi.org/stremio/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoidGFFY2lDUHpjeW5rN1k2d1VYTGwxQT09IiwiZSI6IjlaL3R5VXZCcDdzcytPNXJFeWFweEE9PSIsInQiOiJhIn0/v/drugo/manifest.json"
       },
       {
         "type": "select",

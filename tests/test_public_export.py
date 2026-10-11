@@ -383,8 +383,8 @@ class PublicExportTests(unittest.TestCase):
     def test_honey_anonymized_name_does_not_allow_removed_binding_or_new_credential(self):
         name, original = self.honey()
         value = copy.deepcopy(original)
-        value["services"][0]["name"] = "SYNTHETIC_LOCAL_LABEL"
-        value["services"][0].pop("href")
+        value["services"][11]["name"] = "SYNTHETIC_LOCAL_LABEL"
+        value["services"][11].pop("icon")
         self.write(name, json.dumps(value).encode())
         with self.assertRaisesRegex(sync.Refused, "PRIVATE_BINDING_REMOVAL_REVIEW_REQUIRED"): self.render()
         value = copy.deepcopy(original)
@@ -517,7 +517,9 @@ class PublicExportTests(unittest.TestCase):
     def healthcheck_collision(self):
         name = ".secrets/oauth2-proxy.env"
         rows = sync.env_values((self.source / name).read_bytes())
-        rows["OAUTH2_PROXY_UPSTREAMS"] = "http://127.0.0.1"
+        # The bare loopback URL is now ordinary StremThru configuration. Keep
+        # this synthetic collision confined to the reviewed healthcheck scalar.
+        rows["OAUTH2_PROXY_UPSTREAMS"] = "http://127.0.0.1:9002"
         self.write(name, ("\n".join(k + "=" + v for k, v in rows.items()) + "\n").encode())
 
     def test_unchanged_reviewed_healthchecks_with_private_substring_do_not_block(self):
@@ -538,7 +540,7 @@ class PublicExportTests(unittest.TestCase):
 
     def test_new_service_cannot_inherit_reviewed_healthcheck_exception(self):
         self.healthcheck_collision()
-        self.compose(lambda rows: rows.update(added={"image": "example/new:1", "healthcheck": copy.deepcopy(rows["seanime"]["healthcheck"])}))
+        self.compose(lambda rows: rows.update(added={"image": "example/new:1", "healthcheck": copy.deepcopy(rows["tailscale"]["healthcheck"])}))
         with self.assertRaisesRegex(sync.Refused, "COMPOSE_LITERAL_PRIVATE_VALUE_USE_INTERPOLATION"):
             self.render()
 

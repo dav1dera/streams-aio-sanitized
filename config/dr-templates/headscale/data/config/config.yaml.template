@@ -1,5 +1,5 @@
 {
-  "server_url": "@@INFISICAL:/shared/HEADSCALE_SERVER_URL@@",
+  "server_url": "https://headscale.self-stremiopi.org",
   "listen_addr": "0.0.0.0:8080",
   "metrics_listen_addr": "127.0.0.1:9292",
   "grpc_listen_addr": "127.0.0.1:50443",
@@ -22,7 +22,7 @@
       "stun_listen_addr": "0.0.0.0:3478",
       "private_key_path": "/var/lib/headscale/derp_server_private.key",
       "automatically_add_embedded_derp_region": true,
-      "ipv4": "@@INFISICAL:/headscale/DERP_SERVER_IPV4@@",
+      "ipv4": "198.51.100.1",
       "ipv6": "2001:db8::1"
     },
     "urls": [
@@ -67,20 +67,20 @@
   },
   "dns": {
     "magic_dns": true,
-    "base_domain": "@@INFISICAL:/headscale/DNS_BASE_DOMAIN@@",
+    "base_domain": "wg.net",
     "override_local_dns": true,
     "nameservers": {
       "global": [
-        "@@INFISICAL:/headscale/DNS_NAMESERVERS_GLOBAL_0@@"
+        "192.168.178.12"
       ],
       "split": {}
     },
     "search_domains": [],
     "extra_records": [
       {
-        "name": "@@INFISICAL:/headscale/DNS_EXTRA_RECORDS_0_NAME@@",
+        "name": "temp.tailscale.self-stremiopi.org",
         "type": "A",
-        "value": "@@INFISICAL:/headscale/DNS_EXTRA_RECORDS_0_VALUE@@"
+        "value": "192.168.178.11"
       }
     ]
   },
