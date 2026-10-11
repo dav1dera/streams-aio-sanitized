@@ -50,6 +50,10 @@ EXPECTED = {
     },
 }
 
+# Keep legacy parser coverage above while matching the current private-only plan.
+CURRENT_AIOSTREAMS = AIOSTREAMS.replace(
+    '{{ else if eq .Key "ZILEAN_URL" }}BUILTIN_ZILEAN_URL={{ .Value }}\n', '')
+
 
 def generic(body, path='/aiometadata'):
     return '{{ range secret "synthetic-project" "prod" "' + path + '" }}' + body + '{{ end }}'
@@ -140,7 +144,7 @@ class MappingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             config = Path(directory) / 'synthetic-agent.json'
             templates = [{'destination-path': str(ROOT / '.secrets' / f'{service}.env'), 'template-content': content}
-                         for service, content in [('aiometadata', AIOMETADATA), ('aiostreams', AIOSTREAMS)]]
+                         for service, content in [('aiometadata', AIOMETADATA), ('aiostreams', CURRENT_AIOSTREAMS)]]
             config.write_text(json.dumps({'templates': templates}))
             args = [sys.executable, '-B', str(ROOT / 'scripts/verify-agent-dr-mappings.py'),
                     '--target', str(ROOT), '--agent-config', str(config)]
@@ -154,7 +158,6 @@ class MappingTests(unittest.TestCase):
                 'aiostreams /shared/JACKETT_API_KEY -> BUILTIN_JACKETT_API_KEY',
                 'aiostreams /shared/TMDB_API_KEY -> TMDB_API_KEY',
                 'aiostreams /shared/COMET_PUBLIC_API_TOKEN -> COMET_PUBLIC_API_TOKEN',
-                'aiostreams /shared/ZILEAN_URL -> BUILTIN_ZILEAN_URL',
                 'TOTAL PASS',
             ])
             templates[1]['template-content'] += '{{ unknown .Value }}'
