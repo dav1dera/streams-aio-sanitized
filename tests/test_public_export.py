@@ -58,6 +58,41 @@ def fixture(root, public):
     return write
 
 
+class ComposeYamlTests(unittest.TestCase):
+    def test_formatting_preserves_data_order_and_only_flows_service_profiles(self):
+        profiles = ["all", "vpn"]
+        compose = {
+            "name": "streams-aio",
+            "services": {
+                "comet": {"image": "example/comet:1", "profiles": profiles,
+                          "environment": {"BOOLEAN_LIKE": "on", "INTEGER_LIKE": "1", "NULL_LIKE": "null",
+                                          "INTERPOLATION": "${PRIVATE:?missing}", "ESCAPED": "$$TOKEN", "UNICODE": "è"},
+                          "command": "printf 'hello'\n  gluetun:\n# scalar content"},
+                "gluetun": {"image": "example/vpn:1", "profiles": profiles},
+                "added": {"image": "example/added:1", "profiles": "all"},
+            },
+            "x-extra": {"profiles": ["all", "vpn"]},
+            "volumes": {"state": None},
+            "networks": {"default": {"name": "public"}},
+        }
+        original = copy.deepcopy(compose)
+        text = export.compose_yaml(compose, sync)
+        parsed = sync.yaml_load(text)
+        self.assertEqual(parsed, original)
+        self.assertEqual(compose, original)
+        self.assertEqual(list(parsed["services"]), list(original["services"]))
+        self.assertEqual(export.compose_yaml(compose, sync), text)
+        self.assertEqual(text.count("profiles: [all, vpn]"), 2)
+        self.assertIn("x-extra:\n  profiles:\n  - all\n  - vpn", text)
+        self.assertIn("profiles: all", text)
+        self.assertIn("\n\n  # 📦 Service\n  added:", text)
+        self.assertIn(export.COMPOSE_VPN_DIVIDER + "\n\n  # 🛡️ Gluetun", text)
+        self.assertIn("\n\n# 📦 volumes\nvolumes:", text)
+        self.assertIn("\n\n# 🌐 networks\nnetworks:", text)
+        self.assertFalse(any(isinstance(token, (sync.yaml.tokens.AnchorToken, sync.yaml.tokens.AliasToken))
+                             for token in sync.yaml.scan(text)))
+
+
 class PublicExportTests(unittest.TestCase):
     def repository_url_guard(self):
         root = "https://github.com/" + sync.REPOSITORY
@@ -134,6 +169,16 @@ class PublicExportTests(unittest.TestCase):
 
     def tearDown(self):
         self.tmp.cleanup()
+
+    def test_live_compose_comments_never_enter_public_formatting(self):
+        secret = next(iter(sync.env_values((self.source / ".secrets/comet.env").read_bytes()).values()))
+        raw = (self.source / "docker-compose.yml").read_bytes()
+        self.write("docker-compose.yml", raw + ("\n# PRIVATE_LIVE_COMMENT " + secret + "\n").encode())
+        changes = self.render()
+        text = changes.get("docker-compose.yml", self.public["docker-compose.yml"]).decode()
+        self.assertNotIn("PRIVATE_LIVE_COMMENT", text)
+        self.assertNotIn(secret, text)
+        self.assertIn("# 💫 Comet - Addon", text)
 
     def test_yaml_application_sources_keep_json_templates_and_private_bindings(self):
         cases = [("data/headplane/data/config.yaml", ("server", "port"), 3001),
@@ -529,7 +574,7 @@ class PublicExportTests(unittest.TestCase):
 
     def test_credentials_in_new_public_text_block_without_logging_value(self):
         bad = (b"api_key=some_literal_unknown_credential\n", b"https://user:password@example.org\n", b"ghp_" + b"a" * 36,
-               b"-----BEGIN PRIVATE KEY-----\n", b"-----BEGIN EC PRIVATE KEY-----\n", b"CREATE USER example WITH PASSWORD 'private-literal';\n")
+               b"-----BEGIN " + b"PRIVATE KEY-----\n", b"-----BEGIN EC " + b"PRIVATE KEY-----\n", b"CREATE USER example WITH PASSWORD 'private-literal';\n")
         for data in bad:
             with self.subTest(data=data[:10]):
                 self.write("config/public/unexpected.conf", data)
@@ -687,5 +732,3 @@ class IgnoreInstallerTests(unittest.TestCase):
 
 
 if __name__ == "__main__": unittest.main()
-
-

@@ -1,4 +1,5 @@
 services:
+  # 🔒 Tailscale multinode WireGuard solution
   tailscale:
     image: tailscale/tailscale:latest
     env_file:
@@ -28,9 +29,9 @@ services:
     network_mode: host
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - headscale
+    profiles: [all, headscale]
+
+  # 🖥️ Portainer - Docker manager
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
@@ -48,8 +49,9 @@ services:
         ipv4_address: 172.18.0.2
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # 🕵️‍♂️ DNScrypt-Proxy
   dnscrypt-proxy:
     image: klutchell/dnscrypt-proxy:latest
     container_name: dnscrypt-proxy
@@ -76,9 +78,9 @@ services:
     - 3335:3335
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - headscale
+    profiles: [all, headscale]
+
+  # 🔒 Headscale > selfhosted Tailscale server
   headscale:
     image: headscale/headscale:stable
     container_name: headscale
@@ -101,9 +103,9 @@ services:
     labels:
     - me.tale.headplane.target=headscale
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - headscale
+    profiles: [all, headscale]
+
+  # 🔒 Headplane > Headscale UI
   headplane:
     image: ghcr.io/tale/headplane:latest
     container_name: headplane
@@ -131,9 +133,9 @@ services:
         ipv4_address: 172.18.0.6
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - headscale
+    profiles: [all, headscale]
+
+  # 🌐 Nginx Proxy Manager - proxy & certificates
   npm:
     image: jc21/nginx-proxy-manager:latest
     container_name: nginx-proxy-manager
@@ -161,8 +163,9 @@ services:
         ipv4_address: 172.19.0.4
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # ☁️ Cloudflare DDNS - automatically update DNS
   cloudflare-ddns:
     image: favonia/cloudflare-ddns:latest
     container_name: cloudflare-ddns
@@ -181,8 +184,9 @@ services:
         ipv4_address: 172.18.0.8
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # 🗂️ AIOMetadata - Metadata manager
   aiometadata:
     image: ghcr.io/cedya77/aiometadata:latest
     container_name: aiometadata
@@ -204,8 +208,9 @@ services:
         ipv4_address: 172.19.0.5
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # 🔄 Mediaflow Proxy Light - stream proxy
   mediaflow-proxy-light:
     image: ghcr.io/mhdzumair/mediaflow-proxy-light:latest
     container_name: mediaflow-proxy-light
@@ -222,8 +227,9 @@ services:
         ipv4_address: 172.19.0.6
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # 🎥 AIOStreams - Streaming AIO
   aiostreams:
     image: ghcr.io/viren070/aiostreams:nightly
     container_name: aiostreams
@@ -245,8 +251,9 @@ services:
         ipv4_address: 172.19.0.7
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # 🗄️ PgBouncer - PostgreSQL connection pooler
   pgbouncer:
     container_name: pgbouncer
     image: edoburu/pgbouncer:latest
@@ -273,10 +280,9 @@ services:
         ipv4_address: 172.19.0.8
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
-    - db
+    profiles: [all, gluetun, db]
+
+  # 🗄️ PostgreSQL - Main database
   postgres:
     image: postgres:18-alpine
     container_name: postgres
@@ -303,10 +309,9 @@ services:
         ipv4_address: 172.19.0.9
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
-    - db
+    profiles: [all, gluetun, db]
+
+  # 🗄️ Redis - Cache
   redis:
     image: redis:latest
     container_name: redis
@@ -334,10 +339,9 @@ services:
         ipv4_address: 172.19.0.10
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
-    - db
+    profiles: [all, gluetun, db]
+
+  # ⏱️ Watchtower - Automatically update containers
   watchtower:
     image: nickfedor/watchtower:latest
     container_name: watchtower
@@ -352,8 +356,9 @@ services:
         ipv4_address: 172.18.0.15
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # 🍯 Honey - Dashboard
   honey:
     image: ghcr.io/dani3l0/honey:latest
     container_name: honey
@@ -367,8 +372,9 @@ services:
         ipv4_address: 172.18.0.16
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # 🎙️ TeamSpeak 6 - Voice communication server
   teamspeak:
     image: teamspeaksystems/teamspeak6-server:latest
     container_name: teamspeak
@@ -386,8 +392,9 @@ services:
         ipv4_address: 172.18.0.17
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # ☁️ Cloudflare WARP - proxy
   microwarp:
     image: ghcr.io/ccbkkb/microwarp:latest
     container_name: warp
@@ -409,8 +416,9 @@ services:
         ipv4_address: 172.18.0.18
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # ☁️ Cloudflare WARP - proxy
   gost:
     image: gogost/gost:latest
     container_name: gost
@@ -427,8 +435,9 @@ services:
         ipv4_address: 172.19.0.11
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
+    profiles: [all]
+
+  # 🔐 OAuth2 Proxy - Headplane authentication
   oauth2-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:latest
     container_name: oauth2-proxy
@@ -445,9 +454,9 @@ services:
         ipv4_address: 172.18.0.20
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - headscale
+    profiles: [all, headscale]
+
+  # 🎬 EasyProxy - stream proxy
   easyproxy:
     image: ghcr.io/realbestia1/easyproxy:latest
     container_name: easyproxy
@@ -467,8 +476,9 @@ services:
         ipv4_address: 172.18.0.21
       vpn-net:
         ipv4_address: 172.19.0.12
-    profiles:
-    - all
+    profiles: [all]
+
+  # 📺 StreamVix - Addon
   streamvix:
     image: qwertyuiop8899/streamvix:latest
     container_name: streamvix
@@ -488,9 +498,9 @@ services:
         ipv4_address: 172.19.0.13
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
+    profiles: [all, gluetun]
+
+  # 📺 TVVoo - Addon
   tvvoo:
     image: qwertyuiop8899/tvvoo:latest
     container_name: tvvoo
@@ -510,9 +520,9 @@ services:
         ipv4_address: 172.19.0.14
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
+    profiles: [all, gluetun]
+
+  # 🛠️ AIOManager
   aiomanager:
     image: ghcr.io/sonicx161/aiomanager:beta
     container_name: aiomanager
@@ -538,9 +548,9 @@ services:
         ipv4_address: 172.18.0.24
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - headscale
+    profiles: [all, headscale]
+
+  # 🩺 Deunhealth - Automatically restart unhealthy containers
   deunhealth:
     image: qmcgaw/deunhealth:latest
     container_name: deunhealth
@@ -550,6 +560,10 @@ services:
     restart: always
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
+
+  ##################################################  VPN   ##################################################
+
+  # 🛡️ Gluetun - VPN/Proxy container
   gluetun:
     image: qmcgaw/gluetun:latest
     container_name: gluetun
@@ -577,11 +591,11 @@ services:
     networks:
       vpn-net:
         ipv4_address: 172.19.0.2
-    profiles:
-    - all
-    - gluetun
+    profiles: [all, gluetun]
     labels:
     - com.centurylinklabs.watchtower.enable=false
+
+  # 💫 Comet - Addon
   comet:
     image: g0ldyy/comet:latest
     container_name: comet
@@ -610,9 +624,9 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
+    profiles: [all, gluetun]
+
+  # 💫 CometNet - P2P network service
   cometnet:
     image: g0ldyy/comet:latest
     container_name: cometnet
@@ -650,18 +664,16 @@ services:
       - CMD
       - python
       - -c
-      - import http.client; c=http.client.HTTPConnection('127.0.0.1',8766,timeout=5);
-        c.request('GET','/health'); raise SystemExit(0 if c.getresponse().status ==
-        200 else 1)
+      - import http.client; c=http.client.HTTPConnection('127.0.0.1',8766,timeout=5); c.request('GET','/health'); raise SystemExit(0 if c.getresponse().status == 200 else 1)
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
+    profiles: [all, gluetun]
+
+  # 🔍 StremThru - Scraper
   stremthru:
     image: muniftanjim/stremthru:latest
     container_name: stremthru
@@ -681,9 +693,9 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
+    profiles: [all, gluetun]
+
+  # 🔍 Jackett - Torrent indexer/scraper
   jackett:
     image: lscr.io/linuxserver/jackett:latest
     container_name: jackett
@@ -698,9 +710,9 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
+    profiles: [all, gluetun]
+
+  # 🎬 Seanime - User main
   seanime:
     image: umagistr/seanime:latest
     container_name: seanime
@@ -722,9 +734,9 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
+    profiles: [all, gluetun]
+
+  # 🎬 Seanime - User friends
   seanime-shared:
     image: umagistr/seanime:latest
     container_name: seanime-shared
@@ -746,15 +758,17 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
-    profiles:
-    - all
-    - gluetun
+    profiles: [all, gluetun]
+
+# 📦 volumes
 volumes:
   portainer-data: null
   pgdata: null
   redis-data: null
   teamspeak-data: null
   warp-data: null
+
+# 🌐 networks
 networks:
   default:
     name: net
