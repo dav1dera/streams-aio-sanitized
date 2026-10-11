@@ -53,11 +53,17 @@ Il processo si ferma su contenuti sensibili o associazioni ambigue rilevate. **N
 
 ## Impostazioni ordinarie locali
 
-Gli IP e le subnet delle reti Docker sono valori normali direttamente nel `docker-compose.yml`. Modifica gli `ipv4_address` dei servizi e le `subnet` delle reti in quel file; la sincronizzazione ammette aggiornamenti di IPv4 e CIDR validi nelle proprietà già presenti. I riferimenti privati, per esempio un comando contenente credenziali, restano variabili gestite dall'Agent. Il piano DR e gli alias di rete nella mappa locale vengono conservati per compatibilità con i backup: non sostituiscono i valori letterali del Compose.
+I parametri ordinari si modificano direttamente nei file dello stack:
 
-Il supporto alla separazione usa il file privato canonico della VM `/etc/infisical/local-stack-config.json`: schema `1`, oggetto `values` con riferimenti `/cartella-logica/KEY` e valori stringa approvati dopo la classificazione. Password, token e URI di database con credenziali restano in Infisical. La mappa e la provenienza dei template Agent rimangono fuori dal repository pubblico e vanno incluse nel backup cifrato dell'Agent.
+- **36 parametri di rete**: 34 IPv4 e due subnet letterali nel `docker-compose.yml`.
+- **29 parametri ENV**: nei normali `data/<servizio>/.env`. Zileán è usato da Comet e AIOStreams, quindi le assegnazioni sono 30.
+- **23 parametri di configurazione**: direttamente nei file YAML, JSON e TOML dei servizi, comprese le impostazioni DNSCrypt.
 
-Dopo la migrazione occorre **Streams AIO Recovery GUI 0.4.6 o successiva** per ripristinare la mappa insieme ai secret; i backup precedenti senza mappa restano supportati. Dopo ogni modifica alla mappa rigenera e verifica la configurazione dell'Agent prima di applicarla: i template generati incorporano i valori locali. La pubblicazione di questo supporto non attesta che la migrazione della VM o un nuovo recupero su due VM siano stati completati.
+L'Agent non riscrive questi parametri e non osserva una mappa JSON. Genera gli ENV privati in `.secrets/`, i file di credenziali già previsti e il solo comando privato GOST nel `.env` della radice. Gli ENV pubblici precedono quelli privati nel Compose. Password, token, chiavi applicative e URI contenenti credenziali restano in Infisical.
+
+La sincronizzazione pubblica raccoglie le modifiche ai file ordinari e conserva nei template DR solo i riferimenti ai campi privati. I file di configurazione misti vengono inizializzati durante il recupero e poi restano modificabili sul posto; l'Agent non rigenera l'intero file. Dopo un cambiamento agli ENV, ricrea il servizio interessato per applicarlo al container.
+
+I nuovi backup non richiedono `/etc/infisical/local-stack-config.json` o la relativa provenienza dei template. **Recovery GUI 0.4.6 o successiva** continua a supportare anche i backup precedenti che includevano questi due file. La verifica di produzione e del rendering in un'area temporanea non sostituisce un nuovo collaudo su due VM vuote.
 
 ## Organizzare un servizio
 

@@ -2,13 +2,13 @@
   "id": "aiostreams-plugin",
   "name": "AIOStreams",
   "version": "0.10.2",
-  "manifestURI": "@@INFISICAL:/seanime-shared/AIOSTREAMS_ORIGIN@@/seanime/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoiTS9qMTB0aUN1VTNNdWh3N1J5WlA4QT09IiwiZSI6Im12ZytUd3ZVK29ZRFFVYlMxYU9TbXc9PSIsInQiOiJhIn0/v/ita/extensions/aiostreams-plugin.json",
+  "manifestURI": "https://aiostreams.self-stremiopi.org/seanime/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoiTS9qMTB0aUN1VTNNdWh3N1J5WlA4QT09IiwiZSI6Im12ZytUd3ZVK29ZRFFVYlMxYU9TbXc9PSIsInQiOiJhIn0/v/ita/extensions/aiostreams-plugin.json",
   "language": "javascript",
   "type": "plugin",
   "description": "Stream content from AIOStreams directly in Seanime. Supports all streams with URLs.",
   "author": "Viren070",
   "icon": "https://cdn.jsdelivr.net/gh/selfhst/icons/png/aiostreams-light.png",
-  "website": "@@INFISICAL:/seanime-shared/AIOSTREAMS_ORIGIN@@/stremio/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoiTS9qMTB0aUN1VTNNdWh3N1J5WlA4QT09IiwiZSI6Im12ZytUd3ZVK29ZRFFVYlMxYU9TbXc9PSIsInQiOiJhIn0/configure",
+  "website": "https://aiostreams.self-stremiopi.org/stremio/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoiTS9qMTB0aUN1VTNNdWh3N1J5WlA4QT09IiwiZSI6Im12ZytUd3ZVK29ZRFFVYlMxYU9TbXc9PSIsInQiOiJhIn0/configure",
   "readme": "https://docs.aiostreams.viren070.me/guides/seanime",
   "notes": "You need an existing AIOStreams instance and configuration to use this plugin.",
   "lang": "multi",
@@ -20,7 +20,7 @@
         "type": "text",
         "name": "manifestUrl",
         "label": "Manifest URL",
-        "default": "@@INFISICAL:/seanime-shared/AIOSTREAMS_ORIGIN@@/stremio/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoiTS9qMTB0aUN1VTNNdWh3N1J5WlA4QT09IiwiZSI6Im12ZytUd3ZVK29ZRFFVYlMxYU9TbXc9PSIsInQiOiJhIn0/v/ita/manifest.json"
+        "default": "https://aiostreams.self-stremiopi.org/stremio/@@INFISICAL:/seanime-shared/AIOSTREAMS_CONFIGURATION_ID@@/eyJpIjoiTS9qMTB0aUN1VTNNdWh3N1J5WlA4QT09IiwiZSI6Im12ZytUd3ZVK29ZRFFVYlMxYU9TbXc9PSIsInQiOiJhIn0/v/ita/manifest.json"
       },
       {
         "type": "select",

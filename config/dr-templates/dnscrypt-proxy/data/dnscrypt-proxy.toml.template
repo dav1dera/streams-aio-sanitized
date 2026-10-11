@@ -1,5 +1,5 @@
 "server_names" = ["quad9", "milan", "milan2"]
-"listen_addresses" = ["@@INFISICAL:/dnscrypt-proxy/LISTEN_ADDRESSES_0@@"]
+"listen_addresses" = ["172.18.0.4:5353"]
 "max_clients" = 250
 "ipv4_servers" = false
 "ipv6_servers" = false
@@ -48,5 +48,5 @@
 "anonymized_dns" = { "routes" = [{ "server_name" = "quad9-dnscrypt-ip4-filter-pri", "via" = ["dnscry.pt-anon-milan-ipv4", "dnscry.pt-anon-geneva-ipv4"] }, { "server_name" = "dnscry.pt-milan-ipv4", "via" = ["anon-cs-berlin", "anon-cs-austria"] }, { "server_name" = "dnscry.pt-frankfurt02-ipv4", "via" = ["anon-cs-berlin", "anon-cs-austria"] }, { "server_name" = "dnscry.pt-munich-ipv4", "via" = ["anon-cs-berlin", "anon-cs-austria"] }], "skip_incompatible" = false }
 "dns64" = {  }
 "ip_encryption" = { "algorithm" = "none", "key" = "" }
-"monitoring_ui" = { "enabled" = true, "listen_address" = "@@INFISICAL:/dnscrypt-proxy/MONITORING_UI_LISTEN_ADDRESS@@", "username" = "admin", "password" = "@@INFISICAL:/dnscrypt-proxy/MONITORING_UI_PASSWORD@@", "tls_certificate" = "", "tls_key" = "", "enable_query_log" = true, "privacy_level" = 1 }
+"monitoring_ui" = { "enabled" = true, "listen_address" = "172.18.0.4:8280", "username" = "admin", "password" = "@@INFISICAL:/dnscrypt-proxy/MONITORING_UI_PASSWORD@@", "tls_certificate" = "", "tls_key" = "", "enable_query_log" = true, "privacy_level" = 1 }
 "static" = { "milan" = { "stamp" = "sdns://AQcAAAAAAAAADzIxNy4xMzguMjE5LjIxOSAxM3KtWVYywkFrhy8Jj4Ub3bllKExsvppPGQlkMNupWh4yLmRuc2NyeXB0LWNlcnQuY3J5cHRvc3Rvcm0uaXM" }, "quad9" = { "stamp" = "sdns://AQMAAAAAAAAAEzE0OS4xMTIuMTEyLjExOjg0NDMgZ8hHuMh1jNEgJFVDvnVnRt803x2EwAuMRwNo34Idhj4ZMi5kbnNjcnlwdC1jZXJ0LnF1YWQ5Lm5ldA" }, "milan2" = { "stamp" = "sdns://gQ04Mi4xMTguMTYuMTIx" } }

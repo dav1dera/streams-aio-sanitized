@@ -17,45 +17,9 @@
       {
         "SERVICE": "headplane",
         "SOURCE_FILE": "data/headplane/data/config.yaml",
-        "SOURCE_KEY": "headscale.url",
-        "INFISICAL_PATH": "/shared",
-        "DEST_KEY": "HEADSCALE_SERVER_URL",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headplane",
-        "SOURCE_FILE": "data/headplane/data/config.yaml",
-        "SOURCE_KEY": "integration.agent.host_name",
-        "INFISICAL_PATH": "/headplane",
-        "DEST_KEY": "INTEGRATION_AGENT_HOST_NAME",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headplane",
-        "SOURCE_FILE": "data/headplane/data/config.yaml",
-        "SOURCE_KEY": "oidc.client_id",
-        "INFISICAL_PATH": "/headplane",
-        "DEST_KEY": "OIDC_CLIENT_ID",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headplane",
-        "SOURCE_FILE": "data/headplane/data/config.yaml",
         "SOURCE_KEY": "oidc.client_secret",
         "INFISICAL_PATH": "/headplane",
         "DEST_KEY": "OIDC_CLIENT_SECRET",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headplane",
-        "SOURCE_FILE": "data/headplane/data/config.yaml",
-        "SOURCE_KEY": "server.base_url",
-        "INFISICAL_PATH": "/headplane",
-        "DEST_KEY": "SERVER_BASE_URL",
         "TRANSFORM": "SCALAR",
         "COMPOSE_VARIABLE": ""
       },
@@ -67,15 +31,6 @@
         "DEST_KEY": "SERVER_COOKIE_SECRET",
         "TRANSFORM": "SCALAR",
         "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headplane",
-        "SOURCE_FILE": "data/headplane/data/config.yaml",
-        "SOURCE_KEY": "server.proxy_auth.allowed_cidrs[0]",
-        "INFISICAL_PATH": "/headplane",
-        "DEST_KEY": "SERVER_PROXY_AUTH_ALLOWED_CIDRS_0",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
       }
     ],
     "omit_runtime_identity_fields": []
@@ -85,62 +40,7 @@
     "format": "yaml",
     "mode": "ONE_SHOT_FRESH_ONLY_NO_LIVE_WRITER",
     "preserve_existing": true,
-    "updates": [
-      {
-        "SERVICE": "headscale",
-        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
-        "SOURCE_KEY": "derp.server.ipv4",
-        "INFISICAL_PATH": "/headscale",
-        "DEST_KEY": "DERP_SERVER_IPV4",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headscale",
-        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
-        "SOURCE_KEY": "dns.base_domain",
-        "INFISICAL_PATH": "/headscale",
-        "DEST_KEY": "DNS_BASE_DOMAIN",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headscale",
-        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
-        "SOURCE_KEY": "dns.extra_records[0].name",
-        "INFISICAL_PATH": "/headscale",
-        "DEST_KEY": "DNS_EXTRA_RECORDS_0_NAME",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headscale",
-        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
-        "SOURCE_KEY": "dns.extra_records[0].value",
-        "INFISICAL_PATH": "/headscale",
-        "DEST_KEY": "DNS_EXTRA_RECORDS_0_VALUE",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headscale",
-        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
-        "SOURCE_KEY": "dns.nameservers.global[0]",
-        "INFISICAL_PATH": "/headscale",
-        "DEST_KEY": "DNS_NAMESERVERS_GLOBAL_0",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      },
-      {
-        "SERVICE": "headscale",
-        "SOURCE_FILE": "data/headscale/data/config/config.yaml",
-        "SOURCE_KEY": "server_url",
-        "INFISICAL_PATH": "/shared",
-        "DEST_KEY": "HEADSCALE_SERVER_URL",
-        "TRANSFORM": "SCALAR",
-        "COMPOSE_VARIABLE": ""
-      }
-    ],
+    "updates": [],
     "omit_runtime_identity_fields": []
   },
   {
@@ -276,15 +176,6 @@
         "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
         "SOURCE_KEY": "manifestURI",
         "INFISICAL_PATH": "/seanime-shared",
-        "DEST_KEY": "AIOSTREAMS_ORIGIN",
-        "TRANSFORM": "URI_COMPONENT",
-        "component": "origin"
-      },
-      {
-        "SERVICE": "seanime-shared",
-        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
-        "SOURCE_KEY": "manifestURI",
-        "INFISICAL_PATH": "/seanime-shared",
         "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
         "TRANSFORM": "URI_COMPONENT",
         "component": "uuid"
@@ -294,27 +185,9 @@
         "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
         "SOURCE_KEY": "userConfig.fields[0].default",
         "INFISICAL_PATH": "/seanime-shared",
-        "DEST_KEY": "AIOSTREAMS_ORIGIN",
-        "TRANSFORM": "URI_COMPONENT",
-        "component": "origin"
-      },
-      {
-        "SERVICE": "seanime-shared",
-        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
-        "SOURCE_KEY": "userConfig.fields[0].default",
-        "INFISICAL_PATH": "/seanime-shared",
         "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
         "TRANSFORM": "URI_COMPONENT",
         "component": "uuid"
-      },
-      {
-        "SERVICE": "seanime-shared",
-        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-plugin.json",
-        "SOURCE_KEY": "website",
-        "INFISICAL_PATH": "/seanime-shared",
-        "DEST_KEY": "AIOSTREAMS_ORIGIN",
-        "TRANSFORM": "URI_COMPONENT",
-        "component": "origin"
       },
       {
         "SERVICE": "seanime-shared",
@@ -339,15 +212,6 @@
         "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
         "SOURCE_KEY": "manifestURI",
         "INFISICAL_PATH": "/seanime-shared",
-        "DEST_KEY": "AIOSTREAMS_ORIGIN",
-        "TRANSFORM": "URI_COMPONENT",
-        "component": "origin"
-      },
-      {
-        "SERVICE": "seanime-shared",
-        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
-        "SOURCE_KEY": "manifestURI",
-        "INFISICAL_PATH": "/seanime-shared",
         "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
         "TRANSFORM": "URI_COMPONENT",
         "component": "uuid"
@@ -357,27 +221,9 @@
         "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
         "SOURCE_KEY": "userConfig.fields[0].default",
         "INFISICAL_PATH": "/seanime-shared",
-        "DEST_KEY": "AIOSTREAMS_ORIGIN",
-        "TRANSFORM": "URI_COMPONENT",
-        "component": "origin"
-      },
-      {
-        "SERVICE": "seanime-shared",
-        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
-        "SOURCE_KEY": "userConfig.fields[0].default",
-        "INFISICAL_PATH": "/seanime-shared",
         "DEST_KEY": "AIOSTREAMS_CONFIGURATION_ID",
         "TRANSFORM": "URI_COMPONENT",
         "component": "uuid"
-      },
-      {
-        "SERVICE": "seanime-shared",
-        "SOURCE_FILE": "data/seanime/data/shared/config/extensions/aiostreams-torrent-provider.json",
-        "SOURCE_KEY": "website",
-        "INFISICAL_PATH": "/seanime-shared",
-        "DEST_KEY": "AIOSTREAMS_ORIGIN",
-        "TRANSFORM": "URI_COMPONENT",
-        "component": "origin"
       },
       {
         "SERVICE": "seanime-shared",
