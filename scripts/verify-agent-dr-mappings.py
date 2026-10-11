@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
 """Read only: inspect applied Agent mappings; never read auth credential files."""
-import argparse,json,re,sys
-from pathlib import Path
+import argparse,json,os,re,stat,sys
+from pathlib import Path,PurePosixPath
+from types import SimpleNamespace
 import yaml
 import dr
+import agent_template_transform
+import local_config_contract
 
 # Semantic subset of Go templates. Never evaluates templates or fetches secrets.
 _KEY = '\x01KEY\x02'
 _VALUE = '\x01VALUE\x02'
 _NAME = re.compile(r'[A-Z][A-Z0-9_]*\Z')
 _PATH = re.compile(r'/(?:[a-z0-9_-]+/)*[a-z0-9_-]+\Z')
+_LOCAL_CONFIG_PATH = Path('/etc/infisical/local-stack-config.json')
+_LOCAL_SOURCE_PATH = Path('/etc/infisical/local-stack-agent-source.json')
+_AIO_DESTINATIONS = frozenset(('.secrets/aiostreams.env','.secrets/aiometadata.env'))
 
 
 def _arguments(expression):
@@ -277,14 +283,87 @@ def extract(content):
     return {'folders': sorted(folders), 'overrides': overrides}
 
 
+def _private_document(path):
+    """Canonical private input only; never include JSON or OS details in errors."""
+    try:
+        path=Path(path).absolute()
+        for parent in (path,*path.parents):
+            dr.require(not parent.is_symlink()
+                       and not (hasattr(parent,'is_junction') and parent.is_junction()),
+                       'LOCAL_AGENT_PROVENANCE_INVALID')
+        info=path.lstat()
+        dr.require(stat.S_ISREG(info.st_mode) and info.st_nlink==1 and info.st_size<=1024**2,
+                   'LOCAL_AGENT_PROVENANCE_INVALID')
+        if os.name!='nt':
+            dr.require(stat.S_IMODE(info.st_mode)==0o600,'LOCAL_AGENT_PROVENANCE_INVALID')
+        fd=os.open(path,os.O_RDONLY|getattr(os,'O_NOFOLLOW',0)|getattr(os,'O_BINARY',0))
+        with os.fdopen(fd,'rb') as file:
+            opened=os.fstat(file.fileno())
+            dr.require((opened.st_dev,opened.st_ino)==(info.st_dev,info.st_ino)
+                       and stat.S_ISREG(opened.st_mode) and opened.st_nlink==1
+                       and opened.st_size<=1024**2,'LOCAL_AGENT_PROVENANCE_INVALID')
+            if os.name!='nt':
+                dr.require(stat.S_IMODE(opened.st_mode)==0o600,'LOCAL_AGENT_PROVENANCE_INVALID')
+            raw=file.read(1024**2+1)
+        dr.require(len(raw)<=1024**2,'LOCAL_AGENT_PROVENANCE_INVALID')
+        return json.loads(raw.decode('utf-8'),object_pairs_hook=local_config_contract._unique_object)
+    except Exception:
+        raise dr.Refused('LOCAL_AGENT_PROVENANCE_INVALID') from None
+
+
+def _mapping_sources(plan):
+    """Absent local map keeps the original verification path unchanged."""
+    if not _LOCAL_CONFIG_PATH.exists() and not _LOCAL_CONFIG_PATH.is_symlink():
+        return None
+    try:
+        values=local_config_contract.validate_document(
+            _private_document(_LOCAL_CONFIG_PATH),plan['required_values'])
+        source=_private_document(_LOCAL_SOURCE_PATH)
+        dr.require(isinstance(source,dict) and set(source)=={'schema','templates'}
+                   and type(source['schema']) is int and source['schema']==1
+                   and isinstance(source['templates'],dict)
+                   and _AIO_DESTINATIONS<=source['templates'].keys()
+                   and len(source['templates'])<=200,'LOCAL_AGENT_PROVENANCE_INVALID')
+        for destination,content in source['templates'].items():
+            dr.require(isinstance(destination,str) and len(destination)<=512
+                       and re.fullmatch(r'[A-Za-z0-9_./-]+',destination)
+                       and not PurePosixPath(destination).is_absolute()
+                       and '..' not in PurePosixPath(destination).parts
+                       and PurePosixPath(destination).as_posix()==destination
+                       and destination not in ('','.','..')
+                       and isinstance(content,str) and len(content.encode('utf-8'))<=1024**2
+                       and all(ord(c)>=32 or c in '\t\r\n' for c in content),
+                       'LOCAL_AGENT_PROVENANCE_INVALID')
+        return values,source['templates']
+    except Exception:
+        raise dr.Refused('LOCAL_AGENT_PROVENANCE_INVALID') from None
+
+
+def _proven_content(content,destination,provenance):
+    if provenance is None:
+        return content
+    values,sources=provenance
+    try:
+        original=sources[destination]
+        semantic=SimpleNamespace(_Parser=_Parser,_KEY=_KEY,_VALUE=_VALUE,
+                                 _branches=_branches,_render=_render,_assignments=_assignments)
+        expected=agent_template_transform.transform_template(original,values,semantic=semantic)
+        dr.require(content==expected,'LOCAL_AGENT_TEMPLATE_MISMATCH')
+        return original
+    except Exception:
+        raise dr.Refused('LOCAL_AGENT_TEMPLATE_MISMATCH') from None
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--target',required=True);parser.add_argument('--agent-config',default='/etc/infisical/agent-config.yaml');args=parser.parse_args()
     root=Path(args.target).resolve();plan=dr.load(root/'config/dr-render-plan.json');cfg=yaml.safe_load(Path(args.agent_config).read_text());results={};passed=True
+    provenance=_mapping_sources(plan)
     for service in ('aiometadata','aiostreams'):
         destination=str(root/'.secrets'/f'{service}.env');items=[t for t in cfg.get('templates',[]) if t.get('destination-path')==destination]
         try:
             dr.require(len(items)==1,'UNIQUE_APPLIED_TEMPLATE_REQUIRED');content=items[0].get('template-content')
-            dr.require(isinstance(content,str),'INLINE_TEMPLATE_REQUIRED');actual=extract(content)
+            dr.require(isinstance(content,str),'INLINE_TEMPLATE_REQUIRED')
+            content=_proven_content(content,f'.secrets/{service}.env',provenance);actual=extract(content)
             expected=plan['service_folder_exports'][f'.secrets/{service}.env'];ok=actual['folders']==[expected['path']] and actual['overrides']==expected['overrides']
             results[service]={'status':'PASS' if ok else 'DIFFERENT','mapping':actual};passed &= ok
             print(service,'AGENT_MAPPING',results[service]['status'])
@@ -298,3 +377,4 @@ if __name__=='__main__':
     try:sys.exit(main())
     except PermissionError:print('AGENT_MAPPING EXECUTION_REQUIRES_ROOT');sys.exit(1)
     except Exception:print('AGENT_MAPPING BLOCKED');sys.exit(1)
+

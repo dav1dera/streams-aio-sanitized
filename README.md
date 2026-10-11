@@ -51,6 +51,12 @@ La scelta combina percorsi ammessi, tipi di file, associazioni Infisical dichiar
 
 Il processo si ferma su contenuti sensibili o associazioni ambigue rilevate. **Non riconosce infallibilmente ogni stringa privata**: non inserire secret in file dichiarati pubblici. Inoltre, essere escluso dal repo pubblico non significa essere incluso nel backup cifrato: solo i componenti elencati nella sezione backup hanno una cattura dedicata.
 
+## Impostazioni ordinarie locali
+
+Il supporto alla separazione usa il file privato canonico della VM `/etc/infisical/local-stack-config.json`: schema `1`, oggetto `values` con riferimenti `/cartella-logica/KEY` e valori stringa approvati dopo la classificazione. Password, token e URI di database con credenziali restano in Infisical. La mappa e la provenienza dei template Agent rimangono fuori dal repository pubblico e vanno incluse nel backup cifrato dell'Agent.
+
+Dopo la migrazione occorre **Streams AIO Recovery GUI 0.4.6 o successiva** per ripristinare la mappa insieme ai secret; i backup precedenti senza mappa restano supportati. Dopo ogni modifica alla mappa rigenera e verifica la configurazione dell'Agent prima di applicarla: i template generati incorporano i valori locali. La pubblicazione di questo supporto non attesta che la migrazione della VM o un nuovo recupero su due VM siano stati completati.
+
 ## Organizzare un servizio
 
 ```text
