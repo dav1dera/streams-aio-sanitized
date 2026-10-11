@@ -8,7 +8,7 @@
 
 Questo repository contiene Compose, impostazioni pubbliche, script e template per ricostruire lo stack Docker dopo un guasto. Un esportatore mantiene la parte pubblica allineata alle modifiche locali; un secondo processo conserva i backup indispensabili come artifact cifrati nel repository privato `streams-aio-dr`.
 
-L'obiettivo è un **disaster recovery**: i database applicativi ricostruibili possono ripartire vuoti. Il database di Infisical, la configurazione dell'Agent e il database Nginx Proxy Manager hanno un percorso di backup dedicato.
+L'obiettivo è un **disaster recovery**: i database applicativi ricostruibili possono ripartire vuoti. Il database di Infisical, la configurazione dell'Agent, il database Nginx Proxy Manager e gli SQLite nativi di AIOStreams/AIOMetadata hanno un percorso di backup cifrato dedicato.
 
 **[Come funziona](#come-funziona)** · **[Cosa viene pubblicato](#cosa-viene-pubblicato)** · **[Esempio Comet](#esempio-pratico-aggiungere-comet)** · **[Installazione](#attivare-la-sincronizzazione)** · **[Ripristino](#ripristinare-su-un-nuovo-host)** · **[Guida pratica](docs/ESEMPI-PRATICI.md)**
 
@@ -20,7 +20,7 @@ L'obiettivo è un **disaster recovery**: i database applicativi ricostruibili po
 | --- | --- | --- |
 | Configurazione pubblica | Stack locale → controlli → questo repository | Circa ogni 15 minuti, con un piccolo ritardo casuale |
 | Distribuzione dei secret | GUI Infisical → Agent → file privati locali | Secondo il polling configurato nell'Agent |
-| Backup privato | NPM + Agent + Infisical → cifratura age → GitHub Releases private | Settimanale; massimo 5 release DR |
+| Backup privato | NPM + Agent + Infisical + snapshot SQLite AIO → cifratura age → GitHub Releases private | Giornaliero alle 04:30 Europe/Rome, ritardo fino a 10 minuti; massimo 5 release verificate |
 
 La configurazione pubblica segue **locale → GitHub**. Il timer non distribuisce modifiche GitHub ai container e non avvia servizi nuovi: prima applichi il servizio sulla VM, poi l'esportatore registra la sua configurazione e l'immagine effettiva.
 
@@ -43,7 +43,13 @@ La selezione usa sia `.gitignore` sia regole proprie dell'esportatore. Una regol
 
 **Se un controllo non passa, l'intera pubblicazione si ferma.** Un nome innocuo non rende sicuro un file: mantieni i valori privati in Infisical e nelle destinazioni private. La sanitizzazione non può riconoscere ogni possibile segreto arbitrario.
 
-Una configurazione nuova che mescola impostazioni e secret richiede un template e associazioni esplicite, una volta. Un nuovo target dell'Agent richiede il suo mapping locale. Le impostazioni presenti soltanto nel database di un'app possono essere perse quando quel database riparte vuoto.
+Una configurazione nuova che mescola impostazioni e secret richiede un template e associazioni esplicite, una volta. Un nuovo target dell'Agent richiede il suo mapping locale. Per un nuovo servizio verifica anche dipendenze, inizializzazione del database, permessi e healthcheck nel contratto di recupero. Decidi esplicitamente se il suo database può ripartire vuoto o necessita di un backup; la sola aggiunta al Compose non crea un backup del suo stato.
+
+## Come vengono separati i secret
+
+La scelta combina percorsi ammessi, tipi di file, associazioni Infisical dichiarate, nomi delle variabili e confronto con valori privati conosciuti. Per esempio, un numero di worker può essere pubblico; una password va in Infisical e nel file privato generato dall’Agent. I template pubblici conservano il riferimento al secret, senza il suo valore.
+
+Il processo si ferma su contenuti sensibili o associazioni ambigue rilevate. **Non riconosce infallibilmente ogni stringa privata**: non inserire secret in file dichiarati pubblici. Inoltre, essere escluso dal repo pubblico non significa essere incluso nel backup cifrato: solo i componenti elencati nella sezione backup hanno una cattura dedicata.
 
 ## Organizzare un servizio
 
@@ -210,16 +216,19 @@ Il processo separato `streams-aio-dr` conserva in **GitHub Releases private**:
 
 - Snapshot coerente del database SQLite di Nginx Proxy Manager.
 - Configurazione dell'Agent e materiale di bootstrap privato.
-- Dump PostgreSQL, globals e configurazione del server Infisical.
+- Dump PostgreSQL, globals e configurazione del server Infisical, comprese le nuove cartelle e i nuovi secret presenti al momento della cattura.
+- Snapshot online dei database SQLite di AIOStreams e AIOMetadata, con profili, identità, hash delle password e record collegati. Immagini e chiavi applicative sono verificate e associate al punto di recupero.
 - Manifest leggeri e checksum per la verifica degli artifact.
 
 Gli artifact sono cifrati con **age prima dell'upload**. Il processo verifica checksum e assenza di plaintext/chiavi private nei materiali pubblicabili; il cleanup remoto segue il successo della pubblicazione verificata e della retention. Sono mantenute al massimo **5 release DR** del gruppo gestito.
 
-Il timer di riferimento parte la domenica alle **04:30**, con un ritardo casuale fino a 10 minuti e recupero degli avvii persi. L'orario segue il fuso dell'host, `Europe/Rome` nel deployment di riferimento.
+Il timer di riferimento parte **ogni giorno alle 04:30**, con un ritardo casuale fino a 10 minuti e recupero degli avvii persi. L'orario segue il fuso dell'host, `Europe/Rome` nel deployment di riferimento. Cinque release corrispondono normalmente a cinque punti giornalieri; un backup manuale usa la stessa retention.
 
-**La sincronizzazione pubblica non anticipa il backup settimanale.** Dopo modifiche importanti ai secret o all'Agent, avvia un backup manuale. Conserva le chiavi age private e le credenziali di bootstrap fuori da entrambi i repository, in un luogo recuperabile se la VM viene persa. La vecchia cronologia Git dei backup rimane; la migrazione non l'ha riscritta.
+**La sincronizzazione pubblica non anticipa il backup giornaliero.** Il coordinatore DR esegue invece una sincronizzazione pubblica prima della cattura e registra il commit verificato nel manifest. Le release pubblicate sono immutabili: modifiche a secret, profili AIO o mapping Agent entrano nel successivo backup riuscito. Dopo modifiche importanti avvia un backup manuale. Conserva le chiavi age private e le credenziali di bootstrap fuori da entrambi i repository, in un luogo recuperabile se la VM viene persa. La vecchia cronologia Git dei backup rimane; la migrazione non l'ha riscritta.
 
 ## Ripristinare su un nuovo host
+
+Il percorso automatico attuale usa **[Streams AIO Recovery GUI](https://github.com/dav1dera/streams-aio-recovery-gui)** e un backup completo **schema 2**, con sei artifact cifrati più manifest e checksum. La GUI offre **Crea da zero** per due VM Ubuntu vuote e **Rileva e continua** per un tentativo compatibile già presente. Le VM, SSH/sudo e l’instradamento dei domini devono essere predisposti; la GUI installa Docker, recupera Infisical, AIO e NPM, configura Agent/tunnel e verifica servizi e HTTPS.
 
 La sequenza di ripristino collega i due repository:
 
@@ -227,14 +236,14 @@ La sequenza di ripristino collega i due repository:
 2. Ripristina Infisical e il suo database/configurazione; recupera l'Agent e le credenziali di bootstrap.
 3. Prepara un clone pubblico su un **host nuovo**, installa le dipendenze e fornisci gli input privati dichiarati.
 4. Genera una volta env/configurazioni, crea le directory vuote e inizializza i database applicativi previsti.
-5. Ripristina il database NPM e i payload logici AIO richiesti dal preflight completo attuale; valida Compose e avvia i servizi nell'ordine previsto.
+5. Ripristina il database NPM e gli snapshot SQLite AIO della stessa release, con le immagini e le chiavi applicative corrispondenti; valida Compose e avvia i servizi nell'ordine previsto.
 6. Completa enrollment, autorizzazioni e riemissione TLS richiesti dai servizi; riattiva i timer dopo la verifica.
 
-Gli strumenti `dr.py init/render/prepare-state` e gli importatori sono per il nuovo host; rifiutano destinazioni già inizializzate. La procedura unica è in [DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md), con checklist e approfondimenti collegati.
+Gli strumenti `dr.py init/render/prepare-state` e gli importatori manuali sono per il nuovo host; rifiutano destinazioni già inizializzate. [DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md) conserva la procedura manuale per i backup legacy schema 1. Non usare i suoi requisiti di payload JSON al posto del percorso nativo schema 2 della GUI.
 
-La ripartenza vuota di cache, sessioni e database ricostruibili è prevista. I file runtime unici aggiunti in futuro, come media personali, richiedono una scelta di backup dedicata. I flussi AIOStreams/AIOMetadata esistenti mantengono i loro contratti di export/import.
+La ripartenza vuota di cache, sessioni e database ricostruibili è prevista. I file runtime unici aggiunti in futuro, come media personali, richiedono una scelta di backup dedicata. Per i backup completi schema 2 non servono JSON AIO o payload integrativi sul PC. I vecchi export/import logici restano disponibili per i formati legacy, con i loro limiti di versione.
 
-I test usano input sintetici e la prima sincronizzazione reale è stata verificata. Questo non costituisce una prova completa di ripristino su un host nuovo; la disponibilità degli input privati va verificata separatamente.
+Il recupero 0.4.5 del 10 ottobre 2026 ha completato i controlli sulle due VM: Infisical, AIO nativo, Agent, servizi, TLS e dominio CometNet. Il report conserva un avviso per un upstream NPM esterno. La reinstallazione Ubuntu senza Docker non è confermata; login/profili, P2P pubblico e persistenza dopo riavvio restano da collaudare. Non estendere questo esito a qualsiasi container o database aggiunto in futuro.
 
 ## Tenere le guide locali allineate
 
@@ -255,7 +264,7 @@ Il primo comando del helper confronta soltanto; `--apply` copia README, guide el
 
 Da quel momento modifica le guide nella copia locale: le modifiche ammesse seguiranno il normale locale → GitHub. Per future modifiche editoriali fatte direttamente su GitHub ripeti esplicitamente questo aggiornamento, dopo aver confrontato le note locali da conservare. Non fare un pull dell'intero repo pubblico dentro il deployment attivo.
 
-La guida principale per ricostruire il sistema è **[DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md)**; [BOOTSTRAP.md](docs/BOOTSTRAP.md) è la sua checklist. Le pagine NPM e AIO documentano i contratti specifici. Gli ultimi passaggi non ancora provati su VM nuove sono dichiarati nella guida, senza presentarli come già verificati.
+Per il recupero automatico completo usa il README della GUI e una release schema 2. **[DISASTER-RECOVERY.md](docs/DISASTER-RECOVERY.md)** e [BOOTSTRAP.md](docs/BOOTSTRAP.md) documentano il percorso manuale precedente. Le pagine NPM e AIO documentano i contratti specifici. I limiti del collaudo attuale sono dichiarati sopra; la guida manuale mantiene esplicitamente il proprio ambito legacy.
 
 ## Domande frequenti
 
@@ -265,7 +274,7 @@ La guida principale per ricostruire il sistema è **[DISASTER-RECOVERY.md](docs/
 
 **Posso fare `git add .` dalla cartella dello stack?** L'automazione usa l'esportatore, che seleziona e controlla i file. Un push manuale lo bypassa; `.gitignore` non rimuove file già tracciati. Per aggiornare la parte pubblica usa il servizio di sincronizzazione.
 
-**La GUI dell'app viene salvata?** Sono esportati i file dichiarativi già gestiti dal piano. Le preferenze presenti solo nel database runtime non vengono estratte. Honey conserva etichette pubbliche generiche e associazioni posizionali: modifiche al suo layout privato richiedono una revisione.
+**Le configurazioni delle app vengono salvate?** I file dichiarativi seguono il piano pubblico/privato. AIOStreams e AIOMetadata hanno inoltre snapshot SQLite nativi nel backup giornaliero, aggiornati a ogni cattura riuscita. Le preferenze presenti soltanto nei database di altre app escluse dal backup non vengono estratte. Honey conserva etichette pubbliche generiche e associazioni posizionali: modifiche al suo layout privato richiedono una revisione.
 
 ## Documentazione e riferimenti
 
@@ -275,9 +284,9 @@ La guida principale per ricostruire il sistema è **[DISASTER-RECOVERY.md](docs/
 | [Seamless public sync](docs/SEAMLESS-PUBLIC-SYNC.md) | Regole complete della modalità attiva e limiti della selezione |
 | [Public stack sync](docs/PUBLIC-STACK-SYNC.md) | Modalità precedente a schema fisso e dettagli del trasporto |
 | [Bootstrap](docs/BOOTSTRAP.md) | Prerequisiti di un deployment nuovo |
-| [Disaster recovery](docs/DISASTER-RECOVERY.md) | Guida unica: release, Infisical, bootstrap fresh, NPM/AIO, avvio e verifiche |
+| [Disaster recovery manuale legacy](docs/DISASTER-RECOVERY.md) | Percorso precedente schema 1; per schema 2 usa la GUI e il suo README |
 | [NPM recovery](docs/NPM-RECOVERY.md) | Proxy, database NPM e riemissione TLS |
-| [AIO export/import](docs/AIO-EXPORT-IMPORT.md) | Payload logici AIOStreams/AIOMetadata |
+| [AIO export/import legacy](docs/AIO-EXPORT-IMPORT.md) | Contratto dei vecchi payload logici; il percorso completo attuale usa snapshot nativi |
 | [Manifest DR](config/dr-manifest.yaml) · [Layout pubblico](config/public-stack-layout.json) | Servizi, riferimenti e directory da ricreare |
 
 Gli esempi contengono nomi pubblici e segnaposto. I valori reali di credenziali e configurazione privata appartengono a Infisical e al percorso di backup cifrato.

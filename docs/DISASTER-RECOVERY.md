@@ -1,10 +1,12 @@
-# Disaster recovery · guida operativa del sistema finalizzato
+# Disaster recovery · procedura manuale per backup legacy
 
-[← README](../README.md) · [Uso quotidiano ed esempi](ESEMPI-PRATICI.md)
+[← README attuale](../README.md#ripristinare-su-un-nuovo-host) · [Uso quotidiano ed esempi](ESEMPI-PRATICI.md)
 
-Questa è la guida principale per ripartire su **host nuovi**. Le altre guide approfondiscono NPM e AIO senza definire un secondo percorso di ripristino. Il modello scelto è ricostruire lo stack dalle dichiarazioni e da Infisical: cache, sessioni e database applicativi ricostruibili possono ripartire vuoti.
+**Questa pagina conserva il percorso manuale precedente, basato su release schema 1 e payload logici AIO.** I sette file, gli export e i requisiti indicati nei passi seguenti appartengono a quel percorso.
 
-**Backup e sincronizzazione sono operativi. Il ripristino completo su VM vuote non è ancora stato eseguito.** Non confondere la verifica SHA256 degli artifact con la prova che Infisical, i servizi e TLS si siano ripristinati correttamente. La procedura usa gli strumenti esistenti; i passaggi ancora dipendenti dal deployment privato sono indicati esplicitamente.
+Per il recupero automatico completo attuale usa **Streams AIO Recovery GUI** e una release **schema 2**, con otto file totali: i sei artifact cifrati, incluso `aio-state.tar.gz.age`, più manifest e checksum. Il manifest lega il punto al commit pubblico `stack_commit`; la GUI ripristina AIO nativo con immagini e chiavi coerenti. Non compilare payload JSON legacy per quel percorso.
+
+Il report 0.4.5 del 10 ottobre 2026 ha verificato Infisical, AIO, Agent, avvio servizi, NPM, TLS e dominio CometNet su due VM di recupero. La baseline Ubuntu senza Docker non è confermata; login/profili, P2P pubblico e persistenza dopo riavvio restano da verificare. Vedi il README per lo stato e i limiti attuali.
 
 ## 1. Cosa recuperare prima di iniziare
 
@@ -19,7 +21,7 @@ Questa è la guida principale per ripartire su **host nuovi**. Le altre guide ap
 | Export logici AIO e `/dr/AIO_PROFILE_BINDINGS` | Percorso privato AIO esistente e Infisical | Richiesti dal preflight completo attuale; non inclusi automaticamente nelle release DR |
 | Procedura privata di installazione/ripristino Infisical e backup producer | Custodia operativa esterna | I producer installati fuori Git non vengono ricreati dal clone pubblico |
 
-La release contiene esattamente questi sette file:
+La release legacy schema 1 contiene esattamente questi sette file:
 
 ```text
 npm-database.sqlite.age
@@ -173,7 +175,7 @@ sudo "$DR_PY" -B scripts/npm-dr.py prepare --target "$PWD"
 
 Atteso: `NPM DATABASE_PREPARED PASS`. UID/GID devono essere quelli del deployment recuperato; il valore 1000 è il riferimento attuale. [NPM-RECOVERY.md](NPM-RECOVERY.md) spiega il resto della sequenza e i limiti di versione del helper.
 
-Il preflight completo attuale richiede il payload logico AIO e il suo marker: **non è facoltativo in questo percorso**, anche se gli SQLite applicativi non vengono copiati dalla vecchia VM. Prepara il payload decifrato fuori dal clone, assegna a `AIO_DR_PAYLOAD` il suo percorso e segui il contratto/versioni di [AIO-EXPORT-IMPORT.md](AIO-EXPORT-IMPORT.md).
+Il preflight completo del percorso manuale legacy richiede il payload logico AIO e il suo marker: **non è facoltativo in questo percorso**, anche se gli SQLite applicativi non vengono copiati dalla vecchia VM. Prepara il payload decifrato fuori dal clone, assegna a `AIO_DR_PAYLOAD` il suo percorso e segui il contratto/versioni di [AIO-EXPORT-IMPORT.md](AIO-EXPORT-IMPORT.md).
 
 ```bash
 "$DR_PY" -B scripts/aio-dr.py validate --target "$PWD" --payload "$AIO_DR_PAYLOAD" &&

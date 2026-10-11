@@ -1,12 +1,12 @@
-# AIO · contratto di export/import logico esistente
+# AIO · contratto legacy di export/import logico
 
-[← Procedura unica DR](DISASTER-RECOVERY.md)
+[← README attuale](../README.md#ripristinare-su-un-nuovo-host) · [Procedura manuale legacy](DISASTER-RECOVERY.md)
 
-AIOStreams/AIOMetadata mantengono il percorso precedente, senza modifiche al codice o al flusso applicativo in questo aggiornamento. I loro SQLite sono opzionali come backup; il percorso completo attuale ricostruisce database nuovi da payload logici privati e richiede il marker dell'importazione AIO nel preflight.
+**Ambito: vecchi backup e importazioni logiche manuali.** Il recupero automatico completo attuale usa release **schema 2**, con `aio-state.tar.gz.age`: contiene snapshot SQLite nativi di AIOStreams e AIOMetadata, associati alle immagini e alle chiavi applicative del punto scelto. Non richiede JSON AIO o payload integrativi sul PC.
 
-Le release automatiche `streams-aio-dr` **esistono già**, ma contengono soltanto NPM, Agent e Infisical. Non contengono automaticamente questi payload AIO. Conserva gli export separatamente cifrati e recuperabili prima di perdere l'host originale; disponibilità degli export e di `/dr/AIO_PROFILE_BINDINGS` va verificata, non presunta.
+Le release storiche schema 1 contengono NPM, Agent e Infisical, senza snapshot AIO. Per quel percorso conserva gli export separatamente cifrati e recuperabili prima di perdere l’host originale; disponibilità degli export e di `/dr/AIO_PROFILE_BINDINGS` va verificata.
 
-L'adapter resta legato ad AIOStreams 2.35.3 e AIOMetadata 3.3.0. L'aggiornamento automatico dei digest delle immagini pubbliche non prova la compatibilità di una versione successiva con questo importer. Non aggirare i controlli di versione e non falsificare il marker.
+Il contratto descritto sotto riguarda l’adapter logico legato ad AIOStreams 2.35.3 e AIOMetadata 3.3.0. I suoi limiti di versione non sostituiscono le verifiche di immagini, integrità e chiavi del ripristino nativo. Non falsificare versioni o marker per adattare un export.
 
 The public repository contains the importer, schemas, examples and private-field
 mapping contract. A DR-ready consumer does not imply the private inputs already

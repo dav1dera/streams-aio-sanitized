@@ -137,17 +137,26 @@ by their reviewed IDs or names; this exception applies only to Honey's template.
 
 ## Disaster recovery scope
 
-Application databases can restart empty. Public files plus the empty-directory
-manifest recover declarations and file-based settings. Infisical's encrypted
-PostgreSQL/config backup and the native Agent/bootstrap backup are essential to
-recover private configuration. New Agent mappings need a **new encrypted DR
-backup**; an older snapshot cannot restore mappings created later. Public sync
-does not trigger or change that separate weekly backup. Trigger it manually
-after important private/bootstrap changes if a seven-day recovery window is too
-long. NPM's existing encrypted backup and AIOStreams/AIOMetadata export behavior
-remain unchanged. The older fresh-host guide still has its existing importer
-prerequisites; this change does not claim a full restore drill or rewrite those
-importers.
+Declared rebuildable application databases can restart empty. Public files and
+the empty-directory manifest recover declarations and file-based settings.
+Complete schema-2 DR releases separately include encrypted Infisical
+PostgreSQL/config, Agent/bootstrap, NPM and native AIOStreams/AIOMetadata SQLite
+snapshots. Those AIO databases are preserved rather than recreated from old JSON
+exports.
+
+Encrypted DR runs daily at 04:30 in the host timezone (Europe/Rome on the
+reference host), with up to ten minutes of jitter and five verified recovery
+points retained. Public sync alone does not trigger that backup; the DR
+coordinator requests a verified public sync before capture and binds its
+stack commit. New Agent mappings and live private/AIO changes require a new
+successful encrypted backup. Run it manually after important changes if waiting
+for the next daily point is too long.
+
+A new service/database still needs an explicit recovery contract and a decision
+about whether its state is rebuildable or needs dedicated backup. This exporter
+does not prove that every future application can be restored. See the current
+[README](../README.md#ripristinare-su-un-nuovo-host) for the native GUI path and
+the separate legacy manual-import documentation.
 
 ## Enable on docker-stack
 
@@ -175,7 +184,7 @@ systemctl is-active streams-aio-dr.timer
 ```
 
 The verifier runs the service and checks both its result and active timer. The
-15-minute public timer remains; encrypted DR retains its weekly schedule. Keep
+15-minute public timer remains; encrypted DR uses its separately installed daily schedule. Keep
 the existing worker/state directories and authentication. Do not pull the public
 repo into the live source or replace application directories with the worker.
 
