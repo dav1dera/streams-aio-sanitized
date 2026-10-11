@@ -39,6 +39,81 @@ TOKEN_PATTERNS = (re.compile(r"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0
                   re.compile(r"[a-zA-Z][a-zA-Z0-9+.-]*://[^\s/@:]+:[^\s/@]+@"),
                   re.compile(r"[?&](?:api_?key|token|password|secret|auth)=[^\s&#\"']+", re.I))
 
+COMPOSE_SERVICE_HEADINGS = {
+    "tailscale": "🔒 Tailscale multinode WireGuard solution",
+    "portainer": "🖥️ Portainer - Docker manager",
+    "dnscrypt-proxy": "🕵️‍♂️ DNScrypt-Proxy",
+    "headscale": "🔒 Headscale > selfhosted Tailscale server",
+    "headplane": "🔒 Headplane > Headscale UI",
+    "npm": "🌐 Nginx Proxy Manager - proxy & certificates",
+    "cloudflare-ddns": "☁️ Cloudflare DDNS - automatically update DNS",
+    "aiometadata": "🗂️ AIOMetadata - Metadata manager",
+    "mediaflow-proxy-light": "🔄 Mediaflow Proxy Light - stream proxy",
+    "aiostreams": "🎥 AIOStreams - Streaming AIO",
+    "pgbouncer": "🗄️ PgBouncer - PostgreSQL connection pooler",
+    "postgres": "🗄️ PostgreSQL - Main database",
+    "redis": "🗄️ Redis - Cache",
+    "watchtower": "⏱️ Watchtower - Automatically update containers",
+    "honey": "🍯 Honey - Dashboard",
+    "teamspeak": "🎙️ TeamSpeak 6 - Voice communication server",
+    "microwarp": "☁️ Cloudflare WARP - proxy",
+    "gost": "☁️ Cloudflare WARP - proxy",
+    "oauth2-proxy": "🔐 OAuth2 Proxy - Headplane authentication",
+    "easyproxy": "🎬 EasyProxy - stream proxy",
+    "streamvix": "📺 StreamVix - Addon",
+    "tvvoo": "📺 TVVoo - Addon",
+    "aiomanager": "🛠️ AIOManager",
+    "deunhealth": "🩺 Deunhealth - Automatically restart unhealthy containers",
+    "gluetun": "🛡️ Gluetun - VPN/Proxy container",
+    "comet": "💫 Comet - Addon",
+    "cometnet": "💫 CometNet - P2P network service",
+    "stremthru": "🔍 StremThru - Scraper",
+    "jackett": "🔍 Jackett - Torrent indexer/scraper",
+    "seanime": "🎬 Seanime - User main",
+    "seanime-shared": "🎬 Seanime - User friends",
+}
+COMPOSE_SECTION_HEADINGS = {"volumes": "📦 volumes", "networks": "🌐 networks"}
+COMPOSE_VPN_DIVIDER = "##################################################  VPN   ##################################################"
+
+
+def compose_yaml(compose, sync):
+    """Render data with fixed public headings; source comments are never copied."""
+    class Profiles(list):
+        pass
+
+    class ComposeDumper(sync.yaml.SafeDumper):
+        def ignore_aliases(self, data):
+            return True
+
+    ComposeDumper.add_representer(Profiles, lambda dumper, rows: dumper.represent_sequence(
+        "tag:yaml.org,2002:seq", rows, flow_style=True))
+    public = copy.deepcopy(compose)
+    for row in public.get("services", {}).values():
+        if isinstance(row, dict) and isinstance(row.get("profiles"), list):
+            row["profiles"] = Profiles(row["profiles"])
+    text = sync.yaml.dump(public, Dumper=ComposeDumper, sort_keys=False,
+                          default_flow_style=False, allow_unicode=True, width=4096)
+    # Generated node positions avoid confusing service names with nested keys or
+    # multiline scalar contents. Comments contain only the reviewed constants.
+    document = sync.yaml.compose(text, Loader=sync.yaml.SafeLoader)
+    insertions = []
+    for key, value in document.value:
+        if key.value == "services" and isinstance(value, sync.yaml.nodes.MappingNode):
+            for index, (service, _) in enumerate(value.value):
+                indent = " " * service.start_mark.column
+                heading = COMPOSE_SERVICE_HEADINGS.get(service.value, "📦 Service")
+                comment = ("\n" if index else "")
+                if service.value == "gluetun":
+                    comment += indent + COMPOSE_VPN_DIVIDER + "\n\n"
+                comment += indent + "# " + heading + "\n"
+                insertions.append((service.start_mark.index - service.start_mark.column, comment))
+        elif key.value in COMPOSE_SECTION_HEADINGS:
+            comment = ("\n" if key.start_mark.index else "") + "# " + COMPOSE_SECTION_HEADINGS[key.value] + "\n"
+            insertions.append((key.start_mark.index - key.start_mark.column, comment))
+    for position, comment in sorted(insertions, reverse=True):
+        text = text[:position] + comment + text[position:]
+    return text
+
 
 def sensitive(key):
     key = re.sub(r"([a-z])([A-Z])", r"\1_\2", str(key))
@@ -570,7 +645,7 @@ def render(source, baseline, sync, image_reader=None):
     sync.require(all(re.fullmatch(r"[a-z0-9][a-z0-9_-]{0,63}", s) for s in compose["services"]), "SERVICE_NAME_REFUSED")
     compose = guard.tree(sync.yaml_load(baseline["docker-compose.yml"]), compose, "docker-compose.yml")
     # Compose consumes ${...}; Infisical template markers are for DR config files only.
-    text = sync.yaml.safe_dump(compose, sort_keys=False)
+    text = compose_yaml(compose, sync)
     sync.require(not sync.MARKER.search(text), "COMPOSE_LITERAL_PRIVATE_VALUE_USE_INTERPOLATION")
     outputs["docker-compose.yml"] = guard.scan(text.encode(), "docker-compose.yml")
     services = set(compose["services"])
@@ -769,4 +844,3 @@ def render(source, baseline, sync, image_reader=None):
     sync.require(candidates(source, sync)[0] == names, "PUBLIC_FILE_LIST_CHANGED_DURING_EXPORT")
     sync.require(image_reader(source, compose, old_locks) == locks, "IMAGES_CHANGED_DURING_EXPORT")
     return {n: data for n, data in outputs.items() if data != baseline.get(n)}
-
