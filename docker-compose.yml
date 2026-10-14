@@ -29,6 +29,8 @@ services:
     network_mode: host
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, headscale]
 
   # 🖥️ Portainer - Docker manager
@@ -49,6 +51,8 @@ services:
         ipv4_address: 172.18.0.2
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # 🕵️‍♂️ DNScrypt-Proxy
@@ -78,6 +82,8 @@ services:
     - 3335:3335
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, headscale]
 
   # 🔒 Headscale > selfhosted Tailscale server
@@ -103,6 +109,8 @@ services:
     labels:
     - me.tale.headplane.target=headscale
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, headscale]
 
   # 🔒 Headplane > Headscale UI
@@ -133,6 +141,8 @@ services:
         ipv4_address: 172.18.0.6
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, headscale]
 
   # 🌐 Nginx Proxy Manager - proxy & certificates
@@ -163,6 +173,8 @@ services:
         ipv4_address: 172.19.0.4
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # ☁️ Cloudflare DDNS - automatically update DNS
@@ -184,6 +196,8 @@ services:
         ipv4_address: 172.18.0.8
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # 🗂️ AIOMetadata - Metadata manager
@@ -208,6 +222,8 @@ services:
         ipv4_address: 172.19.0.5
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # 🔄 Mediaflow Proxy Light - stream proxy
@@ -227,6 +243,8 @@ services:
         ipv4_address: 172.19.0.6
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # 🎥 AIOStreams - Streaming AIO
@@ -251,6 +269,8 @@ services:
         ipv4_address: 172.19.0.7
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # 🗄️ PgBouncer - PostgreSQL connection pooler
@@ -280,6 +300,8 @@ services:
         ipv4_address: 172.19.0.8
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun, db]
 
   # 🗄️ PostgreSQL - Main database
@@ -309,6 +331,8 @@ services:
         ipv4_address: 172.19.0.9
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun, db]
 
   # 🗄️ Redis - Cache
@@ -339,6 +363,8 @@ services:
         ipv4_address: 172.19.0.10
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun, db]
 
   # 📦 Service
@@ -377,6 +403,8 @@ services:
         ipv4_address: 172.18.0.16
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # 🎙️ TeamSpeak 6 - Voice communication server
@@ -397,6 +425,8 @@ services:
         ipv4_address: 172.18.0.17
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # ☁️ Cloudflare WARP - proxy
@@ -421,6 +451,8 @@ services:
         ipv4_address: 172.18.0.18
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # ☁️ Cloudflare WARP - proxy
@@ -440,6 +472,8 @@ services:
         ipv4_address: 172.19.0.11
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # 🔐 OAuth2 Proxy - Headplane authentication
@@ -459,10 +493,15 @@ services:
         ipv4_address: 172.18.0.20
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, headscale]
 
   # 🎬 EasyProxy - stream proxy
   easyproxy:
+    labels:
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     image: ghcr.io/realbestia1/easyproxy:latest
     container_name: easyproxy
     restart: unless-stopped
@@ -503,6 +542,8 @@ services:
         ipv4_address: 172.19.0.13
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun]
 
   # 📺 TVVoo - Addon
@@ -525,6 +566,8 @@ services:
         ipv4_address: 172.19.0.14
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun]
 
   # 🛠️ AIOManager
@@ -553,10 +596,15 @@ services:
         ipv4_address: 172.18.0.24
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, headscale]
 
   # 🩺 Deunhealth - Automatically restart unhealthy containers
   deunhealth:
+    labels:
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     image: qmcgaw/deunhealth:latest
     container_name: deunhealth
     network_mode: none
@@ -629,6 +677,8 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun]
 
   # 💫 CometNet - P2P network service
@@ -676,6 +726,8 @@ services:
       start_period: 30s
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun]
 
   # 🔍 StremThru - Scraper
@@ -698,6 +750,8 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun]
 
   # 🔍 Jackett - Torrent indexer/scraper
@@ -715,6 +769,8 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun]
 
   # 🎬 Seanime - User main
@@ -739,6 +795,8 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun]
 
   # 🎬 Seanime - User friends
@@ -763,6 +821,8 @@ services:
     network_mode: service:gluetun
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all, gluetun]
 
 # 📦 volumes
