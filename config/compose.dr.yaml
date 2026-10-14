@@ -1,7 +1,7 @@
 {
   "services": {
     "tailscale": {
-      "image": "tailscale/tailscale@sha256:c507f3a2a6ab1cabd8d809b98edeb41edbd5c3fb6ad9632ffd098b4c7d0b4065",
+      "image": "tailscale/tailscale@sha256:87c55d6be56ad85b3d8bceca5f87f73de288c609131460dd1be1874c250cc41d",
       "platform": "linux/amd64"
     },
     "portainer": {
@@ -13,7 +13,7 @@
       "platform": "linux/amd64"
     },
     "headscale": {
-      "image": "headscale/headscale@sha256:8833f828b414c0907b7e5c71da76473216fe17cce0818a166b536ec552c0903f",
+      "image": "headscale/headscale@sha256:780ed2f9e85719a2211277433f2c8afb45105d0d25031949a6848a485f9e216d",
       "platform": "linux/amd64"
     },
     "headplane": {
