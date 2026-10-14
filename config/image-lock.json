@@ -64,10 +64,10 @@
     "platform": "linux/amd64",
     "configured_image": "redis:latest"
   },
-  "watchtower": {
-    "image": "nickfedor/watchtower@sha256:45b54f6dc15227cfb38dbb826f2881aa0f56aaf0c255cdbb38bd80e598bdca9a",
+  "wud": {
+    "image": "getwud/wud@sha256:cf429f3a95b5ece811088d0d220741ea0b0460de6743197d26c590d1904e3af9",
     "platform": "linux/amd64",
-    "configured_image": "nickfedor/watchtower:latest"
+    "configured_image": "getwud/wud:latest"
   },
   "honey": {
     "image": "ghcr.io/dani3l0/honey@sha256:fe6ce43acf93a211ab63cf247e4ce573cb63a41608092f0bffb1b3bf72527ac5",

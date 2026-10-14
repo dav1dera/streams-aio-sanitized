@@ -31,7 +31,7 @@
     "tailscale",
     "teamspeak",
     "tvvoo",
-    "watchtower"
+    "wud"
   ],
   "empty_directories": [
     {
@@ -98,6 +98,12 @@
       "path": "data/postgres/init",
       "uid": 1000,
       "gid": 1000,
+      "mode": "0775"
+    },
+    {
+      "path": "data/wud/data",
+      "uid": 0,
+      "gid": 0,
       "mode": "0775"
     },
     {
@@ -196,9 +202,12 @@
     ".secrets/streamvix.env",
     ".secrets/stremthru.env",
     ".secrets/tailscale.env",
-    ".secrets/tvvoo.env"
+    ".secrets/tvvoo.env",
+    ".secrets/wud.env"
   ],
-  "private_env_targets_from_restored_agent": [],
+  "private_env_targets_from_restored_agent": [
+    ".secrets/wud.env"
+  ],
   "unclassified_files_excluded": 25,
   "database_policy": "fresh_application_state_restore_infisical",
   "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup"

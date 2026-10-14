@@ -243,19 +243,6 @@
       ]
     },
     {
-      "destination": ".generated/watchtower/config.json",
-      "format": "opaque",
-      "ref": "/watchtower/REGISTRY_AUTH_CONFIG",
-      "mode": "0640",
-      "owner": "root:deployment-group",
-      "app_owned": false,
-      "uid": 0,
-      "gid": 1000,
-      "named_acl": [
-        "user:1000:rw-"
-      ]
-    },
-    {
       "destination": "data/dnscrypt-proxy/data/dnscrypt-proxy.toml",
       "template": "config/dr-templates/dnscrypt-proxy/data/dnscrypt-proxy.toml.template",
       "format": "toml",

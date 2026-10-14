@@ -341,21 +341,26 @@ services:
     - deunhealth.restart.on.unhealthy=true
     profiles: [all, gluetun, db]
 
-  # ⏱️ Watchtower - Automatically update containers
-  watchtower:
-    image: nickfedor/watchtower:latest
-    container_name: watchtower
+  # 📦 Service
+  wud:
+    image: getwud/wud:latest
+    container_name: wud
     restart: unless-stopped
+    ports:
+    - 3001:3000
+    env_file:
+    - ./data/wud/.env
+    - ./.secrets/wud.env
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
-    - ./.generated/watchtower/config.json:/config.json:ro
-    env_file:
-    - ./data/watchtower/.env
+    - ./data/wud/data:/store
     networks:
       default:
         ipv4_address: 172.18.0.15
     labels:
     - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
     profiles: [all]
 
   # 🍯 Honey - Dashboard
@@ -593,7 +598,7 @@ services:
         ipv4_address: 172.19.0.2
     profiles: [all, gluetun]
     labels:
-    - com.centurylinklabs.watchtower.enable=false
+    - wud.watch=false
 
   # 💫 Comet - Addon
   comet:
