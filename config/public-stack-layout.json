@@ -205,9 +205,7 @@
     ".secrets/tvvoo.env",
     ".secrets/wud.env"
   ],
-  "private_env_targets_from_restored_agent": [
-    ".secrets/wud.env"
-  ],
+  "private_env_targets_from_restored_agent": [],
   "unclassified_files_excluded": 25,
   "database_policy": "fresh_application_state_restore_infisical",
   "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup"
