@@ -196,6 +196,12 @@
         "path": "/tailscale",
         "key": "TS_EXTRA_ARGS"
       }
+    },
+    ".secrets/wud.env": {
+      "WUD_AUTH_ADMIN_PASSWORD": {
+        "path": "/wud",
+        "key": "WUD_AUTH_ADMIN_PASSWORD"
+      }
     }
   },
   "service_folder_exports": {
@@ -915,7 +921,8 @@
     "/stremthru/STREMTHRU_VAULT_SECRET",
     "/tailscale/TS_AUTHKEY",
     "/tailscale/TS_EXTRA_ARGS",
-    "/watchtower/REGISTRY_AUTH_CONFIG"
+    "/watchtower/REGISTRY_AUTH_CONFIG",
+    "/wud/WUD_AUTH_ADMIN_PASSWORD"
   ],
   "readiness_blockers": [],
   "runtime_fields": {
