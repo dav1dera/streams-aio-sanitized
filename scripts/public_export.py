@@ -221,10 +221,26 @@ class Guard:
         self.baseline = baseline
         self.plan = sync.loads(baseline["config/dr-render-plan.json"])
         self.values = {}
+        self.compose_env_decoded_values = set()
         # Common settings already declared public are not evidence of a leak.
         self.public_values = set()
         self.reviewed_healthchecks = {}
         compose = sync.yaml_load(baseline["docker-compose.yml"])
+        # Only normal Compose dotenv sources interpret $$ as a literal $.
+        # Raw env_file values and private fields in JSON/TOML remain untouched.
+        self.compose_env_sources = {".env"}
+        live_compose = sync.yaml_load(read("docker-compose.yml"))
+        sync.require(isinstance(live_compose, dict) and isinstance(live_compose.get("services"), dict),
+                     "SERVICES_REQUIRED")
+        for row in live_compose["services"].values():
+            sync.require(isinstance(row, dict), "SERVICE_MAPPING_REQUIRED")
+            entries = row.get("env_file", [])
+            if isinstance(entries, (str, dict)): entries = [entries]
+            for entry in entries:
+                if isinstance(entry, str):
+                    self.compose_env_sources.add(entry.removeprefix("./"))
+                elif isinstance(entry, dict) and entry.get("format") in (None, "") and isinstance(entry.get("path"), str):
+                    self.compose_env_sources.add(entry["path"].removeprefix("./"))
         for service, row in compose["services"].items():
             test = row.get("healthcheck", {}).get("test")
             path = ("services", service, "healthcheck", "test")
@@ -250,17 +266,20 @@ class Guard:
                 rows = sync.env_values(read(name))
                 for key, binding in bindings.items():
                     if key in rows:
-                        self.remember(rows[key], binding["path"] + "/" + binding["key"])
+                        self.remember(rows[key], binding["path"] + "/" + binding["key"],
+                                      compose_env=name in self.compose_env_sources)
         for name, export in self.plan["service_folder_exports"].items():
             if (source / name).is_file():
                 for key, value in sync.env_values(read(name)).items():
                     binding = export["overrides"].get(key, {"path": export["path"], "key": key})
-                    self.remember(value, binding["path"] + "/" + binding["key"])
+                    self.remember(value, binding["path"] + "/" + binding["key"],
+                                  compose_env=name in self.compose_env_sources)
         if (source / ".env").is_file():
             for key, value in sync.env_values(read(".env")).items():
                 binding = self.plan["root_env"].get(key)
                 if binding or sensitive(key):
-                    self.remember(value, binding["path"] + "/" + binding["key"] if binding else None)
+                    self.remember(value, binding["path"] + "/" + binding["key"] if binding else None,
+                                  compose_env=True)
         # Additional Agent env files supply a leak-detection corpus, not guessed mappings.
         private = source / ".secrets"
         if private.is_dir():
@@ -270,11 +289,21 @@ class Guard:
                 for key, value in sync.env_values(read(path.relative_to(source).as_posix())).items():
                     existing = [ref for ref in self.plan["required_values"] if ref.rsplit("/", 1)[1] == key]
                     # Reuse a unique published binding; never invent a folder for a new key.
-                    self.remember(value, existing[0] if len(existing) == 1 else None)
+                    self.remember(value, existing[0] if len(existing) == 1 else None,
+                                  compose_env=path.relative_to(source).as_posix() in self.compose_env_sources)
 
-    def remember(self, value, ref):
+    def remember(self, value, ref, *, compose_env=False):
         # Dotenv producer outputs may quote values. Never evaluate shell syntax.
+        single_quoted = value.startswith("'") and value.endswith("'")
         value = env_literal(value)
+        self.remember_literal(value, ref)
+        if compose_env and not single_quoted and "$$" in value:
+            decoded = value.replace("$$", "$")
+            self.remember_literal(decoded, ref)
+            self.compose_env_decoded_values.add(decoded)
+
+    def remember_literal(self, value, ref):
+        # This value is already decoded. Literal quote characters are data.
         if value and value not in self.public_values and value.lower() not in {"true", "false", "yes", "no", "on", "off"}:
             self.values.setdefault(value, set()).add(ref)
 
@@ -400,9 +429,13 @@ class Guard:
             sql_text = "\n".join(value for node in ast.walk(python)
                                  if isinstance(value := python_literal(node), str))
         self.sync.require(not SQL_CREDENTIAL.search(sql_text), "SQL_CREDENTIAL_REFUSED", name)
-        private = VARIABLE.sub("", self.sync.MARKER.sub("", self.private_projection(text, name)))
+        private_literals = self.sync.MARKER.sub("", self.private_projection(text, name))
+        private = VARIABLE.sub("", private_literals)
         for value in self.values:
-            self.sync.require(len(value) < 8 or value not in private, "PRIVATE_VALUE_IN_PUBLIC_FILE", name)
+            # An escaped dotenv secret can itself contain literal ${VAR}; do
+            # not erase that part of a known secret as if it were a reference.
+            projected = private_literals if value in self.compose_env_decoded_values else private
+            self.sync.require(len(value) < 8 or value not in projected, "PRIVATE_VALUE_IN_PUBLIC_FILE", name)
         # Detect literal credential assignments even in otherwise ordinary text/code.
         structured = assignments and kind.endswith((".json", ".yaml", ".yml", ".toml"))
         if structured:

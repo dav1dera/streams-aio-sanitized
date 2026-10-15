@@ -93,6 +93,90 @@ class ComposeYamlTests(unittest.TestCase):
                              for token in sync.yaml.scan(text)))
 
 
+class ComposeEnvCorpusTests(unittest.TestCase):
+    def guard(self, raw, *, mode="bound", env_format=None, referenced=True, published=True):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        source = Path(temporary.name)
+        root_env = mode == "root"
+        name = ".env" if root_env else ".secrets/example.env"
+        key = "INFISICAL_PRIVATE_TOKEN" if root_env else "PRIVATE_TOKEN"
+        binding = {"path": "/synthetic", "key": "PRIVATE_TOKEN"}
+        plan = {"required_values": ["/synthetic/PRIVATE_TOKEN"], "files": [],
+                "env_files": {}, "service_folder_exports": {}, "root_env": {}}
+        if mode == "bound": plan["env_files"][name] = {key: binding}
+        if mode == "folder": plan["service_folder_exports"][name] = {"path": "/synthetic", "overrides": {}}
+        if root_env: plan["root_env"][key] = binding
+        service = {"image": "example/app:1"}
+        if referenced and not root_env:
+            service["env_file"] = [{"path": "./" + name, "format": env_format}] if env_format else ["./" + name]
+        live = {"services": {"example": service}}
+        public = live if published else {"services": {"existing": {"image": "example/existing:1"}}}
+        baseline = {"config/dr-render-plan.json": json.dumps(plan).encode(),
+                    "docker-compose.yml": sync.yaml.safe_dump(public).encode()}
+        (source / "docker-compose.yml").write_bytes(sync.yaml.safe_dump(live).encode())
+        file = source / name
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_bytes((key + "=" + raw + "\n").encode())
+        return export.Guard(source, baseline, sync, lambda path: (source / path).read_bytes())
+
+    def test_serialized_dollar_values_preserve_both_forms_and_block_unlabeled_leaks(self):
+        values = ["SYNTHETIC_PRIVATE_$VAR_end", "SYNTHETIC_PRIVATE_${VAR}_end",
+                  "SYNTHETIC_PRIVATE_$$literal_end", '"SYNTHETIC_PRIVATE_quoted_$VAR"',
+                  "SYNTHETIC_PRIVATE_'single'\"double\"\\backslash_$VAR\nnewline"]
+        for value in values:
+            with self.subTest(length=len(value)):
+                escaped = value.replace("$", "$$")
+                guard = self.guard(json.dumps(escaped))
+                self.assertIn(escaped, guard.values)
+                self.assertIn(value, guard.values)
+                with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE") as error:
+                    guard.scan(("Unlabeled " + value).encode(), "docs/unlabeled.md")
+                self.assertNotIn(value, str(error.exception))
+
+    def test_all_compose_env_sources_and_new_services_use_decoded_corpus(self):
+        value = "SYNTHETIC_PRIVATE_${VAR}_end"
+        raw = json.dumps(value.replace("$", "$$"))
+        for mode in ("bound", "folder", "root", "additional"):
+            with self.subTest(mode=mode):
+                self.assertIn(value, self.guard(raw, mode=mode).values)
+        self.assertIn(value, self.guard(raw, mode="additional", published=False).values)
+
+    def test_dollar_collapse_occurs_once(self):
+        value = "SYNTHETIC_PRIVATE_$$literal_end"
+        escaped = value.replace("$", "$$")
+        guard = self.guard(json.dumps(escaped))
+        self.assertIn(escaped, guard.values)
+        self.assertIn(value, guard.values)
+        self.assertNotIn(value.replace("$$", "$"), guard.values)
+
+    def test_single_quoted_values_keep_literal_dollars(self):
+        literal = "SYNTHETIC_PRIVATE_$${VAR}_end"
+        guard = self.guard("'" + literal + "'")
+        self.assertIn(literal, guard.values)
+        self.assertNotIn(literal.replace("$$", "$"), guard.values)
+
+    def test_raw_env_files_and_unreferenced_agent_outputs_are_not_collapsed(self):
+        literal = "SYNTHETIC_PRIVATE_$$VAR_end"
+        raw = json.dumps(literal)
+        self.assertNotIn(literal.replace("$$", "$"), self.guard(raw, env_format="raw").values)
+        self.assertNotIn(literal.replace("$$", "$"), self.guard(raw, referenced=False).values)
+
+    def test_private_fields_outside_compose_env_keep_existing_semantics(self):
+        guard = self.guard("SYNTHETIC_BASE_VALUE")
+        literal = "SYNTHETIC_PRIVATE_$$VAR_end"
+        guard.remember(literal, "/synthetic/PLAIN_VALUE")
+        guard.remember(json.dumps(literal), "/synthetic/QUOTED_VALUE")
+        self.assertIn(literal, guard.values)
+        self.assertNotIn(literal.replace("$$", "$"), guard.values)
+
+    def test_existing_public_reference_projection_remains_unchanged(self):
+        guard = self.guard("SYNTHETIC_BASE_VALUE")
+        guard.remember("PRIVATE_REFERENCE_NAME", "/synthetic/PLAIN_VALUE")
+        text = b"The input is ${PRIVATE_REFERENCE_NAME}.\n"
+        self.assertEqual(guard.scan(text, "docs/reference.md"), text)
+
+
 class PublicExportTests(unittest.TestCase):
     def repository_url_guard(self):
         root = "https://github.com/" + sync.REPOSITORY
