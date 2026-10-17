@@ -222,6 +222,7 @@ class Guard:
         self.plan = sync.loads(baseline["config/dr-render-plan.json"])
         self.values = {}
         self.compose_env_decoded_values = set()
+        self.discarded_honey_alias_values = set()
         # Common settings already declared public are not evidence of a leak.
         self.public_values = set()
         self.reviewed_healthchecks = {}
@@ -302,15 +303,25 @@ class Guard:
             self.remember_literal(decoded, ref)
             self.compose_env_decoded_values.add(decoded)
 
-    def remember_literal(self, value, ref):
+    def remember_literal(self, value, ref, *, discarded_honey_alias=False):
         # This value is already decoded. Literal quote characters are data.
         if value and value not in self.public_values and value.lower() not in {"true", "false", "yes", "no", "on", "off"}:
+            if discarded_honey_alias:
+                if value not in self.values or value in self.discarded_honey_alias_values:
+                    self.discarded_honey_alias_values.add(value)
+            else:
+                # An actual private ENV or mapped field must remain strict,
+                # even when the same text also occurs in a discarded Honey label.
+                self.discarded_honey_alias_values.discard(value)
             self.values.setdefault(value, set()).add(ref)
 
-    def mask(self, text, name, preferred=()):
+    def mask(self, text, name, preferred=(), *, published=None):
         for value, references in sorted(self.values.items(), key=lambda row: -len(row[0])):
             if value != text and (len(value) < 8 or value not in text):
                 continue
+            if (value in self.discarded_honey_alias_values and references == {None}
+                    and text == published):
+                continue  # Preserve this exact already-public scalar, not new copies.
             choices = (set(preferred) & references) or (references - {None})
             self.sync.require(len(choices) == 1, "PRIVATE_VALUE_NEEDS_EXPLICIT_BINDING", name)
             text = text.replace(value, "@@INFISICAL:" + next(iter(choices)) + "@@")
@@ -403,11 +414,19 @@ class Guard:
         self.sync.require(not re.search(r"-----BEGIN (?:[A-Z]+ )*PRIVATE KEY-----|PuTTY-User-Key-File:\s*\d", text),
                           "PRIVATE_IDENTITY_REFUSED", name)
         public = self.sync.MARKER.sub("", text)
+        prior_text = self.baseline.get(name, b"").decode()
+        published_variables = {}
+        for variable in VARIABLE.finditer(self.sync.MARKER.sub("", prior_text)):
+            published_variables[variable[0]] = published_variables.get(variable[0], 0) + 1
         # A reference is public; a credential supplied as its default is not.
         for variable in VARIABLE.finditer(public):
             default = variable[0][len(variable[1]) + 2:-1]
+            published_variable = published_variables.get(variable[0], 0) > 0
+            if published_variable: published_variables[variable[0]] -= 1
             self.sync.require(not any(rx.search(default) for rx in TOKEN_PATTERNS)
-                              and not any(len(v) >= 8 and v in default for v in self.values),
+                              and not any(len(v) >= 8 and v in default
+                                          and not (published_variable and v in self.discarded_honey_alias_values
+                                                   and self.values[v] == {None}) for v in self.values),
                               "PRIVATE_VARIABLE_DEFAULT_REFUSED", name)
             if sensitive(variable[1]):
                 self.sync.require(variable[0] in {"${" + variable[1] + "}", "${" + variable[1] + ":-}", "${" + variable[1] + "-}"},
@@ -431,7 +450,15 @@ class Guard:
         self.sync.require(not SQL_CREDENTIAL.search(sql_text), "SQL_CREDENTIAL_REFUSED", name)
         private_literals = self.sync.MARKER.sub("", self.private_projection(text, name))
         private = VARIABLE.sub("", private_literals)
+        prior_literals = self.sync.MARKER.sub("", self.private_projection(
+            prior_text, name)) if self.discarded_honey_alias_values else ""
         for value in self.values:
+            if value in self.discarded_honey_alias_values and self.values[value] == {None}:
+                # A brand can also be an anonymized dashboard label. Keep only
+                # its existing same-file footprint; a new file/copy still fails.
+                self.sync.require(len(value) < 8 or private_literals.count(value) <= prior_literals.count(value),
+                                  "PRIVATE_VALUE_IN_PUBLIC_FILE", name)
+                continue
             # An escaped dotenv secret can itself contain literal ${VAR}; do
             # not erase that part of a known secret as if it were a reference.
             projected = private_literals if value in self.compose_env_decoded_values else private
@@ -501,7 +528,7 @@ class Guard:
                     found = re.findall(re.escape(left) + "(.{1,4096}?)" + re.escape(right), new, re.S)
                     if len(found) == 1: self.remember(found[0], marker[1])
             self.sync.require(isinstance(new, str), "PRIVATE_FIELD_TYPE_CHANGED", location)
-            masked = self.mask(new, location, preferred)
+            masked = self.mask(new, location, preferred, published=old)
             self.sync.require(all("@@INFISICAL:" + ref + "@@" in masked for ref in preferred),
                               "BOUND_CODE_NEEDS_EXPLICIT_BINDING", location)
             return masked
@@ -516,7 +543,7 @@ class Guard:
         if isinstance(new, str):
             if name == "docker-compose.yml" and path in self.reviewed_healthchecks and new == self.reviewed_healthchecks[path]:
                 return new  # Existing public healthcheck; new/changed fields still undergo masking.
-            new = self.mask(new, location)
+            new = self.mask(new, location, published=old if isinstance(old, str) else None)
             if path and sensitive(path[-1]) and new and not self.sync.MARKER.search(new) and not VARIABLE.search(new):
                 self.sync.require(False, "PRIVATE_FIELD_NEEDS_EXPLICIT_BINDING", location)
         return new
@@ -716,7 +743,7 @@ def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None)
             return
         if field == "name" and len(service_keys.get(logical(value), [])) == 1:
             return  # The whole application name is already public in Compose.
-        guard.remember_literal(value, None)
+        guard.remember_literal(value, None, discarded_honey_alias=True)
 
     aligned = []
     after = copy.deepcopy(after)

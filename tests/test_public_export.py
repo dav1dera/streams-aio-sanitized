@@ -632,6 +632,83 @@ class PublicExportTests(unittest.TestCase):
         with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
             self.render()
 
+    def honey_with_discarded_public_brand(self):
+        name, value = self.honey()
+        value["services"][2]["name"] = "Infisical"
+        value["services"].insert(2, {"name": "Wud", "desc": "", "href": "http://wud:3000", "icon": ""})
+        self.write(name, json.dumps(value).encode())
+        return name, value
+
+    def test_honey_public_brand_preserves_exact_published_scalars_and_same_file_occurrences(self):
+        self.honey_with_discarded_public_brand()
+        readme = b"# Public documentation\nInfisical stores inputs. Infisical stays private.\n"
+        self.public["README.md"] = readme
+        self.write("README.md", readme)
+        changes = self.render()
+        compose = sync.yaml_load(changes.get("docker-compose.yml", self.public["docker-compose.yml"]))
+        self.assertEqual(compose["services"]["gost"]["command"],
+                         sync.yaml_load(self.public["docker-compose.yml"])["services"]["gost"]["command"])
+        self.assertNotIn("README.md", changes)
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_honey_public_brand_does_not_allow_new_file_or_appended_readme_copy(self):
+        self.honey_with_discarded_public_brand()
+        readme = b"# Public documentation\nInfisical stores inputs.\n"
+        self.public["README.md"] = readme
+        self.write("README.md", readme)
+        self.write("docs/new.md", b"A new copy of Infisical.\n")
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE docs/new.md"):
+            self.render()
+        (self.source / "docs/new.md").unlink()
+        self.write("README.md", readme + b"A new copy of Infisical.\n")
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE README.md"):
+            self.render()
+
+    def test_honey_public_brand_does_not_allow_new_card_field_or_changed_public_scalar(self):
+        name, value = self.honey_with_discarded_public_brand()
+        value["services"][2]["desc"] = "Infisical"
+        self.write(name, json.dumps(value).encode())
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_NEEDS_EXPLICIT_BINDING"):
+            self.render()
+        value["services"][2]["desc"] = ""
+        self.write(name, json.dumps(value).encode())
+        self.compose(lambda services: services["gost"]["command"].append("New Infisical occurrence"))
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_NEEDS_EXPLICIT_BINDING"):
+            self.render()
+
+    def test_honey_public_brand_remains_strict_if_also_present_in_private_env(self):
+        self.honey_with_discarded_public_brand()
+        self.write(".secrets/unmapped-brand.env", b"NEW_PRIVATE_TOKEN=Infisical\n")
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_NEEDS_EXPLICIT_BINDING"):
+            self.render()
+
+    def test_honey_public_brand_preserves_only_existing_variable_default_occurrences(self):
+        self.honey_with_discarded_public_brand()
+        reference = b"The input is ${PUBLIC_INPUT:?Infisical configuration required}.\n"
+        self.public["docs/reference.md"] = reference
+        self.write("docs/reference.md", reference)
+        self.render()
+        for data in (reference + reference, reference.replace(b"PUBLIC_INPUT", b"OTHER_INPUT")):
+            with self.subTest(extra_copy=len(data) > len(reference)):
+                self.write("docs/reference.md", data)
+                with self.assertRaisesRegex(sync.Refused, "PRIVATE_VARIABLE_DEFAULT_REFUSED docs/reference.md"):
+                    self.render()
+
+    def test_honey_alias_public_footprint_never_weakens_later_private_bindings(self):
+        for reference in (None, "/synthetic/PRIVATE_TOKEN"):
+            with self.subTest(mapped=reference is not None):
+                guard = export.Guard(self.source, self.public, sync, lambda path: (self.source / path).read_bytes())
+                literal = "SYNTHETIC_DISCARDED_ALIAS"
+                guard.remember_literal(literal, None, discarded_honey_alias=True)
+                self.assertIn(literal, guard.discarded_honey_alias_values)
+                guard.remember_literal(literal, reference)
+                self.assertNotIn(literal, guard.discarded_honey_alias_values)
+                guard.remember_literal(literal, None, discarded_honey_alias=True)
+                self.assertNotIn(literal, guard.discarded_honey_alias_values)
+                with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+                    guard.scan(("Public copy " + literal).encode(), "docs/new.md")
+
     def test_honey_anonymized_name_does_not_allow_removed_binding_or_new_credential(self):
         name, original = self.honey()
         value = copy.deepcopy(original)
