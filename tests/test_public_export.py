@@ -1,5 +1,6 @@
 """Synthetic configuration-only recovery inputs. No production secrets or writes."""
 import copy
+from collections import Counter
 import hashlib
 import importlib.util
 import json
@@ -496,7 +497,9 @@ class PublicExportTests(unittest.TestCase):
         self.write(name, json.dumps(value).encode())
         result = sync.loads(self.render()[template])
         self.assertEqual(result["services"][2]["href"], old["services"][2]["href"])
-        self.assertEqual(result["services"][2]["icon"], old["services"][2]["icon"])
+        # With both public anchors changed, this anonymous card is unknown:
+        # safe defaults retain no private alias, URL or image.
+        self.assertEqual(result["services"][2]["icon"], "")
         self.assertTrue(result["services"][2]["ping"])
         self.assertNotIn("synthetic-private.invalid", json.dumps(result))
 
@@ -509,16 +512,125 @@ class PublicExportTests(unittest.TestCase):
                 self.write(name, json.dumps(value).encode())
                 with self.assertRaisesRegex(sync.Refused, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED"): self.render()
 
-    def test_honey_positional_layout_change_requires_review(self):
+    def test_honey_inserted_public_service_keeps_bindings_on_the_same_cards(self):
         name, original = self.honey()
-        for action in ("add", "remove", "reorder"):
+        template = "config/dr-templates/honey/data/config/config.json.template"
+        reviewed = sync.loads(self.public[template])
+        original["services"][17]["name"] = "SYNTHETIC_LOCAL_SHARED_ALIAS"
+        original["services"][20]["name"] = "SYNTHETIC_LOCAL_EXTERNAL_ALIAS"
+        original["services"].insert(2, {"name": "Wud", "desc": "", "href": "http://wud:3000",
+                                        "icon": "https://public.example/wud.svg"})
+        self.write(name, json.dumps(original).encode())
+        changes = self.render()
+        result = sync.loads(changes[template])
+        self.assertEqual(len(result["services"]), 23)
+        self.assertEqual(result["services"][2]["name"], "Wud")
+        self.assertEqual(result["services"][2]["href"], "http://wud:3000")
+        for index, row in enumerate(reviewed["services"]):
+            for field, value in row.items():
+                if isinstance(value, str) and sync.MARKER.search(value):
+                    self.assertEqual(result["services"][index + (index >= 2)][field], value)
+        self.assertEqual(Counter(sync.MARKER.findall(changes[template].decode())),
+                         Counter(sync.MARKER.findall(self.public[template].decode())))
+        for index in (18, 21):
+            self.assertEqual({k: result["services"][index][k] for k in ("name", "desc", "href", "icon")},
+                             {"name": "Service " + str(index + 1), "desc": "", "href": "#", "icon": ""})
+        self.assertFalse(any(b"SYNTHETIC_LOCAL_" in data for data in changes.values() if data))
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_honey_reordered_bound_cards_and_removed_unbound_card_keep_logical_bindings(self):
+        name, value = self.honey()
+        template = "config/dr-templates/honey/data/config/config.json.template"
+        reviewed = sync.loads(self.public[template])
+        value["services"][3], value["services"][9] = value["services"][9], value["services"][3]
+        value["services"].pop(0)
+        self.write(name, json.dumps(value).encode())
+        data = self.render()[template]
+        result = sync.loads(data)
+        headplane = next(row for row in result["services"] if row["name"] == "Headplane")
+        self.assertEqual(headplane["href"], reviewed["services"][9]["href"])
+        self.assertEqual(result["services"][2]["name"], "Headplane")
+        self.assertEqual(Counter(sync.MARKER.findall(data.decode())),
+                         Counter(sync.MARKER.findall(self.public[template].decode())))
+
+    def test_honey_same_length_replacement_does_not_inherit_positional_secret(self):
+        name, value = self.honey()
+        value["services"][12] = {"name": "Unknown replacement", "desc": "", "href": "#", "icon": ""}
+        self.write(name, json.dumps(value).encode())
+        with self.assertRaisesRegex(sync.Refused, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED"):
+            self.render()
+
+    def test_honey_ambiguous_or_conflicting_public_anchors_refuse(self):
+        name, original = self.honey()
+        for action in ("duplicate", "conflict", "remove_bound"):
             with self.subTest(action=action):
                 value = copy.deepcopy(original)
-                if action == "add": value["services"].append({"name": "New", "desc": "", "href": "#", "icon": ""})
-                elif action == "remove": value["services"].pop(0)
-                else: value["services"][3], value["services"][9] = value["services"][9], value["services"][3]
+                if action == "duplicate": value["services"].append(copy.deepcopy(value["services"][12]))
+                elif action == "conflict": value["services"][5]["icon"] = value["services"][9]["icon"]
+                else: value["services"].pop(12)
                 self.write(name, json.dumps(value).encode())
-                with self.assertRaisesRegex(sync.Refused, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED"): self.render()
+                with self.assertRaisesRegex(sync.Refused, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED"):
+                    self.render()
+
+    def test_honey_new_public_service_names_require_whole_unique_normalized_match(self):
+        name, original = self.honey()
+        template = "config/dr-templates/honey/data/config/config.json.template"
+        value = copy.deepcopy(original)
+        value["services"].append({"name": "Private Wud dashboard", "href": "http://private.example/panel",
+                                  "desc": "SYNTHETIC_PRIVATE_ALIAS", "icon": "", "ping": True})
+        self.write(name, json.dumps(value).encode())
+        row = sync.loads(self.render()[template])["services"][-1]
+        self.assertEqual(row["name"], "Service 23")
+        self.assertEqual(row["href"], "#")
+        self.assertEqual(row["desc"], "")
+        self.assertTrue(row["ping"])
+        value["services"][-1]["name"] = "Wud 私人姓名"
+        self.write(name, json.dumps(value).encode())
+        self.assertEqual(sync.loads(self.render()[template])["services"][-1]["name"], "Service 23")
+        value = copy.deepcopy(original)
+        value["services"] += [{"name": "Wud", "href": "#", "icon": ""},
+                              {"name": "W-U-D", "href": "#", "icon": ""}]
+        self.write(name, json.dumps(value).encode())
+        with self.assertRaisesRegex(sync.Refused, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED"):
+            self.render()
+
+    def test_honey_shifted_private_icons_and_discarded_aliases_remain_in_leak_guard(self):
+        name, original = self.honey()
+        for action in ("bound_icon", "discarded_alias"):
+            with self.subTest(action=action):
+                value = copy.deepcopy(original)
+                secret = "SYNTHETIC_PRIVATE_ICON_OR_ALIAS_" + action
+                if action == "bound_icon": value["services"][11]["icon"] = secret
+                else: value["services"][17]["name"] = secret
+                value["services"].insert(2, {"name": "Wud", "href": "http://wud:3000", "icon": ""})
+                self.write(name, json.dumps(value).encode())
+                self.write("docs/new.md", ("Unlabeled " + secret).encode())
+                with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE") as error:
+                    self.render()
+                self.assertNotIn(secret, str(error.exception))
+
+    def test_honey_new_public_card_does_not_publish_another_cards_hidden_alias(self):
+        name, value = self.honey()
+        alias = "SYNTHETIC_PRIVATE_HIDDEN_ALIAS"
+        value["services"][17]["name"] = alias
+        value["services"].insert(2, {"name": "Wud", "desc": alias, "href": "http://wud:3000", "icon": ""})
+        self.write(name, json.dumps(value).encode())
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_NEEDS_EXPLICIT_BINDING|PRIVATE_VALUE_IN_PUBLIC_FILE") as error:
+            self.render()
+        self.assertNotIn(alias, str(error.exception))
+
+    def test_honey_noncomparable_compose_name_does_not_exempt_a_private_unicode_alias(self):
+        name, value = self.honey()
+        compose = sync.yaml_load(self.public["docker-compose.yml"])
+        compose["services"]["example_"] = {"image": "example/app:1"}
+        self.public["docker-compose.yml"] = sync.yaml.safe_dump(compose, sort_keys=False).encode()
+        alias = "Wud 私人姓名_WITH_PRIVATE_SUFFIX"
+        value["services"][17]["name"] = alias
+        self.write(name, json.dumps(value).encode())
+        self.write("docs/new.md", ("Unlabeled " + alias).encode())
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+            self.render()
 
     def test_honey_anonymized_name_does_not_allow_removed_binding_or_new_credential(self):
         name, original = self.honey()

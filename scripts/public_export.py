@@ -636,32 +636,122 @@ def live_json_template(item, data, sync):
     return sync.yaml_load(data) if item["destination"].endswith((".yaml", ".yml")) else sync.loads(data)
 
 
-def json_template_trees(item, old, raw, sync):
+def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None):
     before, after = sync.loads(old), live_json_template(item, raw, sync)
     if item["destination"] != "data/honey/data/config/config.json":
         return before, after
     name = item["template"]
-    # Honey's reviewed SERVICES_<index> bindings use positions. Its anonymized
-    # display names are not IDs: normalize them before the generic name matcher
-    # and before collecting private values. Never overwrite a bound icon first.
+    # SERVICES_<index> are historical secret names, not current row positions.
+    # Move whole reviewed rows using unique public identities before collecting
+    # values. Never attach a private binding to an inserted positional neighbor.
     sync.require(isinstance(before, dict) and isinstance(after, dict)
-                 and isinstance(before.get("services"), list) and isinstance(after.get("services"), list)
-                 and len(before["services"]) == len(after["services"]), "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+                 and isinstance(before.get("services"), list) and isinstance(after.get("services"), list),
+                 "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+    sync.require(len(before["services"]) <= 200 and len(after["services"]) <= 200,
+                 "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+    for row in before["services"] + after["services"]:
+        sync.require(isinstance(row, dict) and isinstance(row.get("name"), str)
+                     and bool(row["name"]) and len(row["name"]) <= 256,
+                     "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+
+    def anonymous(row):
+        return bool(re.fullmatch(r"Service [1-9][0-9]*", row["name"]))
+
+    def identity(row, field):
+        value = row.get(field)
+        if not isinstance(value, str) or not value or value == "#" or sync.MARKER.search(value): return None
+        if field == "name" and anonymous(row): return None
+        return value
+
+    old_keys, new_keys = {}, {}
+    for field in ("name", "href", "icon"):
+        for index, row in enumerate(before["services"]):
+            value = identity(row, field)
+            if value is not None: old_keys.setdefault((field, value), []).append(index)
+        for index, row in enumerate(after["services"]):
+            value = identity(row, field)
+            if value is not None: new_keys.setdefault((field, value), []).append(index)
+    matches, claimed = {}, set()
+    for index, row in enumerate(after["services"]):
+        candidates = set()
+        for field in ("name", "href", "icon"):
+            key = field, identity(row, field)
+            owners = old_keys.get(key, [])
+            if len(owners) == 1:
+                sync.require(len(new_keys.get(key, [])) == 1, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+                candidates.add(owners[0])
+        sync.require(len(candidates) <= 1, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+        if candidates:
+            previous = next(iter(candidates))
+            sync.require(previous not in claimed, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+            matches[index] = previous
+            claimed.add(previous)
+    for index, row in enumerate(before["services"]):
+        sync.require(index in claimed or not sync.MARKER.search(json.dumps(row)),
+                     "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+
+    def logical(value):
+        # Only whole ASCII application names with conventional separators are
+        # comparable. Never erase a Unicode/private suffix to manufacture a match.
+        if not re.fullmatch(r"[A-Za-z0-9]+(?:[ _-]+[A-Za-z0-9]+)*", value): return None
+        return re.sub(r"[ _-]", "", value.lower())
+
+    service_keys = {}
+    live_names = {}
+    for service in public_services:
+        key = logical(service)
+        if key is not None: service_keys.setdefault(key, []).append(service)
+    for index, row in enumerate(after["services"]):
+        live_names.setdefault(logical(row["name"]), []).append(index)
+    owned_names = {logical(after["services"][index]["name"]) for index in matches}
+    public_identities = {value for row in before["services"] + [before.get("ui", {})]
+                         for key in ("name", "desc", "icon", "href")
+                         if isinstance(row, dict) and isinstance(value := row.get(key), str)
+                         and not sync.MARKER.search(value)}
+
+    def remember_discarded(value, replacement, field):
+        if guard is None or not isinstance(value, str) or len(value) < 8 or value == replacement:
+            return
+        if value in public_identities:
+            return
+        if field == "name" and len(service_keys.get(logical(value), [])) == 1:
+            return  # The whole application name is already public in Compose.
+        guard.remember_literal(value, None)
+
+    aligned = []
     after = copy.deepcopy(after)
-    for index, (old_row, new_row) in enumerate(zip(before["services"], after["services"])):
-        sync.require(isinstance(old_row, dict) and isinstance(new_row, dict)
-                     and isinstance(new_row.get("name"), str), "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
-        generic = old_row.get("name") == "Service " + str(index + 1)
-        sync.require(generic or new_row["name"] == old_row.get("name"), "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+    for index, new_row in enumerate(after["services"]):
+        if index not in matches:
+            key = logical(new_row["name"])
+            known_service = key and len(service_keys.get(key, [])) == 1
+            if known_service:
+                sync.require(len(live_names[key]) == 1 and key not in owned_names,
+                             "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+                aligned.append({})  # New public service; normal Guard checks every field.
+                continue
+            # An unknown alias/link can be an old anonymized card. Preserve
+            # harmless options, but never publish its private identity by default.
+            defaults = {"name": "Service " + str(index + 1), "desc": "", "href": "#", "icon": ""}
+            for field, value in defaults.items():
+                remember_discarded(new_row.get(field), value, field)
+                new_row[field] = value
+            aligned.append(copy.deepcopy(defaults))
+            continue
+        old_row = copy.deepcopy(before["services"][matches[index]])
+        aligned.append(old_row)
         for key in ("name", "desc", "icon", "href"):
             value = old_row.get(key)
             preserved = key != "href" or value in ("#", "")
             if key in new_row and isinstance(value, str) and preserved and not sync.MARKER.search(value):
+                remember_discarded(new_row[key], value, key)
                 new_row[key] = value
+    before = copy.deepcopy(before)
+    before["services"] = aligned
     if isinstance(before.get("ui"), dict) and isinstance(after.get("ui"), dict):
         for key in ("name", "desc", "icon"):
             value = before["ui"].get(key)
             if key in after["ui"] and isinstance(value, str) and not sync.MARKER.search(value):
+                remember_discarded(after["ui"][key], value, key)
                 after["ui"][key] = value
     return before, after
 
@@ -671,10 +761,12 @@ def render(source, baseline, sync, image_reader=None):
     def read(name):
         data = sync.read_file(source, name); inputs[name] = data; return data
     guard = Guard(source, baseline, sync, read)
+    public_services = tuple(sync.yaml_load(baseline["docker-compose.yml"])["services"])
     for item in guard.plan["files"]:
         if not item.get("template") or not (source / item["destination"]).is_file(): continue
         old, new = baseline[item["template"]], read(item["destination"])
-        if item["format"] == "json": old, new = json_template_trees(item, old, new, sync)
+        if item["format"] == "json":
+            old, new = json_template_trees(item, old, new, sync, public_services=public_services, guard=guard)
         elif item["format"] == "toml": old, new = sync.tomllib.loads(old.decode()), sync.tomllib.loads(new.decode())
         else: old, new = old.decode(), new.decode()
         guard.bindings(old, new)
@@ -809,7 +901,7 @@ def render(source, baseline, sync, image_reader=None):
             sync.require(False, "ACTIVE_TEMPLATE_SOURCE_MISSING", name)
         old, raw = baseline[name], read(dest)
         if item["format"] == "json":
-            a, b = json_template_trees(item, old, raw, sync)
+            a, b = json_template_trees(item, old, raw, sync, public_services=public_services, guard=guard)
             omitted = set(overlays.get(dest, {}).get("omit_runtime_identity_fields", []))
             if isinstance(b, dict): b = {k: v for k, v in b.items() if k not in omitted}
             if isinstance(a, list) and isinstance(b, list):
