@@ -26,7 +26,7 @@
       "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/proxmox-backup-server.svg"
     },
     {
-      "name": "Service 3",
+      "name": "Infisical",
       "desc": "",
       "href": "#",
       "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/infisical.svg"
