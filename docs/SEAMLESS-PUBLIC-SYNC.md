@@ -123,17 +123,23 @@ with the same safe YAML loader as the strict mode, masks its Infisical bindings,
 and writes the public JSON template. Duplicate keys, aliases and unsafe YAML tags
 remain refused; files declared as `.json` still require valid JSON.
 
-Honey's existing dashboard has positional `SERVICES_<index>` Infisical bindings.
-Its public `Service N` labels intentionally differ from private display names;
-they are normalized before array matching and private-value collection. Reviewed
-names, descriptions, public icons and placeholder links keep their canonical
-public defaults. Bound links and icons retain their Infisical references, and
-other public settings follow the local source. Honey row additions/removals and
-changes to the positions of its named public anchors require explicit review
-(`HONEY_BOUND_LAYOUT_REVIEW_REQUIRED`). Keep its positional bindings in sync when
-reordering anonymized rows; their display labels are not stable identifiers.
-Missing private fields remain refused. Other applications still match array rows
-by their reviewed IDs or names; this exception applies only to Honey's template.
+Honey's historical `SERVICES_<index>` names remain the same Infisical keys even
+when cards move. Whole cards are matched by unique reviewed public names, links
+or icons before private values are collected; no positional fallback attaches
+a secret to a neighboring card. Insertions and reordering preserve the bindings
+when those identities remain unambiguous. A missing bound card, conflicting
+identities or duplicate anchors still require review
+(`HONEY_BOUND_LAYOUT_REVIEW_REQUIRED`).
+
+New cards can use a whole, unique application name already published in Compose.
+Their names, links and other settings undergo the normal private-value checks.
+A new decorative icon is retained only when its exact literal is already a
+reviewed Honey icon; otherwise the sanitized card uses an empty icon. The live
+dashboard is unchanged. This prevents shared or uncertain artwork from blocking
+backup or publishing a private URL. Existing bound links and icons retain their
+exact Infisical references. Unknown aliases keep anonymous public defaults and
+remain covered by leak checks. Other applications continue to match array rows
+by reviewed IDs or names.
 
 ## Disaster recovery scope
 

@@ -735,6 +735,9 @@ def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None)
                          for key in ("name", "desc", "icon", "href")
                          if isinstance(row, dict) and isinstance(value := row.get(key), str)
                          and not sync.MARKER.search(value)}
+    public_icons = {row["icon"] for row in before["services"] + [before.get("ui", {})]
+                    if isinstance(row, dict) and isinstance(row.get("icon"), str)
+                    and not sync.MARKER.search(row["icon"])}
 
     def remember_discarded(value, replacement, field):
         if guard is None or not isinstance(value, str) or len(value) < 8 or value == replacement:
@@ -754,6 +757,15 @@ def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None)
             if known_service:
                 sync.require(len(live_names[key]) == 1 and key not in owned_names,
                              "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+                # A public application name does not approve an arbitrary icon
+                # URL. New cards can omit this cosmetic field instead of
+                # publishing an unreviewed value or blocking on another card's
+                # discarded icon. Existing bound cards keep their exact rules.
+                sync.require("icon" not in new_row or isinstance(new_row["icon"], str),
+                             "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
+                if "icon" in new_row and new_row["icon"] not in public_icons:
+                    remember_discarded(new_row["icon"], "", "icon")
+                    new_row["icon"] = ""
                 aligned.append({})  # New public service; normal Guard checks every field.
                 continue
             # An unknown alias/link can be an old anonymized card. Preserve

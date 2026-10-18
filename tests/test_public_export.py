@@ -539,6 +539,90 @@ class PublicExportTests(unittest.TestCase):
         self.apply(changes)
         self.assertEqual(self.render(), {})
 
+    def test_honey_new_known_card_discards_icon_shared_with_anonymized_existing_card(self):
+        name, value = self.honey()
+        template = "config/dr-templates/honey/data/config/config.json.template"
+        icon = "https://public.example/seanime-logo.png"
+        value["services"][16]["icon"] = icon
+        value["services"][17].update(name="Seanime Shared", href="http://seanime-shared:4321", icon=icon)
+        value["services"].insert(2, {"name": "Wud", "href": "http://wud:3000", "icon": ""})
+        self.write(name, json.dumps(value).encode())
+        changes = self.render()
+        result = sync.loads(changes[template])
+        shared = next(row for row in result["services"] if row["name"] == "Seanime Shared")
+        self.assertEqual(shared["href"], "http://seanime-shared:4321")
+        self.assertEqual(shared["icon"], "")
+        self.assertEqual(next(row for row in result["services"] if row["name"] == "Seanime")["icon"], "")
+        self.assertNotIn(icon, changes[template].decode())
+        self.assertEqual(Counter(sync.MARKER.findall(changes[template].decode())),
+                         Counter(sync.MARKER.findall(self.public[template].decode())))
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_honey_new_known_card_preserves_exact_reviewed_public_icon(self):
+        name, value = self.honey()
+        template = "config/dr-templates/honey/data/config/config.json.template"
+        reviewed = sync.loads(self.public[template])
+        icon = "https://public.example/reviewed-dashboard-icon.svg"
+        reviewed["ui"]["icon"] = icon
+        self.public[template] = json.dumps(reviewed).encode()
+        value["ui"]["icon"] = icon
+        value["services"].append({"name": "Wud", "href": "http://wud:3000", "icon": icon})
+        self.write(name, json.dumps(value).encode())
+        changes = self.render()
+        self.assertEqual(sync.loads(changes[template])["services"][-1]["icon"], icon)
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_honey_new_known_card_icon_does_not_publish_private_env_or_bound_icon(self):
+        name, original = self.honey()
+        template = "config/dr-templates/honey/data/config/config.json.template"
+        for source in ("private_env", "bound_icon"):
+            with self.subTest(source=source):
+                value = copy.deepcopy(original)
+                if source == "private_env":
+                    secret = "SYNTHETIC_PRIVATE_NEW_CARD_ICON"
+                    self.write(".secrets/new-card-icon.env", ("PRIVATE_TOKEN=" + secret + "\n").encode())
+                else:
+                    secret = value["services"][4]["icon"]
+                value["services"].append({"name": "Wud", "href": "http://wud:3000", "icon": secret})
+                self.write(name, json.dumps(value).encode())
+                changes = self.render()
+                result = sync.loads(changes[template])
+                self.assertEqual(result["services"][-1]["icon"], "")
+                self.assertEqual(result["services"][4]["icon"],
+                                 sync.loads(self.public[template])["services"][4]["icon"])
+                self.assertEqual(Counter(sync.MARKER.findall(changes[template].decode())),
+                                 Counter(sync.MARKER.findall(self.public[template].decode())))
+                self.assertFalse(any(secret.encode() in data for data in changes.values() if data))
+                self.write("docs/new.md", ("Unlabeled " + secret).encode())
+                with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE") as error:
+                    self.render()
+                self.assertNotIn(secret, str(error.exception))
+                (self.source / "docs/new.md").unlink()
+
+    def test_honey_new_known_card_discarded_icon_keeps_other_fields_guarded(self):
+        name, value = self.honey()
+        icon = "SYNTHETIC_PRIVATE_DISCARDED_NEW_ICON"
+        value["services"].append({"name": "Wud", "href": "http://wud:3000", "desc": icon, "icon": icon})
+        self.write(name, json.dumps(value).encode())
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_NEEDS_EXPLICIT_BINDING") as error:
+            self.render()
+        self.assertNotIn(icon, str(error.exception))
+
+    def test_honey_new_known_card_rejects_non_string_icon_before_discarding(self):
+        name, original = self.honey()
+        secret = "SYNTHETIC_PRIVATE_NESTED_ICON"
+        for icon in ({"api_key": secret}, [secret], None, True, 123):
+            with self.subTest(icon_type=type(icon).__name__):
+                value = copy.deepcopy(original)
+                value["services"].append({"name": "Wud", "href": "http://wud:3000",
+                                          "desc": secret, "icon": icon})
+                self.write(name, json.dumps(value).encode())
+                with self.assertRaisesRegex(sync.Refused, "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED") as error:
+                    self.render()
+                self.assertNotIn(secret, str(error.exception))
+
     def test_honey_reordered_bound_cards_and_removed_unbound_card_keep_logical_bindings(self):
         name, value = self.honey()
         template = "config/dr-templates/honey/data/config/config.json.template"
@@ -634,6 +718,12 @@ class PublicExportTests(unittest.TestCase):
 
     def honey_with_discarded_public_brand(self):
         name, value = self.honey()
+        # This policy fixture needs an anonymized baseline even when production
+        # has since reviewed the application's public display name.
+        template = "config/dr-templates/honey/data/config/config.json.template"
+        reviewed = sync.loads(self.public[template])
+        reviewed["services"][2]["name"] = "Service 3"
+        self.public[template] = json.dumps(reviewed).encode()
         value["services"][2]["name"] = "Infisical"
         value["services"].insert(2, {"name": "Wud", "desc": "", "href": "http://wud:3000", "icon": ""})
         self.write(name, json.dumps(value).encode())
