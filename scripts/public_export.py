@@ -822,9 +822,10 @@ def yaml_comment_document(raw, destination, guard, name, sync):
             start += len(text[start:end].splitlines(keepends=True)[0])
         if start < end:
             spans.append((start, end))
-    comments, offset, span_index, previous_line = [], 0, 0, None
-    for line_index, line in enumerate(text.splitlines(keepends=True)):
+    blocks, current, offset, span_index = [], [], 0, 0
+    for line in text.splitlines(keepends=True):
         start = 0
+        comment = None
         while (position := line.find("#", start)) >= 0:
             absolute = offset + position
             while span_index < len(spans) and spans[span_index][1] <= absolute:
@@ -832,30 +833,49 @@ def yaml_comment_document(raw, destination, guard, name, sync):
             if span_index < len(spans) and spans[span_index][0] <= absolute < spans[span_index][1]:
                 start = position + 1
                 continue
-            if previous_line is not None and line_index > previous_line + 1:
-                comments.append("")
             # Retain indentation for standalone comments; discard the whole
             # active assignment prefix for inline comments, including secrets.
             prefix = line[:position] if not line[:position].strip() else ""
-            comments.append(prefix + line[position:].rstrip("\r\n"))
-            previous_line = line_index
+            comment = prefix + line[position:].rstrip("\r\n")
             break
+        if comment is not None:
+            current.append(comment)
+        elif not line.strip():
+            if current: current.append(line.rstrip("\r\n"))
+        elif current:
+            blocks.append(current)
+            current = []
         offset += len(line)
-    if not comments:
+    if current: blocks.append(current)
+    retained, omitted = [], 0
+    for block in blocks:
+        comment_text = "\n".join(block)
+        decommented = "\n".join(re.sub(r"^\s*#+\s?", "", line) for line in block)
+        safe = ("@@INFISICAL:" not in comment_text and "INFISICAL:/" not in comment_text
+                and guard.public_env_comment(decommented, name + ".comments.txt", ()))
+        if safe:
+            retained.append(comment_text.rstrip("\n"))
+        else:
+            # Omit the whole contiguous comment/blank block so a credential's
+            # unlabelled continuation cannot survive after its assignment.
+            omitted += 1
+    if not retained:
         return None
-    comment_text = "\n".join(comments) + "\n"
-    sync.require("@@INFISICAL:" not in comment_text and "INFISICAL:/" not in comment_text,
-                 "YAML_COMMENT_BINDING_REFUSED", name)
-    decommented = "\n".join(re.sub(r"^\s*#+\s?", "", line) for line in comments)
-    sync.require(guard.public_env_comment(decommented, name + ".comments.txt", ()),
-                 "YAML_PRIVATE_COMMENT_REFUSED", name)
+    comment_text = "\n\n".join(retained) + "\n"
+    # Removing active fields or an unsafe block can join fragments of a known
+    # multiline secret. Check the complete decommented projection as well as
+    # each block; omit the companion if that combined text is not public.
+    projection = "\n".join(re.sub(r"^\s*#+\s?", "", line) for line in comment_text.splitlines())
+    if not guard.public_env_comment(projection, name + ".comments.txt", ()):
+        return None
     # A source comment containing Markdown fences must remain inert text.
     fence = "`" * max(3, 1 + max((len(run) for run in re.findall(r"`+", comment_text)), default=0))
     destination = sync.relative(destination)
     document = ("# Commenti della configurazione YAML\n\n"
                 + "Origine: `" + destination + "`.\n\n"
                 + "Documentazione dei commenti originali; il ripristino usa il template JSON adiacente.\n"
-                + "I valori attivi della configurazione non sono inclusi in questo documento.\n\n"
+                + "I valori attivi della configurazione non sono inclusi in questo documento.\n"
+                + "Blocchi omessi: " + str(omitted) + " (materiale privato o esempi di credenziali).\n\n"
                 + fence + "text\n" + comment_text + fence + "\n")
     return guard.scan(document.encode("utf-8"), name)
 

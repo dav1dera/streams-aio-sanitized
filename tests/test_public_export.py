@@ -439,26 +439,64 @@ class ComposeEnvCorpusTests(unittest.TestCase):
         self.assertIsNone(export.yaml_comment_document(raw, "data/example/config.yaml", guard,
                                                       "example.yaml.comments.md", sync))
 
-    def test_yaml_comment_document_refuses_private_comments_and_every_binding_macro(self):
+    def test_yaml_comment_document_omits_private_blocks_and_preserves_other_public_blocks(self):
         guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
         comments = ["# PASSWORD=unmanaged_private_value", '# old {"API_KEY":"unmanaged"}',
                     "# SYNTHETIC_PRIVATE_VALUE", "# https://user:privatepass@example.invalid/path",
                     "# ghp_" + "A" * 36,
-                    "# PASSWORD='\n# unlabelled_private_continuation\n# '"]
+                    "# PASSWORD='\n\n# unlabelled_private_continuation\n\n# '"]
         for comment in comments:
             with self.subTest(comment_type=comments.index(comment)):
-                with self.assertRaisesRegex(sync.Refused, "YAML_PRIVATE_COMMENT_REFUSED") as error:
-                    export.yaml_comment_document((comment + "\nworkers: 4\n").encode(),
-                                                 "data/example/config.yaml", guard,
-                                                 "example.yaml.comments.md", sync)
-                self.assertNotIn("unmanaged_private_value", str(error.exception))
+                raw = ("# Public introduction\nfirst: 1\n" + comment
+                       + "\nworkers: 4\n# Public conclusion\nlast: 2\n").encode()
+                result = export.yaml_comment_document(raw, "data/example/config.yaml", guard,
+                                                      "example.yaml.comments.md", sync)
+                self.assertIn(b"# Public introduction", result)
+                self.assertIn(b"# Public conclusion", result)
+                self.assertIn(b"Blocchi omessi: 1 ", result)
+                self.assertNotIn(comment.encode(), result)
+                self.assertNotIn(b"unmanaged", result)
+                self.assertNotIn(b"unlabelled_private_continuation", result)
+                self.assertNotIn(b"SYNTHETIC_PRIVATE_VALUE", result)
+                self.assertEqual(guard.scan(result, "example.yaml.comments.md"), result)
+
+    def test_yaml_comment_document_omits_crossline_private_values_as_a_complete_block(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        guard.remember_literal("KNOWN_PRIVATE_FIRST\n\nKNOWN_PRIVATE_SECOND", None)
+        raw = (b"# KNOWN_PRIVATE_FIRST\n\n# KNOWN_PRIVATE_SECOND\nworkers: 4\n"
+               b"# Public documentation\nlast: 2\n")
+        result = export.yaml_comment_document(raw, "data/example/config.yaml", guard,
+                                              "example.yaml.comments.md", sync)
+        self.assertIn(b"# Public documentation", result)
+        self.assertIn(b"Blocchi omessi: 1 ", result)
+        self.assertNotIn(b"KNOWN_PRIVATE_FIRST", result)
+        self.assertNotIn(b"KNOWN_PRIVATE_SECOND", result)
+
+    def test_yaml_comment_document_omits_combined_private_projection_across_public_blocks(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        guard.remember_literal("KNOWN_PRIVATE_FIRST\n\nKNOWN_PRIVATE_SECOND", None)
+        for middle in (b"", b"# PASSWORD=unmanaged_private_example\nseparate: 3\n"):
+            with self.subTest(unsafe_intermediate_block=bool(middle)):
+                raw = (b"# KNOWN_PRIVATE_FIRST\nworkers: 4\n" + middle
+                       + b"# KNOWN_PRIVATE_SECOND\nlast: 2\n")
+                self.assertIsNone(export.yaml_comment_document(raw, "data/example/config.yaml", guard,
+                                                              "example.yaml.comments.md", sync))
+
+    def test_yaml_comment_document_omits_macro_blocks_and_is_absent_when_none_are_safe(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
         for comment in ("# @@INFISICAL:/synthetic/PRIVATE_TOKEN@@", "# @@INFISICAL:unfinished",
-                        "# INFISICAL:/synthetic/PRIVATE_TOKEN"):
+                        "# INFISICAL:/synthetic/PRIVATE_TOKEN", "# PASSWORD=unmanaged_private_value"):
             with self.subTest(binding_type=len(comment)):
-                with self.assertRaisesRegex(sync.Refused, "YAML_COMMENT_BINDING_REFUSED"):
-                    export.yaml_comment_document((comment + "\nworkers: 4\n").encode(),
-                                                 "data/example/config.yaml", guard,
-                                                 "example.yaml.comments.md", sync)
+                raw = (comment + "\n\n# private_continuation\nworkers: 4\n").encode()
+                self.assertIsNone(export.yaml_comment_document(raw, "data/example/config.yaml", guard,
+                                                              "example.yaml.comments.md", sync))
+                result = export.yaml_comment_document(raw + b"# Safe documentation\nlast: 2\n",
+                                                      "data/example/config.yaml", guard,
+                                                      "example.yaml.comments.md", sync)
+                self.assertIn(b"# Safe documentation", result)
+                self.assertIn(b"Blocchi omessi: 1 ", result)
+                self.assertNotIn(b"INFISICAL:", result)
+                self.assertNotIn(b"private_continuation", result)
 
 
 class PublicExportTests(unittest.TestCase):
@@ -1473,6 +1511,21 @@ class PublicExportTests(unittest.TestCase):
         changes = self.render()
         self.assertIn(companion, changes)
         self.assertIsNone(changes[companion])
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_yaml_comment_companion_is_removed_when_only_private_examples_remain(self):
+        name = "data/headplane/data/config.yaml"
+        companion = "config/dr-templates/headplane/data/config.yaml.template.comments.md"
+        self.apply(self.render())
+        self.assertIn(companion, self.public)
+        content = sync.yaml_load((self.source / name).read_bytes())
+        raw = b"# PASSWORD=unmanaged_private_example\n\n# private_continuation\n" + sync.yaml.safe_dump(content, sort_keys=False).encode()
+        self.write(name, raw)
+        changes = self.render()
+        self.assertIn(companion, changes)
+        self.assertIsNone(changes[companion])
+        self.assertEqual((self.source / name).read_bytes(), raw)
         self.apply(changes)
         self.assertEqual(self.render(), {})
 
