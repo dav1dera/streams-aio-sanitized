@@ -805,6 +805,61 @@ def live_json_template(item, data, sync):
     return sync.yaml_load(data) if item["destination"].endswith((".yaml", ".yml")) else sync.loads(data)
 
 
+def yaml_comment_document(raw, destination, guard, name, sync):
+    """Publish YAML documentation separately from the strict JSON DR template."""
+    text = decode(raw, sync, name)
+    sync.yaml_load(text)
+    # Scalar spans cover quoted/plain strings and complete block scalars. A '#'
+    # within one of them is application data, never documentation to publish.
+    spans = []
+    for token in sync.yaml.scan(text):
+        if not isinstance(token, sync.yaml.tokens.ScalarToken):
+            continue
+        start, end = token.start_mark.index, token.end_mark.index
+        if token.style in ("|", ">"):
+            # A block scalar's header may itself have a real YAML comment.
+            # Only its subsequent body lines contain application string data.
+            start += len(text[start:end].splitlines(keepends=True)[0])
+        if start < end:
+            spans.append((start, end))
+    comments, offset, span_index, previous_line = [], 0, 0, None
+    for line_index, line in enumerate(text.splitlines(keepends=True)):
+        start = 0
+        while (position := line.find("#", start)) >= 0:
+            absolute = offset + position
+            while span_index < len(spans) and spans[span_index][1] <= absolute:
+                span_index += 1
+            if span_index < len(spans) and spans[span_index][0] <= absolute < spans[span_index][1]:
+                start = position + 1
+                continue
+            if previous_line is not None and line_index > previous_line + 1:
+                comments.append("")
+            # Retain indentation for standalone comments; discard the whole
+            # active assignment prefix for inline comments, including secrets.
+            prefix = line[:position] if not line[:position].strip() else ""
+            comments.append(prefix + line[position:].rstrip("\r\n"))
+            previous_line = line_index
+            break
+        offset += len(line)
+    if not comments:
+        return None
+    comment_text = "\n".join(comments) + "\n"
+    sync.require("@@INFISICAL:" not in comment_text and "INFISICAL:/" not in comment_text,
+                 "YAML_COMMENT_BINDING_REFUSED", name)
+    decommented = "\n".join(re.sub(r"^\s*#+\s?", "", line) for line in comments)
+    sync.require(guard.public_env_comment(decommented, name + ".comments.txt", ()),
+                 "YAML_PRIVATE_COMMENT_REFUSED", name)
+    # A source comment containing Markdown fences must remain inert text.
+    fence = "`" * max(3, 1 + max((len(run) for run in re.findall(r"`+", comment_text)), default=0))
+    destination = sync.relative(destination)
+    document = ("# Commenti della configurazione YAML\n\n"
+                + "Origine: `" + destination + "`.\n\n"
+                + "Documentazione dei commenti originali; il ripristino usa il template JSON adiacente.\n"
+                + "I valori attivi della configurazione non sono inclusi in questo documento.\n\n"
+                + fence + "text\n" + comment_text + fence + "\n")
+    return guard.scan(document.encode("utf-8"), name)
+
+
 def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None):
     before, after = sync.loads(old), live_json_template(item, raw, sync)
     if item["destination"] != "data/honey/data/config/config.json":
@@ -1091,6 +1146,11 @@ def render(source, baseline, sync, image_reader=None):
                     if isinstance(row, dict) and row.get("type") == "hiddendata" and row.get("id") in {"cookieheader", "lasterror"}: row["value"] = ""
             result = guard.tree(a, b, name)
             data = (json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False) + "\n").encode()
+            if dest.endswith((".yaml", ".yml")):
+                companion = name + ".comments.md"
+                documentation = yaml_comment_document(raw, dest, guard, companion, sync)
+                if documentation is not None or companion in baseline:
+                    outputs[companion] = documentation
         elif item["format"] == "toml":
             data = toml_template(raw, guard.tree(sync.tomllib.loads(old.decode()), sync.tomllib.loads(raw.decode()), name),
                                  guard, name, sync)
@@ -1105,6 +1165,8 @@ def render(source, baseline, sync, image_reader=None):
         name = item.get("template")
         if name and name not in {i.get("template") for i in plan["files"]}:
             outputs[name] = None
+            if name + ".comments.md" in baseline:
+                outputs[name + ".comments.md"] = None
     active_refs = declared_refs(plan, sync)
     for item in plan["files"]:
         if item.get("template"): active_refs.update(sync.MARKER.findall(outputs[item["template"]].decode()))

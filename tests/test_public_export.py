@@ -407,6 +407,59 @@ class ComposeEnvCorpusTests(unittest.TestCase):
             with self.assertRaisesRegex(sync.Refused, "TOML_ROUNDTRIP_FAILED"):
                 export.toml_template(raw, {"workers": 4}, guard, "example.toml.template", sync)
 
+    def test_yaml_comment_document_excludes_active_values_and_hashes_inside_scalars(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        raw = ("# Public configuration à\r\n"
+               "private_token: SYNTHETIC_PRIVATE_VALUE # supplied by Agent\r\n"
+               "quoted: \"literal # PASSWORD=not_documentation\"\r\n"
+               "single: 'literal # API_KEY=not_documentation'\r\n"
+               "plain: https://example.invalid/path#not_documentation\r\n"
+               "block: | # block documentation\r\n  # PASSWORD=not_documentation\r\n  content\r\n"
+               "folded: >- # folded documentation\r\n  # PASSWORD=not_documentation\r\n"
+               "# ```\r\nitems:\r\n  - first # item documentation\r\n").encode()
+        name = "config/dr-templates/example.yaml.template.comments.md"
+        result = export.yaml_comment_document(raw, "data/example/config.yaml", guard, name, sync)
+        self.assertIn(b"Origine: `data/example/config.yaml`", result)
+        self.assertIn("# Public configuration à".encode(), result)
+        self.assertIn(b"# supplied by Agent", result)
+        self.assertIn(b"# item documentation", result)
+        self.assertIn(b"# block documentation", result)
+        self.assertIn(b"# folded documentation", result)
+        self.assertIn(b"````text\n", result)
+        self.assertTrue(result.endswith(b"````\n"))
+        self.assertNotIn(b"SYNTHETIC_PRIVATE_VALUE", result)
+        self.assertNotIn(b"not_documentation", result)
+        self.assertNotIn(b"private_token:", result)
+        self.assertNotIn(b"items:", result)
+        self.assertEqual(guard.scan(result, name), result)
+
+    def test_yaml_comment_document_is_absent_when_only_scalar_hashes_exist(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        raw = b'quoted: "# a string"\nblock: |\n  # still a string\n'
+        self.assertIsNone(export.yaml_comment_document(raw, "data/example/config.yaml", guard,
+                                                      "example.yaml.comments.md", sync))
+
+    def test_yaml_comment_document_refuses_private_comments_and_every_binding_macro(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        comments = ["# PASSWORD=unmanaged_private_value", '# old {"API_KEY":"unmanaged"}',
+                    "# SYNTHETIC_PRIVATE_VALUE", "# https://user:privatepass@example.invalid/path",
+                    "# ghp_" + "A" * 36,
+                    "# PASSWORD='\n# unlabelled_private_continuation\n# '"]
+        for comment in comments:
+            with self.subTest(comment_type=comments.index(comment)):
+                with self.assertRaisesRegex(sync.Refused, "YAML_PRIVATE_COMMENT_REFUSED") as error:
+                    export.yaml_comment_document((comment + "\nworkers: 4\n").encode(),
+                                                 "data/example/config.yaml", guard,
+                                                 "example.yaml.comments.md", sync)
+                self.assertNotIn("unmanaged_private_value", str(error.exception))
+        for comment in ("# @@INFISICAL:/synthetic/PRIVATE_TOKEN@@", "# @@INFISICAL:unfinished",
+                        "# INFISICAL:/synthetic/PRIVATE_TOKEN"):
+            with self.subTest(binding_type=len(comment)):
+                with self.assertRaisesRegex(sync.Refused, "YAML_COMMENT_BINDING_REFUSED"):
+                    export.yaml_comment_document((comment + "\nworkers: 4\n").encode(),
+                                                 "data/example/config.yaml", guard,
+                                                 "example.yaml.comments.md", sync)
+
 
 class PublicExportTests(unittest.TestCase):
     def repository_url_guard(self):
@@ -1390,6 +1443,49 @@ class PublicExportTests(unittest.TestCase):
                          set(sync.MARKER.findall(self.public[template].decode())))
         self.assertNotIn(b"SYNTHETIC_PRIVATE_", result)
         self.assertEqual((self.source / name).read_bytes(), raw)
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_yaml_comments_are_documented_without_changing_json_restore_templates_or_source(self):
+        name = "data/headplane/data/config.yaml"
+        template = "config/dr-templates/headplane/data/config.yaml.template"
+        companion = template + ".comments.md"
+        raw = b"# Headplane configuration documentation\n\n" + (self.source / name).read_bytes()
+        self.write(name, raw)
+        changes = self.render()
+        self.assertIn(b"# Headplane configuration documentation", changes[companion])
+        self.assertEqual(sync.loads(changes.get(template, self.public[template])), sync.loads(self.public[template]))
+        self.assertEqual(set(sync.MARKER.findall(changes.get(template, self.public[template]).decode())),
+                         set(sync.MARKER.findall(self.public[template].decode())))
+        self.assertEqual((self.source / name).read_bytes(), raw)
+        self.assertFalse(any(re.search(rb"SYNTHETIC_PRIVATE_[a-f0-9]{64}", value)
+                             for value in changes.values() if value))
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_yaml_comment_companion_is_removed_when_source_comments_are_removed(self):
+        name = "data/headplane/data/config.yaml"
+        companion = "config/dr-templates/headplane/data/config.yaml.template.comments.md"
+        self.apply(self.render())
+        self.assertIn(companion, self.public)
+        content = sync.yaml_load((self.source / name).read_bytes())
+        self.write(name, sync.yaml.safe_dump(content, sort_keys=False).encode())
+        changes = self.render()
+        self.assertIn(companion, changes)
+        self.assertIsNone(changes[companion])
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_yaml_comment_companion_is_removed_with_its_retired_template(self):
+        template = "config/dr-templates/headplane/data/config.yaml.template"
+        companion = template + ".comments.md"
+        self.apply(self.render())
+        self.assertIn(companion, self.public)
+        self.compose(lambda rows: (rows.pop("oauth2-proxy"), rows.pop("headplane")))
+        changes = self.render()
+        self.assertIsNone(changes[template])
+        self.assertIn(companion, changes)
+        self.assertIsNone(changes[companion])
         self.apply(changes)
         self.assertEqual(self.render(), {})
 
