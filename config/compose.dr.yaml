@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:405d14d11aa03baaaa1203bd5a7704b03b055d0153e19ae0105ddafbd29781fb",
+      "image": "ghcr.io/viren070/aiostreams@sha256:801891339202523fa13aaf3ec00f98063853fde65d1382cc8ddc94e6f362f3a6",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -80,11 +80,11 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:f66810d4af0727d38c40108ce8cf2d23aded06fa4a534fe593f93ee070ae9c8c",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:e74309377a605fbb8996e74699a01a559ad2e5ec4667586b3d1ed8a5a01ec6ab",
       "platform": "linux/amd64"
     },
     "streamvix": {
-      "image": "qwertyuiop8899/streamvix@sha256:8ac6ace2fe07004f997f6d6451c5f77ef3870f6f5bcc3abd9420e9fc40542134",
+      "image": "qwertyuiop8899/streamvix@sha256:20469eff979b1ee03445a5a6ae8642b1a17a7b742a37e2f63392e05d5a1e0597",
       "platform": "linux/amd64"
     },
     "tvvoo": {
@@ -92,7 +92,7 @@
       "platform": "linux/amd64"
     },
     "aiomanager": {
-      "image": "ghcr.io/sonicx161/aiomanager@sha256:6624ccae7767015914bbdbb238b4ed8723c37786d530e47127e2d9d021ddef13",
+      "image": "ghcr.io/sonicx161/aiomanager@sha256:d2ea5849ade8e755d6990f57548b85c430184482fe14e3016824ed5b71aaab41",
       "platform": "linux/amd64"
     },
     "deunhealth": {
