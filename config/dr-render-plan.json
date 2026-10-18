@@ -160,10 +160,6 @@
         "path": "/cometnet",
         "key": "DATABASE_URL"
       },
-      "COMETNET_BOOTSTRAP_NODES": {
-        "path": "/cometnet",
-        "key": "COMETNET_BOOTSTRAP_NODES"
-      },
       "COMETNET_ADVERTISE_URL": {
         "path": "/cometnet",
         "key": "COMETNET_ADVERTISE_URL"
@@ -875,7 +871,6 @@
     "/comet/PROXY_DEBRID_STREAM_PASSWORD",
     "/comet/STREMTHRU_SCRAPE_URL",
     "/cometnet/COMETNET_ADVERTISE_URL",
-    "/cometnet/COMETNET_BOOTSTRAP_NODES",
     "/cometnet/DATABASE_URL",
     "/dnscrypt-proxy/MONITORING_UI_PASSWORD",
     "/dr/AIO_PROFILE_BINDINGS",

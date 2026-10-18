@@ -955,7 +955,6 @@
       ],
       "INFISICAL_PATHS": [
         "/cometnet/COMETNET_ADVERTISE_URL",
-        "/cometnet/COMETNET_BOOTSTRAP_NODES",
         "/cometnet/COMETNET_NODE_ALIAS",
         "/cometnet/DATABASE_URL",
         "/shared/COMET_PUBLIC_API_TOKEN"
