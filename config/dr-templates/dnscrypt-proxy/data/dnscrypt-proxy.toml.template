@@ -132,7 +132,7 @@ http3_probe = false
 ## Note: the random username and password used by dnscrypt-proxy should not
 ## actually be defined in Tor's configuration.
 
-# Proxy authentication credentials must be supplied privately through Infisical.
+# Proxy authentication credentials must be supplied through the private configuration.
 
 
 ## HTTP/HTTPS proxy
@@ -386,7 +386,7 @@ netprobe_address = '9.9.9.9:53'
 ## encrypted-dns-server can be configured to use this for access control
 ## in the [access_control] section
 
-# token must be supplied privately through Infisical.
+# token must be supplied through the private configuration.
 
 
 ###############################################################################
