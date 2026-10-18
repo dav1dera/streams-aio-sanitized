@@ -330,6 +330,83 @@ class ComposeEnvCorpusTests(unittest.TestCase):
         with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
             guard.env(b"TITLE=SYNTHETIC_PRIVATE_VALUE\n", "data/example/.env")
 
+    def test_toml_template_preserves_comments_tables_arrays_and_public_string_styles(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        name = "config/dr-templates/example.toml.template"
+        raw = ("# Public listener settings\r\n\r\n# enabled = false\r\nenabled = true # listener switch\r\n"
+               "title = 'public # title'\r\nmessage = \"\"\"public multiline\r\n# PASSWORD=public prose in a string\r\n\"\"\"\r\n"
+               "servers = [\r\n  'first', # first server\r\n  'second',\r\n]\r\n"
+               "[routing] # routing table\r\ndotted.value = 4\r\ninline = { retries = 3, mode = 'auto' }\r\n"
+               "[[routing.nodes]] # first node\r\nname = 'node-one' # display name\r\n").encode()
+        expected = sync.tomllib.loads(raw.decode())
+        result = export.toml_template(raw, expected, guard, name, sync)
+        self.assertEqual(result, raw)
+        self.assertEqual(guard.scan(result, name), result)
+
+    def test_toml_template_masks_only_private_scalar_leaves_and_retains_comment_trivia(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        name = "config/dr-templates/example.toml.template"
+        marker = "@@INFISICAL:/synthetic/PRIVATE_TOKEN@@"
+        raw = ("# Public configuration\nprivate_token = 'SYNTHETIC_PRIVATE_VALUE' # supplied by Agent\n"
+               "tokens = [\n 'SYNTHETIC_PRIVATE_VALUE', # first entry\n 'public',\n]\n"
+               "config = { private_token = 'SYNTHETIC_PRIVATE_VALUE', workers = 4 } # public limits\n"
+               "[[nodes]] # node settings\nprivate_token = 'SYNTHETIC_PRIVATE_VALUE'\n").encode()
+        expected = sync.tomllib.loads(raw.decode())
+        expected["private_token"] = marker
+        expected["tokens"][0] = marker
+        expected["config"]["private_token"] = marker
+        expected["nodes"][0]["private_token"] = marker
+        result = export.toml_template(raw, expected, guard, name, sync)
+        self.assertEqual(sync.tomllib.loads(result.decode()), expected)
+        self.assertNotIn(b"SYNTHETIC_PRIVATE_VALUE", result)
+        for comment in (b"# supplied by Agent", b"# first entry", b"# public limits", b"# node settings"):
+            self.assertIn(comment, result)
+        self.assertIn(b"'public'", result)
+        self.assertIn(b"workers = 4", result)
+        self.assertEqual(set(sync.MARKER.findall(result.decode())), {"/synthetic/PRIVATE_TOKEN"})
+        self.assertEqual(guard.scan(result, name), result)
+
+    def test_toml_template_private_comments_refused_in_all_comment_locations(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        name = "config/dr-templates/example.toml.template"
+        examples = [
+            '# old {"PASSWORD":"unmanaged_private_value"}\nworkers = 4\n',
+            "# PASSWORD='\n# unlabelled_private_continuation\n# '\nworkers = 4\n",
+            "workers = 4 # SYNTHETIC_PRIVATE_VALUE\n",
+            "workers = 4 # ghp_" + "A" * 36 + "\n",
+            "values = [\n  1, # API_KEY=unmanaged_private_value\n  2,\n]\n",
+            "[routing] # password: unmanaged_private_value\nworkers = 4\n",
+            "[[nodes]] # https://user:privatepass@example.invalid/path\nworkers = 4\n",
+            "# ${PASSWORD:-unmanaged_private_value}\nworkers = 4\n",
+        ]
+        for example in examples:
+            with self.subTest(location=examples.index(example)):
+                with self.assertRaisesRegex(sync.Refused, "TOML_PRIVATE_COMMENT_REFUSED") as error:
+                    export.toml_template(example.encode(), sync.tomllib.loads(example), guard, name, sync)
+                self.assertNotIn("SYNTHETIC_PRIVATE_VALUE", str(error.exception))
+
+    def test_toml_template_refuses_new_or_repeated_binding_in_comments(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        examples = [
+            (b"# @@INFISICAL:/synthetic/UNDECLARED@@\nworkers = 4\n", {"workers": 4}),
+            (b'# @@INFISICAL:/synthetic/PRIVATE_TOKEN@@\nprivate_token = "SYNTHETIC_PRIVATE_VALUE"\n',
+             {"private_token": "@@INFISICAL:/synthetic/PRIVATE_TOKEN@@"}),
+        ]
+        for raw, expected in examples:
+            with self.subTest(input_length=len(raw)):
+                with self.assertRaisesRegex(sync.Refused, "TOML_BINDING_INVENTORY_CHANGED"):
+                    export.toml_template(raw, expected, guard, "example.toml.template", sync)
+
+    def test_toml_template_refuses_structure_guessing_and_failed_semantic_roundtrip(self):
+        import tomlkit
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        raw = b"# Public settings\nworkers = 4\n"
+        with self.assertRaisesRegex(sync.Refused, "TOML_STRUCTURE_CHANGED"):
+            export.toml_template(raw, {"replacement": 4}, guard, "example.toml.template", sync)
+        with mock.patch.object(tomlkit, "dumps", side_effect=[raw.decode(), "workers = 8\n"]):
+            with self.assertRaisesRegex(sync.Refused, "TOML_ROUNDTRIP_FAILED"):
+                export.toml_template(raw, {"workers": 4}, guard, "example.toml.template", sync)
+
 
 class PublicExportTests(unittest.TestCase):
     def repository_url_guard(self):
@@ -1290,6 +1367,29 @@ class PublicExportTests(unittest.TestCase):
         self.assertEqual(changes[name], raw)
         self.assertEqual((self.source / name).read_bytes(), raw)
         self.assertEqual(sync.env_values(changes[name]), sync.env_values(self.public[name]))
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+
+    def test_toml_layout_new_and_removed_public_keys_keep_private_bindings_and_are_idempotent(self):
+        import tomlkit
+        name = "data/dnscrypt-proxy/data/dnscrypt-proxy.toml"
+        template = "config/dr-templates/dnscrypt-proxy/data/dnscrypt-proxy.toml.template"
+        document = tomlkit.parse((self.source / name).read_text(encoding="utf-8"))
+        del document["cache"]
+        document["new_public_option"] = tomlkit.item(5).comment("public option documentation")
+        raw = ("# DNS listener documentation\n\n# cache = false\n" + tomlkit.dumps(document)).encode()
+        self.write(name, raw)
+        changes = self.render()
+        result = changes[template]
+        parsed = sync.tomllib.loads(result.decode())
+        self.assertEqual(parsed["new_public_option"], 5)
+        self.assertNotIn("cache", parsed)
+        self.assertIn(b"# DNS listener documentation\n\n# cache = false\n", result)
+        self.assertIn(b"# public option documentation", result)
+        self.assertEqual(set(sync.MARKER.findall(result.decode())),
+                         set(sync.MARKER.findall(self.public[template].decode())))
+        self.assertNotIn(b"SYNTHETIC_PRIVATE_", result)
+        self.assertEqual((self.source / name).read_bytes(), raw)
         self.apply(changes)
         self.assertEqual(self.render(), {})
 

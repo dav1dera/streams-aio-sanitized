@@ -699,6 +699,75 @@ def toml_dump(value, sync):
     return data
 
 
+def toml_template(raw, value, guard, name, sync):
+    """Mask private leaves in the parsed live document without rebuilding it."""
+    import tomlkit
+    from tomlkit.container import Container
+    from tomlkit.items import AbstractTable, AoT, Array, Item, Whitespace
+
+    document = tomlkit.parse(raw.decode("utf-8"))
+    original = sync.tomllib.loads(raw.decode("utf-8"))
+    sync.require(sync.tomllib.loads(tomlkit.dumps(document)) == original,
+                 "TOML_PARSER_DISAGREEMENT", name)
+
+    def overlay(target, actual, expected):
+        if isinstance(expected, dict):
+            sync.require(isinstance(actual, dict) and set(target) == set(actual) == set(expected),
+                         "TOML_STRUCTURE_CHANGED", name)
+            entries = expected.items()
+        else:
+            sync.require(isinstance(actual, list) and isinstance(expected, list)
+                         and len(target) == len(actual) == len(expected),
+                         "TOML_STRUCTURE_CHANGED", name)
+            entries = enumerate(expected)
+        for key, replacement in entries:
+            if isinstance(replacement, (dict, list)):
+                overlay(target[key], actual[key], replacement)
+                continue
+            # tomllib is authoritative for semantic values (including CRLF
+            # normalization inside multiline strings); leave unchanged syntax
+            # nodes alone even when tomlkit's unwrap representation differs.
+            if type(actual[key]) is not type(replacement) or actual[key] != replacement:
+                target[key] = tomlkit.item(replacement)
+
+    overlay(document, original, value)
+
+    def comments(node):
+        if isinstance(node, Container):
+            for _, child in node.body:
+                yield from comments(child)
+            return
+        if not isinstance(node, Item) or isinstance(node, Whitespace):
+            return
+        if node.trivia.comment:
+            yield re.sub(r"^\s*#+\s?", "", node.trivia.comment)
+        if isinstance(node, AbstractTable):
+            yield from comments(node.value)
+        elif isinstance(node, AoT):
+            for child in node.body:
+                yield from comments(child)
+        elif isinstance(node, Array):
+            # tomlkit is pinned: this iterator includes array comments and
+            # whitespace, which the ordinary value iterator intentionally omits.
+            for child in node._iter_items():
+                yield from comments(child)
+
+    comment_text = "\n".join(comments(document))
+    # The restore renderer expands markers in raw template bytes, including
+    # comments. A repeated reference here would create a new secret location
+    # even when the set of references already exists in ordinary values.
+    sync.require(not sync.MARKER.search(comment_text), "TOML_BINDING_INVENTORY_CHANGED", name)
+    sync.require(guard.public_env_comment(comment_text, name + ".comments.txt", ()),
+                 "TOML_PRIVATE_COMMENT_REFUSED", name)
+    data = tomlkit.dumps(document).encode("utf-8")
+    sync.require(sync.tomllib.loads(data.decode("utf-8")) == value,
+                 "TOML_ROUNDTRIP_FAILED", name)
+    expected_bindings = set(sync.MARKER.findall(json.dumps(value, ensure_ascii=False, allow_nan=False)))
+    sync.require(set(sync.MARKER.findall(data.decode("utf-8"))) == expected_bindings,
+                 "TOML_BINDING_INVENTORY_CHANGED", name)
+    return data
+
+
 def restore_waves(compose, sync):
     dependencies = {}
     for service, row in compose["services"].items():
@@ -1023,7 +1092,8 @@ def render(source, baseline, sync, image_reader=None):
             result = guard.tree(a, b, name)
             data = (json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False) + "\n").encode()
         elif item["format"] == "toml":
-            data = toml_dump(guard.tree(sync.tomllib.loads(old.decode()), sync.tomllib.loads(raw.decode()), name), sync)
+            data = toml_template(raw, guard.tree(sync.tomllib.loads(old.decode()), sync.tomllib.loads(raw.decode()), name),
+                                 guard, name, sync)
         elif item["format"] == "ini-token":
             data = old  # Private-only Cloudflare token input; public template remains canonical.
         else:
