@@ -74,6 +74,67 @@ def fixture(root, public):
     return write
 
 
+class RuntimeImageReferenceTests(unittest.TestCase):
+    def images(self, declared, observed):
+        source = Path("/synthetic/stack")
+        image_id = "sha256:" + "a" * 64
+        digest = "sha256:" + "b" * 64
+        calls = []
+
+        def run(args):
+            calls.append(args)
+            if args[1] == "ps":
+                return b"123456789abc\n"
+            if args[1] == "inspect":
+                return (" ".join(json.dumps(value) for value in
+                                 ("streamvix", image_id, observed)) + "\n").encode()
+            self.assertEqual(args[:3], ["docker", "image", "inspect"])
+            self.assertEqual(args[-1], image_id)
+            return json.dumps({"RepoDigests": [sync.image_repository(declared) + "@" + digest],
+                               "Os": "linux", "Architecture": "amd64"}).encode()
+
+        with mock.patch.object(sync, "run", side_effect=run):
+            result = export.dynamic_images(source, {"services": {"streamvix": {"image": declared}}}, {}, sync)
+        self.assertNotIn(".Config.Env", str(calls))
+        self.assertFalse(any("pull" in args or "exec" in args for args in calls))
+        return result["streamvix"]
+
+    def test_wud_docker_hub_hostname_alias_keeps_exact_image_id_and_compose_reference(self):
+        declared = "qwertyuiop8899/streamvix:latest"
+        result = self.images(declared, "docker.io/" + declared)
+        self.assertEqual(result["configured_image"], declared)
+        self.assertEqual(result["image"], "qwertyuiop8899/streamvix@sha256:" + "b" * 64)
+
+    def test_docker_hub_aliases_library_and_default_latest_are_equivalent(self):
+        pairs = [
+            ("docker.io/example/app:Beta", "example/app:Beta"),
+            ("example/app:latest", "index.docker.io/example/app:latest"),
+            ("redis", "docker.io/library/redis:latest"),
+            ("library/redis:latest", "index.docker.io/redis"),
+            ("example/app:latest", "example/app:latest"),
+            ("example/app@sha256:" + "b" * 64, "docker.io/example/app@sha256:" + "b" * 64),
+        ]
+        for declared, observed in pairs:
+            with self.subTest(declared=declared, observed=observed):
+                self.assertEqual(self.images(declared, observed)["configured_image"], declared)
+
+    def test_changed_tag_repository_registry_digest_or_image_id_still_refused(self):
+        pairs = [
+            ("example/app:latest", "docker.io/example/app:previous"),
+            ("example/app:Beta", "docker.io/example/app:beta"),
+            ("example/app:latest", "docker.io/other/app:latest"),
+            ("example/app:latest", "ghcr.io/example/app:latest"),
+            ("example/app:latest", "registry-1.docker.io/example/app:latest"),
+            ("example/app:latest", "docker.io/example/app@sha256:" + "b" * 64),
+            ("example/app@sha256:" + "b" * 64, "docker.io/example/app@sha256:" + "c" * 64),
+            ("example/app:latest", "sha256:" + "a" * 64),
+        ]
+        for declared, observed in pairs:
+            with self.subTest(declared=declared, observed=observed):
+                with self.assertRaisesRegex(sync.Refused, "COMPOSE_IMAGE_NOT_APPLIED"):
+                    self.images(declared, observed)
+
+
 class ComposeYamlTests(unittest.TestCase):
     def test_formatting_preserves_data_order_and_only_flows_service_profiles(self):
         profiles = ["all", "vpn"]

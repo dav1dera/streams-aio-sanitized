@@ -560,6 +560,18 @@ class Guard:
         return self.scan(("\n".join(result) + "\n").encode(), name)
 
 
+def image_reference_identity(value, sync):
+    repository = sync.image_repository(value)
+    if "@" in value:
+        selector = ("digest", value.partition("@")[2])
+    else:
+        selector = ("tag", value[len(repository) + 1:] if len(value) > len(repository) else "latest")
+    # Docker/WUD may add Docker Hub's canonical hostname to Config.Image.
+    # Normalize only the repository aliases already accepted for RepoDigests;
+    # preserve the tag (including case) or digest, and never equate the two.
+    return (sync.docker_repository_identity(repository), *selector)
+
+
 def dynamic_images(source, compose, old, sync):
     ids = sync.run(["docker", "ps", "-aq", "--filter", "label=com.docker.compose.project.working_dir=" + str(source)]).decode().split()
     running = {}
@@ -575,7 +587,9 @@ def dynamic_images(source, compose, old, sync):
         service, image, configured = values
         if service not in compose["services"]:
             continue  # A removed service can leave an orphan without becoming part of recovery.
-        sync.require(configured == compose["services"][service]["image"], "COMPOSE_IMAGE_NOT_APPLIED", service)
+        sync.require(image_reference_identity(configured, sync) ==
+                     image_reference_identity(compose["services"][service]["image"], sync),
+                     "COMPOSE_IMAGE_NOT_APPLIED", service)
         sync.require(service not in running or running[service] == image, "MIXED_SERVICE_IMAGES")
         running[service] = image
     result = {}
