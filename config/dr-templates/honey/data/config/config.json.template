@@ -26,6 +26,12 @@
       "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/proxmox-backup-server.svg"
     },
     {
+      "name": "Wud",
+      "desc": "Docker updater",
+      "href": "http://192.168.178.11:3001/",
+      "icon": ""
+    },
+    {
       "name": "Infisical",
       "desc": "",
       "href": "#",
@@ -116,9 +122,9 @@
       "icon": ""
     },
     {
-      "name": "Service 18",
-      "desc": "",
-      "href": "#",
+      "name": "Seanime Shared",
+      "desc": "Shared Seanime",
+      "href": "https://shared-seanime.self-stremiopi.org/",
       "icon": ""
     },
     {
@@ -134,7 +140,7 @@
       "icon": ""
     },
     {
-      "name": "Service 21",
+      "name": "Service 22",
       "desc": "",
       "href": "#",
       "icon": ""
