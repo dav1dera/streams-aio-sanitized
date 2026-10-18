@@ -1,0 +1,149 @@
+{
+  "ui": {
+    "name": "honey",
+    "desc": "",
+    "icon": "",
+    "wallpaper": "img/background.jpg",
+    "wallpaper_dark": "img/background-dark.jpg",
+    "dark_mode": "Auto",
+    "open_new_tab": false,
+    "ping_dots": false,
+    "blur": true,
+    "animations": true,
+    "trusted_domains": []
+  },
+  "services": [
+    {
+      "name": "Service 1",
+      "desc": "",
+      "href": "https://public.example/service-0",
+      "icon": "https://public.example/icon-0.svg"
+    },
+    {
+      "name": "Service 2",
+      "desc": "",
+      "href": "https://public.example/service-1",
+      "icon": "https://public.example/icon-1.svg"
+    },
+    {
+      "name": "Infisical",
+      "desc": "",
+      "href": "#",
+      "icon": "https://public.example/icon-2.svg"
+    },
+    {
+      "name": "Portainer",
+      "desc": "",
+      "href": "https://public.example/service-3",
+      "icon": "https://public.example/icon-3.svg"
+    },
+    {
+      "name": "Aiostreams",
+      "desc": "",
+      "href": "#",
+      "icon": "@@INFISICAL:/honey/SERVICES_4_ICON@@"
+    },
+    {
+      "name": "AIOManager",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_5_HREF@@",
+      "icon": "https://public.example/icon-5.svg"
+    },
+    {
+      "name": "Aiometadata",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_6_HREF@@",
+      "icon": "@@INFISICAL:/honey/SERVICES_6_ICON@@"
+    },
+    {
+      "name": "Service 8",
+      "desc": "",
+      "href": "https://public.example/service-7",
+      "icon": "https://public.example/icon-7.svg"
+    },
+    {
+      "name": "Comet",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_8_HREF@@",
+      "icon": "https://public.example/icon-8.svg"
+    },
+    {
+      "name": "Headplane",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_9_HREF@@",
+      "icon": "https://public.example/icon-9.svg"
+    },
+    {
+      "name": "Jackett",
+      "desc": "",
+      "href": "https://public.example/service-10",
+      "icon": "@@INFISICAL:/honey/SERVICES_10_ICON@@"
+    },
+    {
+      "name": "Service 12",
+      "desc": "",
+      "href": "https://public.example/service-11",
+      "icon": "@@INFISICAL:/honey/SERVICES_11_ICON@@"
+    },
+    {
+      "name": "EasyProxy Proxy",
+      "desc": "",
+      "href": "@@INFISICAL:/honey/SERVICES_12_HREF@@",
+      "icon": ""
+    },
+    {
+      "name": "Service 14",
+      "desc": "",
+      "href": "https://public.example/service-13",
+      "icon": "https://public.example/icon-13.svg"
+    },
+    {
+      "name": "Stremthru",
+      "desc": "",
+      "href": "https://public.example/service-14",
+      "icon": "https://public.example/icon-14.svg"
+    },
+    {
+      "name": "Service 16",
+      "desc": "dnscrypt-proxy",
+      "href": "https://public.example/service-15",
+      "icon": "https://public.example/icon-15.svg"
+    },
+    {
+      "name": "Seanime",
+      "desc": "",
+      "href": "#",
+      "icon": ""
+    },
+    {
+      "name": "Service 18",
+      "desc": "",
+      "href": "#",
+      "icon": ""
+    },
+    {
+      "name": "StreamViX",
+      "desc": "",
+      "href": "#",
+      "icon": "https://public.example/icon-18.svg"
+    },
+    {
+      "name": "Tvvoo",
+      "desc": "",
+      "href": "#",
+      "icon": ""
+    },
+    {
+      "name": "Service 21",
+      "desc": "",
+      "href": "#",
+      "icon": ""
+    },
+    {
+      "name": "Service 22",
+      "desc": "",
+      "href": "https://public.example/service-21",
+      "icon": "https://public.example/icon-21.svg"
+    }
+  ]
+}

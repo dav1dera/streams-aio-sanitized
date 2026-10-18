@@ -48,6 +48,21 @@ def fixture(root, public):
     compose = sync.yaml_load(public["docker-compose.yml"])
     destinations = {r["destination"] for r in plan["files"]}
     for row in compose["services"].values():
+        entries = row.get("env_file", [])
+        if isinstance(entries, (str, dict)): entries = [entries]
+        for entry in entries:
+            if isinstance(entry, dict) and entry.get("required") is False: continue
+            name = entry if isinstance(entry, str) else entry.get("path", "")
+            name = name.removeprefix("./")
+            if not name.startswith(".secrets/"): continue
+            sync.relative(name)
+            sync.require(re.fullmatch(r"\.secrets/[A-Za-z0-9][A-Za-z0-9_.-]*\.env", name), "UNSAFE_PATH")
+            path = root / name
+            sync.safe_path(path)
+            if not path.exists():
+                # The restored Agent owns this target; a synthetic ENV value
+                # supplies fixture input without inventing an Infisical folder.
+                write(name, ("SYNTHETIC_AGENT_TOKEN=" + secret("agent-target:" + name) + "\n").encode())
         for kind, name, target, mode in export.mounts(row, sync):
             if kind != "bind" or name.startswith("/"): continue
             if name in destinations or name in public:
@@ -256,6 +271,11 @@ class PublicExportTests(unittest.TestCase):
         self.source = self.root / "live"
         self.source.mkdir()
         self.public = baseline()
+        self.honey_template = "config/dr-templates/honey/data/config/config.json.template"
+        self.published_honey = self.public[self.honey_template]
+        # Positional mutation tests exercise a fixed historical layout, not
+        # whichever dashboard the automatic exporter most recently published.
+        self.public[self.honey_template] = (ROOT / "tests/fixtures/honey-layout-22.json").read_bytes()
         for name in ("config/dr-manifest.yaml", ".gitignore"):
             self.public[name] = (ROOT / name).read_bytes()
         self.write = fixture(self.source, self.public)
@@ -391,6 +411,40 @@ class PublicExportTests(unittest.TestCase):
         self.assertIn(b"NEW_OPTION=balanced", changes["data/mediafusion/.env"])
         self.assertFalse(any(b"SYNTHETIC_NEW_PRIVATE_KEY" in v for v in changes.values() if v))
 
+    def test_published_service_with_agent_only_env_targets_has_safe_synthetic_inputs(self):
+        targets = [".secrets/agent-string.env", ".secrets/agent-long.env"]
+        optional = ".secrets/agent-optional.env"
+        compose = sync.yaml_load(self.public["docker-compose.yml"])
+        compose["services"]["agent-example"] = {"image": "example/new:1", "env_file": [
+            "./data/agent-example/.env", "./" + targets[0], {"path": "./" + targets[1]},
+            {"path": "./" + optional, "required": False}]}
+        self.public["docker-compose.yml"] = sync.yaml.safe_dump(compose, sort_keys=False).encode()
+        self.public["data/agent-example/.env"] = b"WORKERS=4\n"
+        known = (self.source / ".secrets/comet.env").read_bytes()
+        self.write = fixture(self.source, self.public)
+        self.assertEqual((self.source / ".secrets/comet.env").read_bytes(), known)
+        self.assertFalse((self.source / optional).exists())
+        synthetic = [next(iter(sync.env_values((self.source / name).read_bytes()).values())) for name in targets]
+        self.assertTrue(all(value.startswith("SYNTHETIC_PRIVATE_") for value in synthetic))
+        changes = self.render()
+        layout = sync.loads(changes[export.LAYOUT])
+        component = sync.loads(changes["config/dr-manifest.yaml"])["components"]["agent-example"]
+        plan = sync.loads(changes.get("config/dr-render-plan.json", self.public["config/dr-render-plan.json"]))
+        for name in targets:
+            self.assertIn(name, layout["private_env_targets_from_restored_agent"])
+            self.assertIn(name, component["GENERATED_FILES"])
+            self.assertNotIn(name, plan["env_files"])
+            self.assertNotIn(name, plan["service_folder_exports"])
+        self.assertNotIn(optional, layout["private_env_targets"])
+        self.assertFalse(any(value.encode() in data for value in synthetic for data in changes.values() if data))
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
+        compose["services"]["agent-example"]["env_file"].append("./.secrets/../escaped.env")
+        unsafe = dict(self.public, **{"docker-compose.yml": sync.yaml.safe_dump(compose).encode()})
+        with self.assertRaisesRegex(sync.Refused, "UNSAFE_PATH"):
+            fixture(self.source, unsafe)
+        self.assertFalse((self.source / "escaped.env").exists())
+
     def test_service_removal_deletes_public_env_templates_and_image_lock(self):
         self.compose(lambda rows: rows.pop("jackett"))
         changes = self.render()
@@ -450,6 +504,24 @@ class PublicExportTests(unittest.TestCase):
     def honey(self):
         name = "data/honey/data/config/config.json"
         return name, sync.loads((self.source / name).read_bytes())
+
+    def test_honey_current_published_layout_preserves_bindings_and_is_idempotent(self):
+        self.public[self.honey_template] = self.published_honey
+        self.write = fixture(self.source, self.public)
+        reviewed = sync.loads(self.published_honey)
+        changes = self.render()
+        result = changes.get(self.honey_template, self.published_honey)
+        rendered = sync.loads(result)
+        self.assertEqual(len(rendered["services"]), len(reviewed["services"]))
+        self.assertEqual(Counter(sync.MARKER.findall(result.decode())),
+                         Counter(sync.MARKER.findall(self.published_honey.decode())))
+        for index, row in enumerate(reviewed["services"]):
+            for field, value in row.items():
+                if isinstance(value, str) and sync.MARKER.search(value):
+                    self.assertEqual(rendered["services"][index][field], value)
+        self.assertNotIn(b"SYNTHETIC_PRIVATE_", result)
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
 
     def test_honey_anonymized_names_keep_all_positional_private_bindings(self):
         name, value = self.honey()
