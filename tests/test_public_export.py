@@ -253,6 +253,83 @@ class ComposeEnvCorpusTests(unittest.TestCase):
         text = b"The input is ${PRIVATE_REFERENCE_NAME}.\n"
         self.assertEqual(guard.scan(text, "docs/reference.md"), text)
 
+    def test_public_env_preserves_comments_blank_lines_order_and_disabled_public_settings(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        raw = ("# Worker settings\r\n\r\n# WORKERS=8\r\nWORKERS=4  \r\n"
+               "# Public option\r\nLOG_LEVEL=\"info\" # normal logging\r\n\r\n"
+               "TITLE='public # title'\r\n").encode()
+        self.assertEqual(guard.env(raw, "data/example/.env"), raw)
+
+    def test_private_env_assignment_is_omitted_and_public_values_are_preserved(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        raw = b"# Public settings\nWORKERS=4\nPRIVATE_TOKEN=SYNTHETIC_PRIVATE_VALUE\nLOG_LEVEL=info\n"
+        result = guard.env(raw, "data/example/.env")
+        self.assertEqual(result, b"# Public settings\nWORKERS=4\nLOG_LEVEL=info\n")
+        self.assertEqual(sync.env_values(result), {"WORKERS": "4", "LOG_LEVEL": "info"})
+
+    def test_private_commented_values_and_whole_continuation_blocks_are_omitted(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        comments = [
+            "# PASSWORD=unmanaged_private_value\n",
+            "  ## export PASSWORD=unmanaged_private_value\n",
+            "# password: unmanaged_private_value\n",
+            "# Legacy example (API_KEY=unmanaged_private_value)\n",
+            '# old {"PASSWORD":"unmanaged_private_value"}\n',
+            '# example "API_KEY"=unmanaged_private_value\n',
+            "# CUSTOM_OPTION=not_for_public\n",
+            "# SYNTHETIC_PRIVATE_VALUE\n",
+            "# ghp_" + "A" * 36 + "\n",
+            "# https://user:privatepass@example.invalid/path\n",
+            "# ${PASSWORD:-unmanaged_private_value}\n",
+            "# PASSWORD='\n\n# unlabelled_private_continuation\n# '\n",
+        ]
+        for comment in comments:
+            with self.subTest(comment_type=comments.index(comment)):
+                result = guard.env((comment + "WORKERS=4\n").encode(), "data/example/.env", {"CUSTOM_OPTION"})
+                self.assertEqual(result, b"WORKERS=4\n")
+
+    def test_unsafe_inline_comments_are_refused_without_rewriting_public_values(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        comments = ["PASSWORD=unmanaged_private_value", "SYNTHETIC_PRIVATE_VALUE",
+                    "https://user:privatepass@example.invalid/path", "ghp_" + "A" * 36,
+                    "${PASSWORD:-unmanaged_private_value}"]
+        for comment in comments:
+            with self.subTest(comment_type=comments.index(comment)):
+                with self.assertRaisesRegex(sync.Refused, "PUBLIC_ENV_INLINE_COMMENT_PRIVATE"):
+                    guard.env(("WORKERS=4 # " + comment + "\n").encode(), "data/example/.env")
+
+    def test_unquoted_apostrophes_and_immediate_hashes_cannot_hide_private_inline_comments(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        values = ["John's # PASSWORD=unmanaged_private_value",
+                  'an_embedded"quote # PASSWORD=unmanaged_private_value',
+                  "'public'# PASSWORD=unmanaged_private_value",
+                  '"public # title"# PASSWORD=unmanaged_private_value',
+                  "public\\# PASSWORD=unmanaged_private_value"]
+        for value in values:
+            with self.subTest(value_type=values.index(value)):
+                with self.assertRaisesRegex(sync.Refused, "PUBLIC_ENV_INLINE_COMMENT_PRIVATE"):
+                    guard.env(("TITLE=" + value + "\n").encode(), "data/example/.env")
+
+    def test_hash_inside_public_quotes_or_url_fragment_is_not_an_inline_comment(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        raw = ("TITLE=\"public # PASSWORD=part_of_public_text\"\n"
+               "URL=https://example.invalid/path#section\n"
+               "MESSAGE='public # title' # public note\n"
+               "ESCAPED=\"public \\\" # text\"\n").encode()
+        self.assertEqual(guard.env(raw, "data/example/.env"), raw)
+
+    def test_public_env_retains_existing_duplicate_and_multiline_rejection(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        for raw in (b"WORKERS=4\nWORKERS=8\n", b'TITLE="first\nsecond"\n'):
+            with self.subTest(input_length=len(raw)):
+                with self.assertRaisesRegex(sync.Refused, "DOTENV_FORMAT_REVIEW_REQUIRED"):
+                    guard.env(raw, "data/example/.env")
+
+    def test_known_private_value_in_active_public_assignment_still_blocks(self):
+        guard = self.guard("SYNTHETIC_PRIVATE_VALUE")
+        with self.assertRaisesRegex(sync.Refused, "PRIVATE_VALUE_IN_PUBLIC_FILE"):
+            guard.env(b"TITLE=SYNTHETIC_PRIVATE_VALUE\n", "data/example/.env")
+
 
 class PublicExportTests(unittest.TestCase):
     def repository_url_guard(self):
@@ -1204,6 +1281,17 @@ class PublicExportTests(unittest.TestCase):
             return result
         with self.assertRaisesRegex(sync.Refused, "IMAGES_CHANGED_DURING_EXPORT"):
             self.render(changing)
+
+    def test_commented_public_env_is_exported_without_local_writes_and_second_run_is_unchanged(self):
+        name = "data/comet/.env"
+        raw = b"# Public worker options\n\n# FASTAPI_WORKERS=8\n" + self.public[name] + b"\n# End of public options\n"
+        self.write(name, raw)
+        changes = self.render()
+        self.assertEqual(changes[name], raw)
+        self.assertEqual((self.source / name).read_bytes(), raw)
+        self.assertEqual(sync.env_values(changes[name]), sync.env_values(self.public[name]))
+        self.apply(changes)
+        self.assertEqual(self.render(), {})
 
     def test_new_service_cached_image_is_locked_without_reading_environment(self):
         compose = {"services": {"added": {"image": "example/new:1"}}}

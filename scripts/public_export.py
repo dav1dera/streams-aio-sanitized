@@ -548,16 +548,75 @@ class Guard:
                 self.sync.require(False, "PRIVATE_FIELD_NEEDS_EXPLICIT_BINDING", location)
         return new
 
+    def public_env_comment(self, text, name, private_keys):
+        # A comment can contain a disabled credential assignment, even though
+        # the normal assignment scanner deliberately ignores the leading '#'.
+        for match in re.finditer(r"(?:^|[^A-Za-z0-9_])[\"']?([A-Za-z][A-Za-z0-9_-]*)[\"']?\s*[:=]", text):
+            if match[1] in private_keys or sensitive(match[1]):
+                return False
+        try:
+            self.scan(text.encode(), name)
+        except self.sync.Refused:
+            return False
+        return True
+
+    @staticmethod
+    def env_inline_comment(value):
+        stripped = value.lstrip()
+        quote = stripped[:1] if stripped[:1] in {"'", '"'} else None
+        start = len(value) - len(stripped) + 1 if quote else 0
+        escaped = False
+        for index, char in enumerate(value[start:], start):
+            if escaped:
+                escaped = False
+            elif char == "\\" and quote:
+                escaped = True
+            elif quote:
+                if char == quote: quote = None
+            elif char == "#":
+                # Quotes embedded in an unquoted value are literal. Treat a
+                # hash after the initial quoted value conservatively too,
+                # even without whitespace or preceded by a backslash.
+                return value[index + 1:]
+        return None
+
     def env(self, data, name, private_keys=()):
-        result = []
-        for key, value in self.sync.env_values(data).items():
+        # Retain the established parser and its rejection of duplicate keys or
+        # multiline assignments; formatting must not change effective values.
+        values, public = self.sync.env_values(data), {}
+        private_keys = set(private_keys)
+        for key, value in values.items():
             if key in private_keys or sensitive(key):
                 self.sync.require(not value.strip("\"' ") or value.strip("\"' ") in self.values or value.strip("\"' ") in self.public_values,
                                   "PUBLIC_ENV_PRIVATE_VALUE_MUST_COME_FROM_AGENT", name)
                 continue  # Agent/private env must supply these; no guessed Infisical path.
             self.sync.require(not self.sync.MARKER.search(value), "PUBLIC_ENV_BINDING_USE_PRIVATE_ENV", name)
-            result.append(key + "=" + value)
-        return self.scan(("\n".join(result) + "\n").encode(), name)
+            public[key] = value
+        result, lines, index = [], data.decode("utf-8").splitlines(keepends=True), 0
+        while index < len(lines):
+            line = lines[index]
+            if not line.strip() or line.lstrip().startswith("#"):
+                block = []
+                while index < len(lines) and (not lines[index].strip() or lines[index].lstrip().startswith("#")):
+                    block.append(lines[index]); index += 1
+                # Inspect a whole comment block, including continuation lines.
+                # If it contains private material, omit the whole block rather
+                # than leaving a credential's unlabelled continuation behind.
+                text = "\n".join(re.sub(r"^\s*#+\s?", "", row.rstrip("\r\n")) for row in block)
+                if self.public_env_comment(text, name, private_keys): result.extend(block)
+                continue
+            index += 1
+            key, _, value = line.rstrip("\r\n").partition("=")
+            if key not in public: continue
+            comment = self.env_inline_comment(value)
+            # Removing an inline comment would change the existing parser's
+            # value. Refuse unsafe inline content instead of rewriting it.
+            self.sync.require(comment is None or self.public_env_comment(comment, name, private_keys),
+                              "PUBLIC_ENV_INLINE_COMMENT_PRIVATE", name)
+            result.append(line)
+        output = "".join(result).encode()
+        self.sync.require(self.sync.env_values(output) == public, "PUBLIC_ENV_SEMANTICS_CHANGED", name)
+        return self.scan(output, name)
 
 
 def image_reference_identity(value, sync):
