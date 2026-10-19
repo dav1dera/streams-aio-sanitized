@@ -41,7 +41,7 @@
       "platform": "linux/amd64"
     },
     "pgbouncer": {
-      "image": "edoburu/pgbouncer@sha256:9c78945868a6a142c7fc40ccd843bbe5a606df163c7ffce4de70e0d628d696a2",
+      "image": "edoburu/pgbouncer@sha256:8638aa563607256d3c7440437534195f1066a92b68015d89ae9d6b935b444a6d",
       "platform": "linux/amd64"
     },
     "postgres": {
@@ -80,7 +80,7 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:ada86d04dcb6b68d504a57ff69b73bebd2a9f5efd4d31cef45efda79d5f558de",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:ad5daa42b21944f38b959714282512b228f8c76d6b331b4b931dc3681c29ef0a",
       "platform": "linux/amd64"
     },
     "streamvix": {
@@ -119,7 +119,7 @@
       "platform": "linux/amd64"
     },
     "jackett": {
-      "image": "lscr.io/linuxserver/jackett@sha256:d97a1e0de3aca41249a0b4deccfe3ab158f1639bacb84ac6f5f28aef08b287a2",
+      "image": "lscr.io/linuxserver/jackett@sha256:104a82c2f75892745d36b65a8c1244761e9f66678424ca547b203ff2ed708975",
       "platform": "linux/amd64"
     },
     "seanime": {
