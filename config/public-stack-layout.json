@@ -38,7 +38,7 @@
       "path": "data/tailscale/data/state",
       "uid": 1000,
       "gid": 1000,
-      "mode": "0770"
+      "mode": "0700"
     },
     {
       "path": "data/dnscrypt-proxy/data",
