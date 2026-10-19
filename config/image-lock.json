@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:801891339202523fa13aaf3ec00f98063853fde65d1382cc8ddc94e6f362f3a6",
+    "image": "ghcr.io/viren070/aiostreams@sha256:3c75a486fe428d67ec31a387ae4682444e3bbeabcbfadb29f92ea649786d70c0",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -65,12 +65,12 @@
     "configured_image": "redis:latest"
   },
   "wud": {
-    "image": "getwud/wud@sha256:cf429f3a95b5ece811088d0d220741ea0b0460de6743197d26c590d1904e3af9",
+    "image": "getwud/wud@sha256:2dcc930828ce983b1c3b0373e3ca8ee67759835e4a7eb2f78af9ada45eb1a1f9",
     "platform": "linux/amd64",
     "configured_image": "getwud/wud:latest"
   },
   "honey": {
-    "image": "ghcr.io/dani3l0/honey@sha256:fe6ce43acf93a211ab63cf247e4ce573cb63a41608092f0bffb1b3bf72527ac5",
+    "image": "ghcr.io/dani3l0/honey@sha256:3a9bba2b1867bb1a802ee898378189a80dd75a1e2e17e389200e715acd5b6b06",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/dani3l0/honey:latest"
   },
@@ -95,7 +95,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:e74309377a605fbb8996e74699a01a559ad2e5ec4667586b3d1ed8a5a01ec6ab",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:ada86d04dcb6b68d504a57ff69b73bebd2a9f5efd4d31cef45efda79d5f558de",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
@@ -145,12 +145,12 @@
     "configured_image": "lscr.io/linuxserver/jackett:latest"
   },
   "seanime": {
-    "image": "umagistr/seanime@sha256:d74dcac9d5c29f74d980cccf5311a2212fe202b85308032d8665a15469824363",
+    "image": "umagistr/seanime@sha256:99f9210c66eff284d3f4605d63ea129d0678eac5ec9ef74f0fee0a5c8ddf6871",
     "platform": "linux/amd64",
     "configured_image": "umagistr/seanime:latest"
   },
   "seanime-shared": {
-    "image": "umagistr/seanime@sha256:d74dcac9d5c29f74d980cccf5311a2212fe202b85308032d8665a15469824363",
+    "image": "umagistr/seanime@sha256:99f9210c66eff284d3f4605d63ea129d0678eac5ec9ef74f0fee0a5c8ddf6871",
     "platform": "linux/amd64",
     "configured_image": "umagistr/seanime:latest"
   }
