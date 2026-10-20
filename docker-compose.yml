@@ -646,7 +646,9 @@ services:
         ipv4_address: 172.19.0.2
     profiles: [all, gluetun]
     labels:
-    - wud.watch=false
+    - wud.watch=true
+    - wud.trigger.docker.local.enabled=false
+    - wud.trigger.docker.manual.enabled=true
 
   # 💫 Comet - Addon
   comet:
