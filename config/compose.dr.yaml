@@ -84,7 +84,7 @@
       "platform": "linux/amd64"
     },
     "streamvix": {
-      "image": "qwertyuiop8899/streamvix@sha256:20469eff979b1ee03445a5a6ae8642b1a17a7b742a37e2f63392e05d5a1e0597",
+      "image": "qwertyuiop8899/streamvix@sha256:c7c2c69c8607f2468887b59c6f10a533432cbf8e7c9d0385afaffc5cfe8bdec4",
       "platform": "linux/amd64"
     },
     "tvvoo": {
