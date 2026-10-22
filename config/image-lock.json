@@ -1,6 +1,6 @@
 {
   "tailscale": {
-    "image": "tailscale/tailscale@sha256:87c55d6be56ad85b3d8bceca5f87f73de288c609131460dd1be1874c250cc41d",
+    "image": "tailscale/tailscale@sha256:b11583ad2e93e4671128538c88cf11f460444a5d7e449311dd1933a400ab849d",
     "platform": "linux/amd64",
     "configured_image": "tailscale/tailscale:latest"
   },
@@ -10,7 +10,7 @@
     "configured_image": "portainer/portainer-ce:latest"
   },
   "dnscrypt-proxy": {
-    "image": "klutchell/dnscrypt-proxy@sha256:a98e8d13314fa8b75620026441b1d6581e2b55189509a794500c5c86064df810",
+    "image": "klutchell/dnscrypt-proxy@sha256:42c88a9f5e6486c3f0f8266286ffdac8f8d6ebb2a61f414ed57bcf129342862d",
     "platform": "linux/amd64",
     "configured_image": "klutchell/dnscrypt-proxy:latest"
   },
@@ -35,7 +35,7 @@
     "configured_image": "favonia/cloudflare-ddns:latest"
   },
   "aiometadata": {
-    "image": "ghcr.io/cedya77/aiometadata@sha256:83d23c3f3ce12bdceebb01566f66ced00e08b7ccb1758628af8bd45d2e022b85",
+    "image": "ghcr.io/cedya77/aiometadata@sha256:6bdb7482c9e848e5c5894fa04bcf8580e73ca578ddd47d2a51f337b4a8fa3a85",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/cedya77/aiometadata:latest"
   },
@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:2b197c4cc2facd190400dc8fef1a8e6614d714072f079b18b52526a1b76abba2",
+    "image": "ghcr.io/viren070/aiostreams@sha256:a9befc41bdc2f1a4bc5c4cfb6114e443d86df5b7151b3e68cf5e0ba0f4f5d93d",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -55,12 +55,12 @@
     "configured_image": "edoburu/pgbouncer:latest"
   },
   "postgres": {
-    "image": "postgres@sha256:650d7a867dc5336eff67802a1417fcc801821d73d824c608e80afbde792fe6e1",
+    "image": "postgres@sha256:83148c0bc09eac4d598b70a61e1404d0212b76c95c504bfd6c81a4c59ec91792",
     "platform": "linux/amd64",
     "configured_image": "postgres:18-alpine"
   },
   "redis": {
-    "image": "redis@sha256:2c2dff791878316e3b083188be0d578423b24813cdda5de0e80ea4f7b3e6bfd6",
+    "image": "redis@sha256:5c02d7c0f8d75af45958c0294a8004f2e14b42df98a1103e3a669aa7ec787be6",
     "platform": "linux/amd64",
     "configured_image": "redis:latest"
   },
@@ -85,7 +85,7 @@
     "configured_image": "ghcr.io/ccbkkb/microwarp:latest"
   },
   "gost": {
-    "image": "gogost/gost@sha256:55f05a58541f69bd7aa5fb9ee24fda12669430fb71489496473ecf15c32bcc8e",
+    "image": "gogost/gost@sha256:c3f849542469bc6027cd38d9a7ef86e8efbcc1176551a3ace8df85ef90a9c5b9",
     "platform": "linux/amd64",
     "configured_image": "gogost/gost:latest"
   },
@@ -95,7 +95,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:876635ef563dfbd4468d5740b8439ed2beb7c7b4bb1c2db4b416676f1474d7e3",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:a7886e1e476f69cccb7a4c4074193a407deb31c27d26963f1e6fa5fd40b26f84",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
@@ -110,7 +110,7 @@
     "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
-    "image": "ghcr.io/sonicx161/aiomanager@sha256:d2ea5849ade8e755d6990f57548b85c430184482fe14e3016824ed5b71aaab41",
+    "image": "ghcr.io/sonicx161/aiomanager@sha256:bed162f2412b58295bb9c70cb6bf7b1284cda70213fdd8958a5a63be1d1eb823",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
