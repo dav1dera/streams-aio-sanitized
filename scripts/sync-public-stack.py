@@ -317,6 +317,17 @@ def docker_repository_identity(repo):
     return domain + "/" + path
 
 
+def image_reference_identity(value):
+    repository = image_repository(value)
+    if "@" in value:
+        selector = ("digest", value.partition("@")[2])
+    else:
+        selector = ("tag", value[len(repository) + 1:] if len(value) > len(repository) else "latest")
+    # Docker/WUD may add Docker Hub's canonical hostname to Config.Image.
+    # Preserve the tag (including case) or digest, and never equate the two.
+    return (docker_repository_identity(repository), *selector)
+
+
 def select_image_digest(configured, observed, previous, location):
     repo = image_repository(configured)
     identity = docker_repository_identity(repo)
@@ -413,7 +424,9 @@ def docker_locks(source, compose, old_locks):
             values.append(value)
         service, image_id, configured = values
         require(service in compose["services"], "UNREVIEWED_RUNTIME_SERVICE")
-        require(configured == compose["services"][service]["image"], "COMPOSE_IMAGE_NOT_APPLIED", "docker-compose.yml:services/" + service)
+        require(image_reference_identity(configured) ==
+                image_reference_identity(compose["services"][service]["image"]),
+                "COMPOSE_IMAGE_NOT_APPLIED", "docker-compose.yml:services/" + service)
         require(service not in images or images[service] == image_id, "MIXED_SERVICE_IMAGES")
         images[service] = image_id
     require(images, "NO_STACK_CONTAINERS_FOUND")

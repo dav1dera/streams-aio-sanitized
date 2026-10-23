@@ -620,15 +620,8 @@ class Guard:
 
 
 def image_reference_identity(value, sync):
-    repository = sync.image_repository(value)
-    if "@" in value:
-        selector = ("digest", value.partition("@")[2])
-    else:
-        selector = ("tag", value[len(repository) + 1:] if len(value) > len(repository) else "latest")
-    # Docker/WUD may add Docker Hub's canonical hostname to Config.Image.
-    # Normalize only the repository aliases already accepted for RepoDigests;
-    # preserve the tag (including case) or digest, and never equate the two.
-    return (sync.docker_repository_identity(repository), *selector)
+    # Compatibility entry point; both export policies use the same comparison.
+    return sync.image_reference_identity(value)
 
 
 def dynamic_images(source, compose, old, sync):

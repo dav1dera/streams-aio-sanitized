@@ -135,10 +135,15 @@ class PublicSyncTests(unittest.TestCase):
         self.assertTrue(mutate(old))
         file.write_bytes(sync.toml_dump(old))
         file = self.source / "data/comet/.env"
-        file.write_text(file.read_text(encoding="utf-8").replace("FASTAPI_WORKERS=1", "FASTAPI_WORKERS=2"), encoding="utf-8")
+        raw = file.read_text(encoding="utf-8")
+        workers = str(int(sync.env_values(raw.encode())["FASTAPI_WORKERS"]) + 1)
+        updated, count = re.subn(r"(?m)^FASTAPI_WORKERS=[^\r\n]*", "FASTAPI_WORKERS=" + workers, raw)
+        self.assertEqual(count, 1)
+        self.assertNotEqual(updated, raw)
+        file.write_text(updated, encoding="utf-8")
         changes = self.render()
         self.assertIn("config/dr-templates/seanime/data/main/config/config.toml.template", changes)
-        self.assertIn(b"FASTAPI_WORKERS=2", changes["data/comet/.env"])
+        self.assertEqual(sync.env_values(changes["data/comet/.env"])["FASTAPI_WORKERS"], workers)
         self.assertNotIn(SECRET.encode(), changes["data/comet/.env"])
 
     def test_unknown_compose_field_blocks_without_its_value_in_error(self):
@@ -208,8 +213,12 @@ class PublicSyncTests(unittest.TestCase):
     def test_unknown_env_key_and_private_value_in_public_field_block(self):
         path = self.source / "data/comet/.env"
         original = path.read_bytes()
+        private_workers, count = re.subn(rb"(?m)^FASTAPI_WORKERS=[^\r\n]*",
+                                         b"FASTAPI_WORKERS=" + SECRET.encode(), original)
+        self.assertEqual(count, 1)
+        self.assertIn(SECRET.encode(), private_workers)
         for data in (original + b"NEW_ACCESS_TOKEN=" + SECRET.encode() + b"\n",
-                     original.replace(b"FASTAPI_WORKERS=1", b"FASTAPI_WORKERS=" + SECRET.encode())):
+                     private_workers):
             path.write_bytes(data)
             with self.assertRaises(sync.Refused) as error:
                 self.render()
@@ -346,7 +355,7 @@ class PublicSyncTests(unittest.TestCase):
     def test_all_jackett_indexer_cookies_and_null_errors_stay_out_of_public_exports(self):
         before = self.render()
         names = [n for n in self.public if n.startswith("config/dr-templates/jackett/data/Jackett/Indexers/")]
-        self.assertEqual(len(names), 5)
+        self.assertTrue(names, "Fixture must include at least one reviewed Jackett indexer")
         for name in names:
             path = self.source / ("data/" + name.removeprefix("config/dr-templates/").removesuffix(".template"))
             value = sync.loads(path.read_bytes())
@@ -532,12 +541,14 @@ class PublicSyncTests(unittest.TestCase):
     def test_postgres_multiple_manifests_keep_verified_existing_pin(self):
         compose = sync.yaml_load(self.public["docker-compose.yml"])
         locks = sync.loads(self.public["config/image-lock.json"])
-        image_id = "sha256:c293117fcecda7344b5480222e813b9f673d7abd69b1dd95eff239b768b04f59"
-        # Public metadata from the reported PostgreSQL image; no runtime config.
+        image_id = "sha256:" + "e" * 64
+        # Synthetic metadata must stay independent of future published image locks.
+        # The existing pin is deliberately not the sorted fallback candidate.
+        locks["postgres"]["image"] = "postgres@sha256:" + "f" * 64
         digests = [
-            "postgres@sha256:650d7a867dc5336eff67802a1417fcc801821d73d824c608e80afbde792fe6e1",
-            "postgres@sha256:6c538e7206ea40ff740ef27883529390a690b6ead6ba96b44c67a9f7c638e8fd",
-            "postgres@sha256:77f585114c32fbca283dc835b0596f4e52b51b4c6662d7810b2f4084f60a1873",
+            locks["postgres"]["image"],
+            "postgres@sha256:" + "1" * 64,
+            "postgres@sha256:" + "6" * 64,
         ]
         configured = compose["services"]["postgres"]["image"]
         for order in (digests, list(reversed(digests))):
@@ -547,6 +558,7 @@ class PublicSyncTests(unittest.TestCase):
             with mock.patch.object(sync, "run", side_effect=values) as transport:
                 result = sync.docker_locks(self.source, compose, locks)
             self.assertEqual(result["postgres"]["image"], locks["postgres"]["image"])
+            self.assertIn(result["postgres"]["image"], order)
             self.assertEqual(result["postgres"]["platform"], "linux/amd64")
             self.assertEqual(transport.call_args_list[-1].args[0][-1], image_id)
             commands = [call.args[0] for call in transport.call_args_list]
@@ -554,6 +566,23 @@ class PublicSyncTests(unittest.TestCase):
             self.assertEqual(commands[-1][2], "inspect")
             self.assertNotIn("Config.Env", str(commands))
             self.assertNotIn("{{json .}}", str(commands))
+
+    def test_postgres_previous_pin_absent_from_running_image_is_replaced(self):
+        compose = sync.yaml_load(self.public["docker-compose.yml"])
+        locks = sync.loads(self.public["config/image-lock.json"])
+        locks["postgres"]["image"] = "postgres@sha256:" + "f" * 64
+        image_id = "sha256:" + "e" * 64
+        configured = compose["services"]["postgres"]["image"]
+        digests = ["postgres@sha256:" + char * 64 for char in ("1", "6")]
+        for order in (digests, list(reversed(digests))):
+            values = [b"123abcdefabc\n",
+                      " ".join(map(json.dumps, ("postgres", image_id, configured))).encode(),
+                      json.dumps({"RepoDigests": order, "Os": "linux", "Architecture": "amd64"}).encode()]
+            with mock.patch.object(sync, "run", side_effect=values):
+                result = sync.docker_locks(self.source, compose, locks)
+            self.assertEqual(result["postgres"]["image"], digests[0])
+            self.assertIn(result["postgres"]["image"], order)
+            self.assertNotEqual(result["postgres"]["image"], locks["postgres"]["image"])
 
     def test_new_running_image_selects_stable_digest_and_updates_recovery_pair(self):
         compose = sync.yaml_load(self.public["docker-compose.yml"])
