@@ -51,7 +51,8 @@ for connection in plan['postgres_bootstrap']['connections']:
  svc=connection['service'];uri=svc+':'+urllib.parse.quote(password,safe='')+'@pgbouncer:5432/'+svc
  values[connection['ref']]=uri if svc=='comet' else 'postgresql://'+uri
  userlist.append('"'+svc+'" "'+verifier+'"')
-values[plan['postgres_bootstrap']['admin_password_ref']]=password;userlist.append('"postgres" "'+verifier+'"')
+admin_user=plan['postgres_bootstrap'].get('admin_user','postgres')
+values[plan['postgres_bootstrap']['admin_password_ref']]=password;userlist.append('"'+admin_user.replace('"','""')+'" "'+verifier+'"')
 values[plan['postgres_bootstrap']['userlist_ref']]='\n'.join(userlist)+'\n'
 for item in plan['service_folder_exports'].values():values[item['path']+'/SYNTHETIC_ONLY']='synthetic-test'
 sys_path=str(ROOT/'tests')
@@ -109,7 +110,17 @@ manifest=json.loads((target/'config/dr-manifest.yaml').read_text())
 for row in manifest['references']:
  if row['TYPE']=='BIND_MOUNT':need((target/row['SOURCE']).exists(),'BIND_SOURCE_MISSING')
 need(not any(u['blocks_quick_redeploy'] for u in manifest['state_units'] if u['classification'] in ('OPTIONAL_RUNTIME_STATE','DISPOSABLE_STATE')),'OPTIONAL_STATE_GATE')
-sql=(target/plan['postgres_bootstrap']['destination']).read_text();need(sql.count('\\gexec')==6 and sql.count(verifier)==4 and password not in sql,'SCRAM_SQL_EXACT_CREDENTIAL')
+sql=(target/plan['postgres_bootstrap']['destination']).read_text()
+connections=plan['postgres_bootstrap']['connections']
+need(sql.count('\\gexec')==2*len(connections) and sql.count(verifier)==len(connections)+1 and password not in sql,'SCRAM_SQL_EXACT_CREDENTIAL')
+# Every declared role/database and the administrator must retain the verified
+# credential. Matching aggregate counts alone could hide an omitted connection.
+for connection in connections:
+ user,_,database=dr.postgres_connection(values[connection['ref']],connection['service'])
+ role="SELECT format('CREATE ROLE %I LOGIN PASSWORD %L', "+dr.sql_literal(user)+', '+dr.sql_literal(verifier)+')'
+ database_statement="SELECT format('CREATE DATABASE %I OWNER %I', "+dr.sql_literal(database)+', '+dr.sql_literal(user)+')'
+ need(sql.count(role)==1 and sql.count(database_statement)==1,'SCRAM_SQL_DECLARED_CONNECTION')
+need(sql.count('ALTER ROLE '+dr.sql_identifier(admin_user)+' PASSWORD '+dr.sql_literal(verifier)+';')==1,'SCRAM_SQL_ADMIN_CREDENTIAL')
 need(dr.postgres_connection("comet:synthetic%27password%3D%23%24@pgbouncer/comet",'comet')==('comet',password,'comet'),'COMET_CONNECTION_PARSE')
 need(dr.userlist_entries('"user""name" "password""value"\n')=={'user"name':'password"value'},'USERLIST_QUOTES')
 def refuses(fn):

@@ -1312,12 +1312,25 @@ class PublicExportTests(unittest.TestCase):
         self.assertIn(b"LOG_LEVEL=debug", changes["data/comet/.env"])
 
     def healthcheck_collision(self):
+        # These policy tests need a known reviewed healthcheck, independently
+        # of commands/endpoints most recently exported by the live stack.
+        compose = sync.yaml_load(self.public["docker-compose.yml"])
+        for service in ("tailscale", "seanime", "seanime-shared"):
+            compose["services"][service]["healthcheck"] = {
+                "test": ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:9002/healthz"],
+                "interval": "10s", "timeout": "5s", "retries": 3,
+            }
+        reviewed = sync.yaml.safe_dump(compose, sort_keys=False).encode()
+        self.public["docker-compose.yml"] = reviewed
+        self.write("docker-compose.yml", reviewed)
         name = ".secrets/oauth2-proxy.env"
         rows = sync.env_values((self.source / name).read_bytes())
         # The bare loopback URL is now ordinary StremThru configuration. Keep
         # this synthetic collision confined to the reviewed healthcheck scalar.
         rows["OAUTH2_PROXY_UPSTREAMS"] = "http://127.0.0.1:9002"
         self.write(name, ("\n".join(k + "=" + v for k, v in rows.items()) + "\n").encode())
+        self.assertEqual(sync.env_values((self.source / name).read_bytes())["OAUTH2_PROXY_UPSTREAMS"],
+                         "http://127.0.0.1:9002")
 
     def test_unchanged_reviewed_healthchecks_with_private_substring_do_not_block(self):
         self.healthcheck_collision()
@@ -1348,6 +1361,7 @@ class PublicExportTests(unittest.TestCase):
             self.render()
 
     def test_private_scan_healthcheck_exception_is_scoped_to_scalar_at_same_path(self):
+        self.healthcheck_collision()
         guard = export.Guard(self.source, self.public, sync, lambda name: sync.read_file(self.source, name))
         guard.remember("http://127.0.0.1:9002", "/oauth2-proxy/OAUTH2_PROXY_UPSTREAMS")
         self.assertIn("http://127.0.0.1:9002", guard.values)
