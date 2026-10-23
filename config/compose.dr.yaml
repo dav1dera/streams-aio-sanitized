@@ -5,11 +5,11 @@
       "platform": "linux/amd64"
     },
     "portainer": {
-      "image": "portainer/portainer-ce@sha256:03f94a406496dc84d37b552795fc424ccad8d0d7200353b6a82915f6e8f73ab0",
+      "image": "portainer/portainer-ce@sha256:3609c307943bca8e5c492f69ddd6965df177208b50678a4cff28391c8dd4e96e",
       "platform": "linux/amd64"
     },
     "dnscrypt-proxy": {
-      "image": "klutchell/dnscrypt-proxy@sha256:42c88a9f5e6486c3f0f8266286ffdac8f8d6ebb2a61f414ed57bcf129342862d",
+      "image": "klutchell/dnscrypt-proxy@sha256:9d4e4c1408f71f669ffdc34836d801442dddd7c176838c6d129938d2c1bd95b1",
       "platform": "linux/amd64"
     },
     "headscale": {
@@ -17,7 +17,7 @@
       "platform": "linux/amd64"
     },
     "headplane": {
-      "image": "ghcr.io/tale/headplane@sha256:2cc960b89fad90ead5151a2e6ab025dbf63c3b2a3dfe33af9183eae45b611261",
+      "image": "ghcr.io/tale/headplane@sha256:b053a0a6699d0a67be3f0d9bae8e7dbe35ed67ae8448412adcbad7ea49866faa",
       "platform": "linux/amd64"
     },
     "npm": {
@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:a9befc41bdc2f1a4bc5c4cfb6114e443d86df5b7151b3e68cf5e0ba0f4f5d93d",
+      "image": "ghcr.io/viren070/aiostreams@sha256:b36dd5c650fff86cb81847cce901613aacf35fc32208c18d8362e281677cd8eb",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -80,7 +80,7 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:a7886e1e476f69cccb7a4c4074193a407deb31c27d26963f1e6fa5fd40b26f84",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:16d9e5122f70a331bc2abe4f7f744246bc2f61f909230a608d4aa91871d1e7da",
       "platform": "linux/amd64"
     },
     "streamvix": {
@@ -88,7 +88,7 @@
       "platform": "linux/amd64"
     },
     "tvvoo": {
-      "image": "qwertyuiop8899/tvvoo@sha256:0406a926240d3214d5edfe4a2ee3341a755ebd29d5e93385a44f68322334aea7",
+      "image": "qwertyuiop8899/tvvoo@sha256:14def5d13ac2c6399f2abcf077e2635b859cfcdc835740cc4c39cf27ff90e46e",
       "platform": "linux/amd64"
     },
     "aiomanager": {
