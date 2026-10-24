@@ -25,7 +25,7 @@
       "platform": "linux/amd64"
     },
     "cloudflare-ddns": {
-      "image": "favonia/cloudflare-ddns@sha256:5e61736b982b87d84a1120b4767c4deff0f2cc55ca3ee9dcb1dc58623039b5cb",
+      "image": "favonia/cloudflare-ddns@sha256:345b41895a8846d74c62d30bd27e61101a754f8ab8da10c68115823883803afb",
       "platform": "linux/amd64"
     },
     "aiometadata": {
@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:b36dd5c650fff86cb81847cce901613aacf35fc32208c18d8362e281677cd8eb",
+      "image": "ghcr.io/viren070/aiostreams@sha256:5fed070e5e75f7a78325de7f08aba01ea10a6042b576cde30548f9ebdf1a616a",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
