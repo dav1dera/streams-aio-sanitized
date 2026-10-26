@@ -52,6 +52,12 @@ class PublicConfigurationModeTests(unittest.TestCase):
                 self.assertEqual(read_acl.call_args.args[1], 'system.posix_acl_access')
                 self.assertEqual(read_acl.call_args.kwargs, {'follow_symlinks': False})
 
+    def test_owning_group_keeps_declared_access_even_with_a_wide_mask(self):
+        for owning_group in range(8):
+            with self.subTest(owning_group=owning_group):
+                result, _ = self.matches(acl=access_acl(group=owning_group, mask=7))
+                self.assertEqual(result, bool(owning_group & 4))
+
     def test_mode_changes_outside_group_and_lost_group_access_are_refused(self):
         for observed in (0o774, 0o670, 0o604, 0o4674):
             with self.subTest(observed=oct(observed)):
@@ -104,6 +110,13 @@ class PublicConfigurationModeTests(unittest.TestCase):
             self.assertTrue(export.public_configuration_mode_matches(target, 0o644))
             self.assertEqual(target.read_bytes(), before_data)
             self.assertEqual(os.getxattr(target, 'system.posix_acl_access'), before_acl)
+            subprocess.run(['setfacl', '-m', 'g::---,m::rwx', str(target)],
+                           check=True, capture_output=True)
+            self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o674)
+            self.assertFalse(export.public_configuration_mode_matches(target, 0o644))
+            subprocess.run(['setfacl', '-m', 'g::rwx', str(target)],
+                           check=True, capture_output=True)
+            self.assertTrue(export.public_configuration_mode_matches(target, 0o644))
             target.chmod(0o604)
             self.assertFalse(export.public_configuration_mode_matches(target, 0o644))
             subprocess.run(['setfacl', '-b', str(target)], check=True, capture_output=True)
