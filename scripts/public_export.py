@@ -11,6 +11,9 @@ from pathlib import Path, PurePosixPath
 import re
 import stat
 import struct
+from types import SimpleNamespace
+
+PUBLIC_ONBOARDING_PREFLIGHT = 1
 
 INVENTORY = "config/public-sync-inventory.json"
 LAYOUT = "config/public-stack-layout.json"
@@ -170,7 +173,7 @@ def allowed(name):
     return Path(name).suffix in TEXT_SUFFIXES and (len(parts) == 1 or parts[0] in {"docs", "scripts"})
 
 
-def candidates(source, sync):
+def candidates(source, sync, extra_names=()):
     names = []
     skipped = 0
     for folder, dirs, files in os.walk(source, followlinks=False):
@@ -187,6 +190,12 @@ def candidates(source, sync):
                 names.append(name)
             else:
                 skipped += 1
+    for name in extra_names:
+        sync.relative(name)
+        if allowed(name) and name not in names:
+            sync.safe_path(source / name)
+            names.append(name)
+    if extra_names: names.sort()
     # The source ignore file may only add exclusions; the floor above is fixed.
     if (source / ".git").is_dir() and names:
         result = sync.run(["git", "-C", str(source), "check-ignore", "--no-index", "--stdin", "-z"],
@@ -219,18 +228,187 @@ def env_literal(value):
     return value
 
 
+class _SourceView:
+    """Read-only access shared by publication and prospective declarations."""
+    def __init__(self, source, sync):
+        self.source, self.sync = source, sync
+
+    def path(self, name):
+        path = self.source if name == "" else self.source / self.sync.relative(name)
+        self.sync.safe_path(path)
+        return path
+
+    def read(self, name):
+        return self.sync.read_file(self.source, name)
+
+    def exists(self, name): return self.path(name).exists()
+    def is_file(self, name): return self.path(name).is_file()
+    def is_dir(self, name): return self.path(name).is_dir()
+    def stat(self, name): return self.path(name).stat()
+    def mode_matches(self, name, mode): return public_configuration_mode_matches(self.path(name), mode)
+    def public_candidates(self): return candidates(self.source, self.sync)
+
+    def private_env_names(self):
+        if not self.is_dir(".secrets"): return []
+        return [path.relative_to(self.source).as_posix()
+                for path in sorted(self.path(".secrets").glob("*.env"))]
+
+
+class _CandidateSource(_SourceView):
+    """Overlay public bytes and future directories without touching the source.
+
+    Existing private files are always read through. Missing Agent targets may
+    be represented by key-only placeholders; no secret values enter the API.
+    """
+    def __init__(self, source, sync, files, directories=None, private_keys=None):
+        super().__init__(source, sync)
+        sync.require(source.is_absolute() and super().is_dir(""), "CANDIDATE_SOURCE_INVALID")
+        sync.require(isinstance(files, dict) and len(files) <= 600, "CANDIDATE_FILES_INVALID")
+        self.files, self.public_files, self.directories = {}, set(), {}
+        self.private_files = set()
+        root = self.stat("")
+        self.uid, self.gid = getattr(root, "st_uid", 1000), getattr(root, "st_gid", 1000)
+        self.configuration_modes = {}
+        for name, data in files.items():
+            sync.require(isinstance(name, str) and len(name) <= 4096
+                         and not any(ord(char) < 32 or ord(char) == 127 for char in name) and allowed(name)
+                         and (name in {"docker-compose.yml", SERVICE_RESOURCES}
+                              or re.fullmatch(r"data/[a-z0-9][a-z0-9_-]*/\.env(?:\.example)?", name)
+                              or re.fullmatch(r"data/[a-z0-9][a-z0-9_-]*/public/.+", name))
+                         and isinstance(data, bytes) and len(data) <= sync.MAX_FILE,
+                         "CANDIDATE_FILES_INVALID")
+            self.path(name)
+            sync.require(not super().is_dir(name), "CANDIDATE_PATH_CONFLICT")
+            self.files[name] = data
+            self.public_files.add(name)
+        inventory_raw = files.get(SERVICE_RESOURCES)
+        if inventory_raw is None and super().is_file(SERVICE_RESOURCES):
+            inventory_raw = super().read(SERVICE_RESOURCES)
+        if inventory_raw is not None:
+            value = sync.loads(inventory_raw)
+            sync.require(isinstance(value, dict) and isinstance(value.get("configuration_files"), list),
+                         "SERVICE_RESOURCES_INVENTORY_INVALID")
+            for row in value["configuration_files"]:
+                sync.require(isinstance(row, dict) and isinstance(row.get("path"), str)
+                             and type(row.get("mode")) is int and 0 <= row["mode"] <= 0o777,
+                             "SERVICE_CONFIGURATION_METADATA_INVALID")
+                self.configuration_modes[row["path"]] = row["mode"]
+        directories = {} if directories is None else directories
+        sync.require(isinstance(directories, dict) and len(directories) <= 600, "CANDIDATE_DIRECTORIES_INVALID")
+        for name, metadata in directories.items():
+            sync.require(isinstance(name, str) and len(name) <= 4096
+                         and not any(ord(char) < 32 or ord(char) == 127 for char in name)
+                         and re.fullmatch(r"data/[a-z0-9][a-z0-9_-]*(?:/.+)?", name)
+                         and isinstance(metadata, dict) and set(metadata) == {"uid", "gid", "mode"}
+                         and all(type(metadata[key]) is int and 0 <= metadata[key] <= 0xffffffff for key in metadata)
+                         and metadata["mode"] <= 0o777, "CANDIDATE_DIRECTORIES_INVALID")
+            self.path(name)
+            sync.require(name not in self.files and not super().is_file(name), "CANDIDATE_PATH_CONFLICT")
+            if not super().is_dir(name): self.directories[name] = dict(metadata)
+        private_keys = {} if private_keys is None else private_keys
+        sync.require(isinstance(private_keys, dict) and len(private_keys) <= 100, "CANDIDATE_PRIVATE_KEYS_INVALID")
+        for name, keys in private_keys.items():
+            sync.require(isinstance(name, str) and re.fullmatch(r"\.secrets/[a-z0-9][a-z0-9_-]*\.env", name)
+                         and isinstance(keys, (list, tuple)) and 0 < len(keys) <= 200
+                         and all(isinstance(key, str) and re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,127}", key)
+                                 for key in keys) and len(set(keys)) == len(keys), "CANDIDATE_PRIVATE_KEYS_INVALID")
+            self.path(name)
+            sync.require(not super().is_dir(name), "CANDIDATE_PATH_CONFLICT")
+            if not super().is_file(name):
+                self.files[name] = "".join(key + "=PREFLIGHT_PRIVATE_" + sync.digest((name + "\0" + key).encode())
+                                           + "\n" for key in keys).encode()
+                self.private_files.add(name)
+        # A future file/directory implies parents, but never shadows an existing
+        # file or symlink. Existing directory metadata are preserved verbatim.
+        for name in list(self.files) + list(self.directories):
+            for parent in PurePosixPath(name).parents:
+                relative = str(parent)
+                if relative == ".": continue
+                self.path(relative)
+                sync.require(relative not in self.files and not super().is_file(relative), "CANDIDATE_PATH_CONFLICT")
+                if not super().is_dir(relative):
+                    self.directories.setdefault(relative, dict(uid=self.uid, gid=self.gid, mode=0o750))
+
+    def read(self, name):
+        self.path(name)
+        return self.files[name] if name in self.files else super().read(name)
+
+    def exists(self, name):
+        self.path(name)
+        return name in self.files or name in self.directories or super().exists(name)
+
+    def is_file(self, name):
+        self.path(name)
+        return name in self.files or name not in self.directories and super().is_file(name)
+
+    def is_dir(self, name):
+        self.path(name)
+        return name in self.directories or name not in self.files and super().is_dir(name)
+
+    def stat(self, name):
+        if name in getattr(self, "files", {}):
+            if super().is_file(name): original = super().stat(name)
+            else: original = SimpleNamespace(st_uid=self.uid, st_gid=self.gid, st_mode=0o640)
+            mode = self.configuration_modes.get(name, stat.S_IMODE(original.st_mode))
+            return SimpleNamespace(st_mode=stat.S_IFREG | mode, st_uid=original.st_uid,
+                                   st_gid=original.st_gid, st_size=len(self.files[name]))
+        if name in getattr(self, "directories", {}):
+            row = self.directories[name]
+            return SimpleNamespace(st_mode=stat.S_IFDIR | row["mode"], st_uid=row["uid"], st_gid=row["gid"], st_size=0)
+        return super().stat(name)
+
+    def mode_matches(self, name, mode):
+        if name in self.files:
+            return stat.S_IMODE(self.stat(name).st_mode) == mode
+        return super().mode_matches(name, mode)
+
+    def public_candidates(self):
+        return candidates(self.source, self.sync, self.public_files)
+
+    def private_env_names(self):
+        return sorted(set(super().private_env_names()) | self.private_files)
+
+
+def software_key(value):
+    if not isinstance(value, str) or not re.fullmatch(r"[A-Za-z0-9]+(?:[ _-]+[A-Za-z0-9]+)*", value):
+        return None
+    return re.sub(r"[ _-]", "", value.lower())
+
+
+def catalog_software_key(icon):
+    if not isinstance(icon, str): return None
+    for prefix in ("https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/",
+                   "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/"):
+        if not icon.startswith(prefix): continue
+        asset = icon[len(prefix):]
+        if re.fullmatch(r"[A-Za-z0-9]+(?:[-_][A-Za-z0-9]+)*\.(?:svg|png)", asset):
+            stem = asset.rsplit(".", 1)[0]
+            return software_key(stem) if re.search(r"[A-Za-z]", stem) else None
+    return None
+
+
 class Guard:
-    def __init__(self, source, baseline, sync, read):
+    def __init__(self, source, baseline, sync, read, filesystem=None):
         self.sync, self.read = sync, read
         self.baseline = baseline
+        filesystem = filesystem or _SourceView(source, sync)
         self.plan = sync.loads(baseline["config/dr-render-plan.json"])
         self.values = {}
         self.compose_env_decoded_values = set()
         self.discarded_honey_alias_values = set()
+        self.honey_alias_catalog_keys = {}
+        self.public_software_image_keys = set()
+        self.managed_public_files = set()
         # Common settings already declared public are not evidence of a leak.
         self.public_values = set()
         self.reviewed_healthchecks = {}
         compose = sync.yaml_load(baseline["docker-compose.yml"])
+        for row in compose.get("services", {}).values():
+            image = row.get("image") if isinstance(row, dict) else None
+            if not isinstance(image, str) or "$" in image or sync.MARKER.search(image): continue
+            image_name = sync.image_repository(image).rsplit("/", 1)[-1]
+            key = software_key(image_name)
+            if key is not None and re.search(r"[A-Za-z]", image_name): self.public_software_image_keys.add(key)
         # Only normal Compose dotenv sources interpret $$ as a literal $.
         # Raw env_file values and private fields in JSON/TOML remain untouched.
         self.compose_env_sources = {".env"}
@@ -267,35 +445,32 @@ class Guard:
         for item in self.plan["files"]:
             if item.get("template") and item["format"] == "json": literals(sync.loads(baseline[item["template"]]))
         for name, bindings in self.plan["env_files"].items():
-            if (source / name).is_file():
+            if filesystem.is_file(name):
                 rows = sync.env_values(read(name))
                 for key, binding in bindings.items():
                     if key in rows:
                         self.remember(rows[key], binding["path"] + "/" + binding["key"],
                                       compose_env=name in self.compose_env_sources)
         for name, export in self.plan["service_folder_exports"].items():
-            if (source / name).is_file():
+            if filesystem.is_file(name):
                 for key, value in sync.env_values(read(name)).items():
                     binding = export["overrides"].get(key, {"path": export["path"], "key": key})
                     self.remember(value, binding["path"] + "/" + binding["key"],
                                   compose_env=name in self.compose_env_sources)
-        if (source / ".env").is_file():
+        if filesystem.is_file(".env"):
             for key, value in sync.env_values(read(".env")).items():
                 binding = self.plan["root_env"].get(key)
                 if binding or sensitive(key):
                     self.remember(value, binding["path"] + "/" + binding["key"] if binding else None,
                                   compose_env=True)
         # Additional Agent env files supply a leak-detection corpus, not guessed mappings.
-        private = source / ".secrets"
-        if private.is_dir():
-            sync.safe_path(private)
-            for path in sorted(private.glob("*.env")):
-                sync.require(len(self.values) < 3000, "PRIVATE_INPUT_LIMIT")
-                for key, value in sync.env_values(read(path.relative_to(source).as_posix())).items():
-                    existing = [ref for ref in self.plan["required_values"] if ref.rsplit("/", 1)[1] == key]
-                    # Reuse a unique published binding; never invent a folder for a new key.
-                    self.remember(value, existing[0] if len(existing) == 1 else None,
-                                  compose_env=path.relative_to(source).as_posix() in self.compose_env_sources)
+        for name in filesystem.private_env_names():
+            sync.require(len(self.values) < 3000, "PRIVATE_INPUT_LIMIT")
+            for key, value in sync.env_values(read(name)).items():
+                existing = [ref for ref in self.plan["required_values"] if ref.rsplit("/", 1)[1] == key]
+                # Reuse a unique published binding; never invent a folder for a new key.
+                self.remember(value, existing[0] if len(existing) == 1 else None,
+                              compose_env=name in self.compose_env_sources)
 
     def remember(self, value, ref, *, compose_env=False):
         # Dotenv producer outputs may quote values. Never evaluate shell syntax.
@@ -405,7 +580,71 @@ class Guard:
             text = text[:start] + '""' + text[end:]
         return text
 
+    def alias_caption_projection(self, text, name, alias):
+        """Project only complete public display-title keys, never their values.
+
+        The original bytes and private corpus are retained. This projection is
+        used only for discarded Honey aliases, never ENV or bound values.
+        """
+        if name not in self.managed_public_files or not name.endswith((".yaml", ".yml")):
+            return text
+        proven = self.public_software_image_keys | self.honey_alias_catalog_keys.get(alias, set())
+        if not proven: return text
+        try:
+            self.sync.yaml_load(text)
+            node = self.sync.yaml.compose(text, Loader=self.sync.UniqueLoader)
+        except Exception:
+            return text
+        spans = []
+        def visit(row):
+            if isinstance(row, self.sync.yaml.nodes.MappingNode):
+                for key, value in row.value:
+                    if (isinstance(key, self.sync.yaml.nodes.ScalarNode)
+                            and key.tag == "tag:yaml.org,2002:str"
+                            and software_key(key.value) in proven
+                            and isinstance(value, self.sync.yaml.nodes.MappingNode)
+                            and any(field.value in {"href", "icon", "widget", "container", "server"}
+                                    for field, _ in value.value
+                                    if isinstance(field, self.sync.yaml.nodes.ScalarNode))):
+                        spans.append((key.start_mark.index, key.end_mark.index))
+                    visit(value)
+            elif isinstance(row, self.sync.yaml.nodes.SequenceNode):
+                for value in row.value: visit(value)
+        visit(node)
+        for start, end in sorted(spans, reverse=True):
+            text = text[:start] + '\"\"' + text[end:]
+        return text
+
+    def private_refusal(self, code, name, text, value):
+        error = self.sync.Refused(code + " " + name)
+        references = sorted(ref for ref in self.values.get(value, ())
+                            if ref in set(self.plan.get("required_values", ())))
+        lines = sorted({text.count("\n", 0, match.start()) + 1
+                        for match in re.finditer(re.escape(value), text)})
+        error.public_preflight_diagnostic = dict(schema=1, stage="GITHUB", code=code,
+            path=name, lines=lines, references=references, retryable=False)
+        raise error
+
     def scan(self, data, name, assignments=True):
+        try:
+            return self._scan(data, name, assignments)
+        except self.sync.Refused as error:
+            if not hasattr(error, "public_preflight_diagnostic"):
+                error.public_preflight_diagnostic = dict(schema=1, stage="GITHUB",
+                    code=str(error).partition(" ")[0], path=name,
+                    lines=[], references=[], retryable=False)
+            raise
+        except (self.sync.yaml.YAMLError, json.JSONDecodeError, self.sync.tomllib.TOMLDecodeError) as error:
+            refused = self.sync.Refused("PUBLIC_DECLARATION_INVALID " + name)
+            mark = getattr(error, "problem_mark", None)
+            line = getattr(mark, "line", None)
+            line = line + 1 if type(line) is int else getattr(error, "lineno", None)
+            refused.public_preflight_diagnostic = dict(schema=1, stage="GITHUB",
+                code="PUBLIC_DECLARATION_INVALID", path=name,
+                lines=[line] if type(line) is int and line > 0 else [], references=[], retryable=False)
+            raise refused from None
+
+    def _scan(self, data, name, assignments=True):
         text = decode(data, self.sync, name)
         kind = name.removesuffix(".example").removesuffix(".template")
         python = None
@@ -458,15 +697,20 @@ class Guard:
             prior_text, name)) if self.discarded_honey_alias_values else ""
         for value in self.values:
             if value in self.discarded_honey_alias_values and self.values[value] == {None}:
-                # A brand can also be an anonymized dashboard label. Keep only
-                # its existing same-file footprint; a new file/copy still fails.
-                self.sync.require(len(value) < 8 or private_literals.count(value) <= prior_literals.count(value),
-                                  "PRIVATE_VALUE_IN_PUBLIC_FILE", name)
+                # A complete, proven software display title can contain a
+                # discarded description such as "Backup Server". Its caption
+                # key is public; copies in values, comments and other files are
+                # still compared against their exact previous footprint.
+                observed = self.alias_caption_projection(private_literals, name, value)
+                previous = self.alias_caption_projection(prior_literals, name, value)
+                if len(value) >= 8 and observed.count(value) > previous.count(value):
+                    self.private_refusal("PRIVATE_VALUE_IN_PUBLIC_FILE", name, observed, value)
                 continue
             # An escaped dotenv secret can itself contain literal ${VAR}; do
             # not erase that part of a known secret as if it were a reference.
             projected = private_literals if value in self.compose_env_decoded_values else private
-            self.sync.require(len(value) < 8 or value not in projected, "PRIVATE_VALUE_IN_PUBLIC_FILE", name)
+            if len(value) >= 8 and value in projected:
+                self.private_refusal("PRIVATE_VALUE_IN_PUBLIC_FILE", name, text, value)
         # Detect literal credential assignments even in otherwise ordinary text/code.
         structured = assignments and kind.endswith((".json", ".yaml", ".yml", ".toml"))
         if structured:
@@ -931,11 +1175,7 @@ def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None)
         sync.require(index in claimed or not sync.MARKER.search(json.dumps(row)),
                      "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", name)
 
-    def logical(value):
-        # Only whole ASCII application names with conventional separators are
-        # comparable. Never erase a Unicode/private suffix to manufacture a match.
-        if not re.fullmatch(r"[A-Za-z0-9]+(?:[ _-]+[A-Za-z0-9]+)*", value): return None
-        return re.sub(r"[ _-]", "", value.lower())
+    logical = software_key
 
     service_keys = {}
     live_names = {}
@@ -953,7 +1193,7 @@ def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None)
                     if isinstance(row, dict) and isinstance(row.get("icon"), str)
                     and not sync.MARKER.search(row["icon"])}
 
-    def remember_discarded(value, replacement, field):
+    def remember_discarded(value, replacement, field, reviewed_icon=None):
         if guard is None or not isinstance(value, str) or len(value) < 8 or value == replacement:
             return
         if value in public_identities:
@@ -961,6 +1201,9 @@ def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None)
         if field == "name" and len(service_keys.get(logical(value), [])) == 1:
             return  # The whole application name is already public in Compose.
         guard.remember_literal(value, None, discarded_honey_alias=True)
+        icon_key = catalog_software_key(reviewed_icon) if field in {"name", "desc"} else None
+        if icon_key is not None:
+            guard.honey_alias_catalog_keys.setdefault(value, set()).add(icon_key)
 
     aligned = []
     after = copy.deepcopy(after)
@@ -996,7 +1239,7 @@ def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None)
             value = old_row.get(key)
             preserved = key != "href" or value in ("#", "")
             if key in new_row and isinstance(value, str) and preserved and not sync.MARKER.search(value):
-                remember_discarded(new_row[key], value, key)
+                remember_discarded(new_row[key], value, key, reviewed_icon=old_row.get("icon"))
                 new_row[key] = value
     before = copy.deepcopy(before)
     before["services"] = aligned
@@ -1168,14 +1411,15 @@ def service_state_units(value):
              "fresh_bootstrap": "Restore this resource from the matching encrypted service-state archive before starting the service."}
             for row in value["resources"] if row["recovery"]["method"] == "stopped_archive"]
 
-def render(source, baseline, sync, image_reader=None):
+def render(source, baseline, sync, image_reader=None, *, filesystem=None, declarations_only=False):
     inputs, outputs, directories = {}, {}, {}
+    filesystem = filesystem or _SourceView(source, sync)
     def read(name):
-        data = sync.read_file(source, name); inputs[name] = data; return data
-    guard = Guard(source, baseline, sync, read)
+        data = filesystem.read(name); inputs[name] = data; return data
+    guard = Guard(source, baseline, sync, read, filesystem)
     public_services = tuple(sync.yaml_load(baseline["docker-compose.yml"])["services"])
     for item in guard.plan["files"]:
-        if not item.get("template") or not (source / item["destination"]).is_file(): continue
+        if not item.get("template") or not filesystem.is_file(item["destination"]): continue
         old, new = baseline[item["template"]], read(item["destination"])
         if item["format"] == "json":
             old, new = json_template_trees(item, old, new, sync, public_services=public_services, guard=guard)
@@ -1199,16 +1443,17 @@ def render(source, baseline, sync, image_reader=None):
         names = [sync.relative((e if isinstance(e, str) else e.get("path", "")).removeprefix("./")) for e in entries]
         keys = set()
         for name in names:
-            if name.startswith(".secrets/") and (source / name).is_file(): keys.update(sync.env_values(read(name)))
+            if name.startswith(".secrets/") and filesystem.is_file(name): keys.update(sync.env_values(read(name)))
         for name in names:
             if not name.startswith(".secrets/"): private_by_public.setdefault(name, set()).update(keys)
     plan = copy.deepcopy(guard.plan)
     old_manifest = sync.loads(baseline["config/dr-manifest.yaml"])
     managed = {"schema": 1, "resources": [], "configuration_files": []}
     managed_sha = None
-    if (source / SERVICE_RESOURCES).exists():
+    if filesystem.exists(SERVICE_RESOURCES):
         raw_inventory = read(SERVICE_RESOURCES)
         managed = service_inventory(sync.loads(raw_inventory), compose, sync)
+        guard.managed_public_files = {row["path"] for row in managed["configuration_files"]}
         guard.scan(raw_inventory, SERVICE_RESOURCES)
         managed_sha = sync.digest(raw_inventory)
         for item in managed["configuration_files"]:
@@ -1216,11 +1461,11 @@ def render(source, baseline, sync, image_reader=None):
             data = read(name)
             sync.require(sync.digest(data) == item["sha256"], "SERVICE_CONFIGURATION_HASH_MISMATCH", name)
             if os.name != "nt":
-                sync.require(public_configuration_mode_matches(source / name, item["mode"]),
+                sync.require(filesystem.mode_matches(name, item["mode"]),
                              "SERVICE_CONFIGURATION_MODE_MISMATCH", name)
             guard.scan(data, name)
     managed_by_target = {(row["service"], row["target"]): row for row in managed["resources"]}
-    names, skipped = candidates(source, sync)
+    names, skipped = filesystem.public_candidates()
     sync.require(managed_sha is None or SERVICE_RESOURCES in names, "SERVICE_RESOURCES_NOT_PUBLIC")
     sync.require(all(item["path"] in names for item in managed["configuration_files"]), "SERVICE_CONFIGURATION_NOT_PUBLIC")
     prior = sync.loads(baseline.get(INVENTORY, b'{"schema":1,"files":{},"source_hashes":{}}'))
@@ -1232,7 +1477,14 @@ def render(source, baseline, sync, image_reader=None):
         if name.startswith("data/") and name.split("/")[1] not in services: continue
         data = read(name)
         if re.fullmatch(r"data/[^/]+/\.env(?:\.example)?", name):
+            prospective = declarations_only and isinstance(filesystem, _CandidateSource) and name in filesystem.public_files
+            if prospective:
+                private_keys = set(private_by_public.get(name, ()))
+                sync.require(not any(key in private_keys or sensitive(key) for key in sync.env_values(data)),
+                             "CANDIDATE_PUBLIC_ENV_REQUIRES_PRIVATE_CLASSIFICATION", name)
             safe = guard.env(data, name, private_by_public.get(name, ()))
+            if prospective:
+                sync.require(safe == data, "CANDIDATE_PUBLIC_ENV_REQUIRES_PRIVATE_CLASSIFICATION", name)
         else:
             guard.scan(data, name)
             safe = data
@@ -1263,7 +1515,7 @@ def render(source, baseline, sync, image_reader=None):
             name = entry if isinstance(entry, str) else entry.get("path", "")
             name = sync.relative(name.removeprefix("./"))
             optional = isinstance(entry, dict) and entry.get("required") is False
-            if optional and not (source / name).exists():
+            if optional and not filesystem.exists(name):
                 continue
             if name.startswith(".secrets/"):
                 rows = sync.env_values(read(name))
@@ -1298,9 +1550,9 @@ def render(source, baseline, sync, image_reader=None):
                     continue
             if kind == "bind" and not name.startswith("/"):
                 sync.relative(name)
-                path = source / name; sync.safe_path(path)
-                if path.is_dir():
-                    info = path.stat()
+                filesystem.path(name)
+                if filesystem.is_dir(name):
+                    info = filesystem.stat(name)
                     directories[name] = {"path": name, "uid": getattr(info, "st_uid", 1000), "gid": getattr(info, "st_gid", 1000),
                                          "mode": format(stat.S_IMODE(info.st_mode), "04o")}
                     method = "BOOTSTRAP_GENERATED"
@@ -1369,7 +1621,7 @@ def render(source, baseline, sync, image_reader=None):
     for item in plan["files"]:
         if not item.get("template"): continue
         name, dest = item["template"], item["destination"]
-        if not (source / dest).is_file():
+        if not filesystem.is_file(dest):
             sync.require(False, "ACTIVE_TEMPLATE_SOURCE_MISSING", name)
         old, raw = baseline[name], read(dest)
         if item["format"] == "json":
@@ -1411,10 +1663,6 @@ def render(source, baseline, sync, image_reader=None):
     for name in baseline:
         if re.fullmatch(r"data/[^/]+/\.env", name) and name.split("/")[1] in removed:
             outputs[name] = None
-    image_reader = image_reader or (lambda src, c, old: dynamic_images(src, c, old, sync))
-    old_locks = sync.loads(baseline["config/image-lock.json"])
-    locks = image_reader(source, compose, old_locks)
-    sync.require(set(locks) == services, "IMAGE_INVENTORY_MISMATCH")
     override = sync.loads(baseline["config/compose.dr.yaml"])
     # The one existing non-image override is a reviewed fresh PostgreSQL cluster.
     # Never silently keep it when the live PostgreSQL mounts are changed.
@@ -1423,7 +1671,6 @@ def render(source, baseline, sync, image_reader=None):
             old_compose = sync.yaml_load(baseline["docker-compose.yml"])
             sync.require(compose["services"][service].get("volumes") == old_compose["services"][service].get("volumes"),
                          "RECOVERY_VOLUME_OVERRIDE_REVIEW_REQUIRED", service)
-    override["services"] = {s: dict(override["services"].get(s, {}), image=locks[s]["image"], platform=locks[s]["platform"]) for s in compose["services"]}
     manifest = copy.deepcopy(old_manifest)
     manifest["components"], manifest["references"] = components, refs
     manifest["state_units"] = [dict(r, services=[s for s in r["services"] if s in services])
@@ -1445,8 +1692,7 @@ def render(source, baseline, sync, image_reader=None):
               "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup"}
     if managed_sha is not None:
         layout["service_resources_inventory"] = {"path": SERVICE_RESOURCES, "sha256": managed_sha}
-    for name, value in {"config/image-lock.json": locks, "config/compose.dr.yaml": override,
-                        "config/dr-render-plan.json": plan, "config/dr-manifest.yaml": manifest, LAYOUT: layout}.items():
+    for name, value in {"config/dr-render-plan.json": plan, "config/dr-manifest.yaml": manifest, LAYOUT: layout}.items():
         outputs[name] = guard.scan((json.dumps(value, indent=2, ensure_ascii=False) + "\n").encode(), name, assignments=False)
     owned = {n: h for n, h in owned.items() if outputs.get(n, b"") is not None}
     outputs[INVENTORY] = (json.dumps({"schema": 1, "files": owned, "source_hashes": source_hashes}, indent=2, sort_keys=True) + "\n").encode()
@@ -1454,9 +1700,99 @@ def render(source, baseline, sync, image_reader=None):
     # Values learned in later templates must also protect earlier files.
     generated = {INVENTORY, LAYOUT, "config/image-lock.json", "config/compose.dr.yaml",
                  "config/dr-render-plan.json", "config/dr-manifest.yaml"}
+    if declarations_only:
+        # All templates have contributed their private corpus before this final
+        # pass. Image metadata/publication proofs are checked separately by the
+        # caller and are never synthesized for a prospective deployment.
+        for name, data in outputs.items():
+            if data is not None: guard.scan(data, name, assignments=name not in generated)
+        sync.require(all(filesystem.read(name) == data for name, data in inputs.items()), "SOURCE_CHANGED_DURING_EXPORT")
+        sync.require(filesystem.public_candidates()[0] == names, "PUBLIC_FILE_LIST_CHANGED_DURING_EXPORT")
+        hashes = {name: sync.digest(data) if data is not None else None for name, data in outputs.items()}
+        fingerprint = sync.digest(json.dumps(hashes, sort_keys=True, separators=(",", ":")).encode())
+        return dict(schema=1, status="PASS", stage="PUBLIC_EXPORT",
+                    public_paths=sorted(hashes), public_fingerprint=fingerprint)
+    image_reader = image_reader or (lambda src, c, old: dynamic_images(src, c, old, sync))
+    old_locks = sync.loads(baseline["config/image-lock.json"])
+    locks = image_reader(source, compose, old_locks)
+    sync.require(set(locks) == services, "IMAGE_INVENTORY_MISMATCH")
+    override["services"] = {s: dict(override["services"].get(s, {}), image=locks[s]["image"], platform=locks[s]["platform"]) for s in compose["services"]}
+    for name, value in {"config/image-lock.json": locks, "config/compose.dr.yaml": override}.items():
+        outputs[name] = guard.scan((json.dumps(value, indent=2, ensure_ascii=False) + "\n").encode(), name, assignments=False)
     for name, data in outputs.items():
         if data is not None: guard.scan(data, name, assignments=name not in generated)
-    sync.require(all(sync.read_file(source, n) == value for n, value in inputs.items()), "SOURCE_CHANGED_DURING_EXPORT")
-    sync.require(candidates(source, sync)[0] == names, "PUBLIC_FILE_LIST_CHANGED_DURING_EXPORT")
+    sync.require(all(filesystem.read(n) == value for n, value in inputs.items()), "SOURCE_CHANGED_DURING_EXPORT")
+    sync.require(filesystem.public_candidates()[0] == names, "PUBLIC_FILE_LIST_CHANGED_DURING_EXPORT")
     sync.require(image_reader(source, compose, old_locks) == locks, "IMAGES_CHANGED_DURING_EXPORT")
     return {n: data for n, data in outputs.items() if data != baseline.get(n)}
+
+
+# A closed reason vocabulary keeps parser/transport messages and source values
+# out of the GUI boundary. Unlisted reasons become the fixed generic fallback.
+_PUBLIC_PREFLIGHT_CODES = frozenset({
+    "PUBLIC_DECLARATION_INVALID", "PUBLIC_EXPORT_REFUSED", "COMMAND_FAILED",
+    "PRIVATE_VALUE_IN_PUBLIC_FILE", "PRIVATE_VALUE_NEEDS_EXPLICIT_BINDING",
+    "PRIVATE_FIELD_NEEDS_EXPLICIT_BINDING", "PRIVATE_VARIABLE_DEFAULT_REFUSED",
+    "PRIVATE_BINDING_REMOVAL_REVIEW_REQUIRED", "BOUND_CODE_NEEDS_EXPLICIT_BINDING",
+    "CREDENTIAL_PATTERN_REFUSED", "LITERAL_CREDENTIAL_REFUSED", "SQL_CREDENTIAL_REFUSED",
+    "PRIVATE_IDENTITY_REFUSED", "DATABASE_DUMP_REFUSED", "DATABASE_OR_ARCHIVE_REFUSED",
+    "BINARY_FILE_REFUSED", "NON_UTF8_PUBLIC_FILE", "PYTHON_SOURCE_INVALID",
+    "SERVICE_CONFIGURATION_HASH_MISMATCH", "SERVICE_CONFIGURATION_MODE_MISMATCH",
+    "SERVICE_CONFIGURATION_METADATA_INVALID", "SERVICE_CONFIGURATION_NOT_PUBLIC",
+    "SERVICE_CONFIGURATION_NOT_MOUNTED", "SERVICE_CONFIGURATION_DATA_OVERLAP",
+    "SERVICE_RESOURCES_INVENTORY_INVALID", "SERVICE_RESOURCES_COMPOSE_MISMATCH",
+    "SERVICE_RESOURCE_PATH_INVALID", "SERVICE_DATA_RECOVERY_REQUIRED", "SERVICE_DATA_RECOVERY_INVALID",
+    "SERVICE_RUNTIME_ARCHIVE_REFUSED", "SERVICE_RUNTIME_SOURCE_INVALID", "SERVICE_VOLUME_DRIVER_UNSUPPORTED",
+    "SERVICE_DATA_RESOURCE_OUTSIDE_STACK", "SERVICE_RESOURCES_NOT_PUBLIC",
+    "SOURCE_FILE_MISSING_OR_OVERSIZED", "SOURCE_CHANGED_DURING_EXPORT", "PUBLIC_FILE_LIST_CHANGED_DURING_EXPORT",
+    "ACTIVE_TEMPLATE_SOURCE_MISSING", "PUBLIC_ENV_PATH_REQUIRED", "PRIVATE_ENV_EMPTY",
+    "PUBLIC_ENV_PRIVATE_VALUE_MUST_COME_FROM_AGENT", "PUBLIC_ENV_BINDING_USE_PRIVATE_ENV",
+    "PUBLIC_ENV_INLINE_COMMENT_PRIVATE", "PUBLIC_ENV_SEMANTICS_CHANGED",
+    "PRIVATE_BIND_FILE_NEEDS_TEMPLATE", "SERVICES_REQUIRED", "SERVICE_LIMIT", "SERVICE_NAME_REFUSED",
+    "SERVICE_MAPPING_REQUIRED", "HONEY_BOUND_LAYOUT_REVIEW_REQUIRED", "RECOVERY_VOLUME_OVERRIDE_REVIEW_REQUIRED",
+    "MISSING_SERVICE_DEPENDENCY", "SERVICE_DEPENDENCY_CYCLE", "SYMLINK_REFUSED", "UNSAFE_PATH",
+    "CANDIDATE_SOURCE_INVALID", "CANDIDATE_FILES_INVALID", "CANDIDATE_PATH_CONFLICT",
+    "CANDIDATE_DIRECTORIES_INVALID", "CANDIDATE_PRIVATE_KEYS_INVALID",
+    "CANDIDATE_PUBLIC_ENV_REQUIRES_PRIVATE_CLASSIFICATION",
+})
+
+
+def safe_preflight_diagnostic(error, *, prospective_paths, baseline):
+    """Return only a closed reason, reviewed paths, positions and public refs."""
+    raw = str(error)
+    reason, _, location = raw.partition(" ")
+    code = reason if reason in _PUBLIC_PREFLIGHT_CODES else "PUBLIC_DECLARATION_INVALID"
+    allowed_paths = {path for path in prospective_paths if isinstance(path, str) and len(path) <= 4096
+                     and not any(ord(char) < 32 or ord(char) == 127 for char in path) and allowed(path)}
+    path = next((path for path in sorted(allowed_paths)
+                 if location == path or location.startswith(path + ":/")), None)
+    evidence = getattr(error, "public_preflight_diagnostic", {})
+    if not isinstance(evidence, dict): evidence = {}
+    if isinstance(evidence.get("path"), str) and evidence["path"] in allowed_paths: path = evidence["path"]
+    try:
+        plan = json.loads(baseline["config/dr-render-plan.json"])
+        published_refs = set(plan.get("required_values", ()))
+    except Exception:
+        published_refs = set()
+    lines = evidence.get("lines", ())
+    references = evidence.get("references", ())
+    safe_lines = sorted({value for value in lines if type(value) is int and 0 < value <= 4 * 1024**2}) if isinstance(lines, (list, tuple)) else []
+    safe_refs = sorted({value for value in references if isinstance(value, str) and value in published_refs}) if isinstance(references, (list, tuple)) else []
+    result = dict(schema=1, stage="GITHUB", code=code, lines=safe_lines[:256],
+                  references=safe_refs[:200], retryable=code in {
+                      "SOURCE_CHANGED_DURING_EXPORT", "PUBLIC_FILE_LIST_CHANGED_DURING_EXPORT"})
+    if path is not None: result["path"] = path
+    return result
+
+
+def preflight(source, baseline, sync, *, files, directories=None, private_keys=None):
+    """Check prospective public declarations without files, containers or writes.
+
+    ``files`` maps reviewed relative public paths to immutable bytes. Directory
+    metadata use ``{uid, gid, mode}``. Missing private targets use key names only;
+    entered secret values must be checked by the desktop before this call.
+    This validates declarations and the complete available private corpus, not
+    image locks, running applications or successful GitHub publication.
+    """
+    view = _CandidateSource(source, sync, files, directories, private_keys)
+    return render(source, baseline, sync, filesystem=view, declarations_only=True)

@@ -117,6 +117,17 @@ def _closing(actions, start):
     raise TransformRefused("LOCAL_TEMPLATE_TRANSFORM_REFUSED")
 
 
+def _raw_secret_options(text):
+    """The reviewed optional Agent argument disables only reference expansion."""
+    try:
+        pairs = json.loads(text, object_pairs_hook=lambda items: items)
+        return (isinstance(pairs, list) and len(pairs) == 1
+                and isinstance(pairs[0], tuple) and len(pairs[0]) == 2
+                and pairs[0][0] == 'expandSecretReferences' and pairs[0][1] is False)
+    except (ValueError, TypeError, RecursionError):
+        return False
+
+
 def _signature(action):
     if not re.match(r"^(?:with|range)\s+(?:getSecretByName|secret|listSecrets)\s", action.expression):
         return None
@@ -126,13 +137,15 @@ def _signature(action):
     if function == "getSecretByName":
         _need(operation == "with" and len(args) == 6)
     else:
-        _need(len(args) == 5)
+        _need(len(args) in (5, 6))
+        if len(args) == 6:
+            _need(_raw_secret_options(args[5][1]))
     project, environment, folder = (v for _, v in args[2:5])
     _need(re.fullmatch(r"[A-Za-z0-9_-]+", project) and re.fullmatch(r"[A-Za-z0-9_-]+", environment)
           and re.fullmatch(r"/(?:[a-z0-9_-]+/)*[a-z0-9_-]+", folder))
     key = args[5][1] if function == "getSecretByName" else None
     if key is not None:
-        _need(re.fullmatch(r"[A-Z][A-Z0-9_]*", key))
+        _need(re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,127}", key))
     return operation, function, folder, key
 
 

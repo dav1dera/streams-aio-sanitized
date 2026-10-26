@@ -11,7 +11,7 @@ import local_config_contract
 # Semantic subset of Go templates. Never evaluates templates or fetches secrets.
 _KEY = '\x01KEY\x02'
 _VALUE = '\x01VALUE\x02'
-_NAME = re.compile(r'[A-Z][A-Z0-9_]*\Z')
+_NAME = re.compile(r'[A-Za-z_][A-Za-z0-9_]{0,127}\Z')
 _PATH = re.compile(r'/(?:[a-z0-9_-]+/)*[a-z0-9_-]+\Z')
 _LOCAL_CONFIG_PATH = Path('/etc/infisical/local-stack-config.json')
 _LOCAL_SOURCE_PATH = Path('/etc/infisical/local-stack-agent-source.json')
@@ -86,6 +86,17 @@ def _tokens(content):
     return tokens
 
 
+def _raw_secret_options(text):
+    """The reviewed optional Agent argument disables only reference expansion."""
+    try:
+        pairs = json.loads(text, object_pairs_hook=lambda items: items)
+        return (isinstance(pairs, list) and len(pairs) == 1
+                and isinstance(pairs[0], tuple) and len(pairs[0]) == 2
+                and pairs[0][0] == 'expandSecretReferences' and pairs[0][1] is False)
+    except (ValueError, TypeError, RecursionError):
+        return False
+
+
 class _Parser:
     def __init__(self, content):
         self.tokens = _tokens(content)
@@ -106,11 +117,13 @@ class _Parser:
                 else:
                     nodes.append(('text', args))
                 continue
-            if (len(args) == 5 and args[0] in (
+            if (len(args) in (5, 6) and args[0] in (
                     ('symbol', 'range'), ('symbol', 'with'))
-                    and args[1] == ('symbol', 'secret')
+                    and args[1] in (('symbol', 'secret'), ('symbol', 'listSecrets'))
                     and all(t == 'string' for t, _ in args[2:])):
-                project, environment, path = (v for _, v in args[2:])
+                if len(args) == 6:
+                    dr.require(_raw_secret_options(args[5][1]), 'UNSUPPORTED_SECRET_OPTIONS')
+                project, environment, path = (v for _, v in args[2:5])
                 dr.require(re.fullmatch(r'[A-Za-z0-9_-]+', project)
                            and re.fullmatch(r'[A-Za-z0-9_-]+', environment)
                            and _PATH.fullmatch(path),
@@ -226,7 +239,7 @@ def _render(nodes, key):
 def _assignments(text):
     result = []
     value = re.escape(_VALUE)
-    pattern = re.compile('(' + re.escape(_KEY) + r'|[A-Z][A-Z0-9_]*)=(?:'
+    pattern = re.compile('(' + re.escape(_KEY) + r'|[A-Za-z_][A-Za-z0-9_]{0,127})=(?:'
                          + value + "|'" + value + "'|\"" + value + '\")')
     for line in text.splitlines():
         line = line.strip()
