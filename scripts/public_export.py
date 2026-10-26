@@ -7,12 +7,13 @@ import ast
 import copy
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import re
 import stat
 
 INVENTORY = "config/public-sync-inventory.json"
 LAYOUT = "config/public-stack-layout.json"
+SERVICE_RESOURCES = "config/service-resources.json"
 RESERVED = {INVENTORY, LAYOUT, ".gitignore", ".github", "systemd",
             "config/dr-render-plan.json", "config/dr-manifest.yaml",
             "config/private-config-overlays.json", "config/image-lock.json", "config/compose.dr.yaml",
@@ -147,6 +148,8 @@ def python_target_sensitive(node):
 def allowed(name):
     """Immutable floor beneath Git ignore rules; negation cannot permit a DB."""
     parts = name.split("/")
+    if name == SERVICE_RESOURCES:
+        return True
     if name in RESERVED or parts[0] in {".github", "systemd", "tests"}:
         return False
     if any(p.lower() in {d.lower() for d in PRIVATE_DIRS} for p in parts) or PRIVATE_SUFFIX.search(parts[-1]):
@@ -1005,6 +1008,118 @@ def json_template_trees(item, old, raw, sync, *, public_services=(), guard=None)
     return before, after
 
 
+
+"""Reviewed metadata validator, kept independent from the GUI installation."""
+def service_inventory(value, compose, sync):
+    sync.require(isinstance(value, dict) and set(value) == {"schema", "resources", "configuration_files"}
+                 and value["schema"] == 1 and isinstance(value["resources"], list)
+                 and len(value["resources"]) <= 500 and isinstance(value["configuration_files"], list),
+                 "SERVICE_RESOURCES_INVENTORY_INVALID")
+    def path(raw, absolute=None):
+        sync.require(isinstance(raw, str) and raw and len(raw) <= 4096 and "\\" not in raw
+                     and not any(ord(char) < 32 or ord(char) == 127 for char in raw)
+                     and "$" not in raw and ".." not in raw.split("/"), "SERVICE_RESOURCE_PATH_INVALID")
+        canonical = str(PurePosixPath(raw))
+        sync.require(canonical not in {"", "."} and (absolute is None or canonical.startswith("/") == absolute),
+                     "SERVICE_RESOURCE_PATH_INVALID")
+        return canonical
+    def runtime(source):
+        return source == "/" or any(source == root or source.startswith(root + "/") for root in
+               ("/proc", "/sys", "/dev", "/run", "/var/run", "/var/lib/docker")) or (
+                   source.startswith("/") and source.endswith(".sock")) or source in {"/etc/localtime", "/etc/timezone"}
+    declared = {}
+    for service, row in compose["services"].items():
+        for kind, source, target, mode in mounts(row, sync):
+            declared[(service, path(target, True))] = (kind, path(source) if source else "", "ro" in mode.split(","))
+        tmpfs = row.get("tmpfs", [])
+        if isinstance(tmpfs, str): tmpfs = [tmpfs]
+        sync.require(isinstance(tmpfs, list), "SERVICE_RESOURCES_COMPOSE_MISMATCH")
+        for entry in tmpfs:
+            sync.require(isinstance(entry, str), "SERVICE_RESOURCES_COMPOSE_MISMATCH")
+            declared[(service, path(entry.split(":", 1)[0], True))] = ("tmpfs", "", False)
+        configs = row.get("configs", [])
+        sync.require(isinstance(configs, list), "SERVICE_RESOURCES_COMPOSE_MISMATCH")
+        for entry in configs:
+            sync.require(isinstance(entry, (dict, str)), "SERVICE_RESOURCES_COMPOSE_MISMATCH")
+            name = entry if isinstance(entry, str) else entry.get("source")
+            definition = compose.get("configs", {}).get(name)
+            sync.require(isinstance(name, str) and isinstance(definition, dict), "SERVICE_RESOURCES_COMPOSE_MISMATCH")
+            target = "/" + name if isinstance(entry, str) else entry.get("target", "/" + name)
+            source = path(definition["file"], False) if "file" in definition else "config:" + name
+            declared[(service, path(target, True))] = ("config", source, True)
+    files, ids, targets = {}, set(), set()
+    for item in value["configuration_files"]:
+        sync.require(isinstance(item, dict) and set(item) == {"path", "mode", "sha256"},
+                     "SERVICE_CONFIGURATION_METADATA_INVALID")
+        name = path(item["path"], False)
+        parts = name.split("/")
+        sync.require(len(parts) >= 4 and parts[0] == "data" and parts[1] in compose["services"]
+                     and parts[2] == "public" and allowed(name) and name not in files
+                     and type(item["mode"]) is int and 0 <= item["mode"] <= 0o777
+                     and isinstance(item["sha256"], str) and re.fullmatch(r"[0-9a-f]{64}", item["sha256"]),
+                     "SERVICE_CONFIGURATION_METADATA_INVALID")
+        files[name] = item
+    for item in value["resources"]:
+        sync.require(isinstance(item, dict) and set(item) == {"id", "service", "type", "source", "target", "read_only", "role", "recovery"}
+                     and isinstance(item["id"], str) and re.fullmatch(r"[A-Za-z0-9_-]{1,128}", item["id"])
+                     and item["service"] in compose["services"] and item["type"] in {"bind", "volume", "tmpfs", "config"}
+                     and item["role"] in {"runtime", "config", "data", "external"}
+                     and type(item["read_only"]) is bool and isinstance(item["recovery"], dict)
+                     and set(item["recovery"]) == {"method"}
+                     and item["recovery"]["method"] in {"recreate", "stopped_archive", "external"},
+                     "SERVICE_RESOURCES_INVENTORY_INVALID")
+        target = path(item["target"], True)
+        source = item["source"]
+        if item["type"] == "config" and isinstance(source, str) and source.startswith("config:"):
+            sync.require(re.fullmatch(r"config:[A-Za-z0-9][A-Za-z0-9_.-]{0,127}", source), "SERVICE_RESOURCE_PATH_INVALID")
+        else:
+            source = path(source) if source else ""
+        key = item["service"], target
+        sync.require(item["id"] not in ids and key not in targets
+                     and declared.get(key) == (item["type"], source, item["read_only"]), "SERVICE_RESOURCES_COMPOSE_MISMATCH")
+        ids.add(item["id"]); targets.add(key)
+        method = item["recovery"]["method"]
+        is_runtime = item["type"] == "tmpfs" or item["type"] == "bind" and runtime(source)
+        sync.require(not is_runtime or item["role"] == "runtime" and method == "recreate",
+                     "SERVICE_RUNTIME_ARCHIVE_REFUSED")
+        sync.require(item["role"] != "runtime" or is_runtime, "SERVICE_RUNTIME_SOURCE_INVALID")
+        if method == "stopped_archive":
+            sync.require(item["role"] == "data" and not item["read_only"] and item["type"] in {"bind", "volume"},
+                         "SERVICE_DATA_RECOVERY_INVALID")
+            if item["type"] == "bind":
+                sync.require(source.startswith("data/") and not source.startswith("/"), "SERVICE_DATA_RESOURCE_OUTSIDE_STACK")
+        elif method == "recreate":
+            sync.require(item["read_only"] or is_runtime or item["role"] == "config" and source in files,
+                         "SERVICE_DATA_RECOVERY_REQUIRED")
+        if item["type"] == "volume":
+            definition = compose.get("volumes", {}).get(source)
+            sync.require(definition is None and source in compose.get("volumes", {}) or isinstance(definition, dict),
+                         "SERVICE_RESOURCES_COMPOSE_MISMATCH")
+            if method == "stopped_archive":
+                definition = definition or {}
+                sync.require(not definition.get("external") and definition.get("driver", "local") == "local"
+                             and not definition.get("driver_opts"), "SERVICE_VOLUME_DRIVER_UNSUPPORTED")
+    seeded = set(files) | {'data/' + service + '/.env' for service in compose['services']}
+    sync.require(not any(row['type'] == 'bind' and row['recovery']['method'] == 'stopped_archive'
+                         and any(name == row['source'] or name.startswith(row['source'] + '/') for name in seeded)
+                         for row in value['resources']), 'SERVICE_CONFIGURATION_DATA_OVERLAP')
+    for name in files:
+        sync.require(any(row['read_only'] and (row["type"] == "bind" and (name == row["source"] or name.startswith(row["source"] + "/"))
+                         or row["type"] == "config" and row["source"] == name) for row in value["resources"]),
+                     "SERVICE_CONFIGURATION_NOT_MOUNTED")
+    return value
+
+
+def service_state_units(value):
+    return [{"id": "service-" + row["id"], "resource_id": row["id"], "services": [row["service"]],
+             "path_or_type": ("volume:" if row["type"] == "volume" else "") + row["source"],
+             "classification": "REQUIRED_USER_STATE", "backup_required": True, "blocks_quick_redeploy": True,
+             "recovery_asset": "services-state.tar.gz.age",
+             "reason": "Declared writable service data are captured with all writers stopped in the encrypted service-state archive.",
+             "loss_consequence": "Application data and settings cannot be recreated from public configuration alone.",
+             "fresh_bootstrap": "Restore this resource from the matching encrypted service-state archive before starting the service."}
+            for row in value["resources"] if row["recovery"]["method"] == "stopped_archive"]
+
 def render(source, baseline, sync, image_reader=None):
     inputs, outputs, directories = {}, {}, {}
     def read(name):
@@ -1041,7 +1156,25 @@ def render(source, baseline, sync, image_reader=None):
             if not name.startswith(".secrets/"): private_by_public.setdefault(name, set()).update(keys)
     plan = copy.deepcopy(guard.plan)
     old_manifest = sync.loads(baseline["config/dr-manifest.yaml"])
+    managed = {"schema": 1, "resources": [], "configuration_files": []}
+    managed_sha = None
+    if (source / SERVICE_RESOURCES).exists():
+        raw_inventory = read(SERVICE_RESOURCES)
+        managed = service_inventory(sync.loads(raw_inventory), compose, sync)
+        guard.scan(raw_inventory, SERVICE_RESOURCES)
+        managed_sha = sync.digest(raw_inventory)
+        for item in managed["configuration_files"]:
+            name = item["path"]
+            data = read(name)
+            sync.require(sync.digest(data) == item["sha256"], "SERVICE_CONFIGURATION_HASH_MISMATCH", name)
+            if os.name != "nt":
+                sync.require(stat.S_IMODE((source / name).stat().st_mode) == item["mode"],
+                             "SERVICE_CONFIGURATION_MODE_MISMATCH", name)
+            guard.scan(data, name)
+    managed_by_target = {(row["service"], row["target"]): row for row in managed["resources"]}
     names, skipped = candidates(source, sync)
+    sync.require(managed_sha is None or SERVICE_RESOURCES in names, "SERVICE_RESOURCES_NOT_PUBLIC")
+    sync.require(all(item["path"] in names for item in managed["configuration_files"]), "SERVICE_CONFIGURATION_NOT_PUBLIC")
     prior = sync.loads(baseline.get(INVENTORY, b'{"schema":1,"files":{},"source_hashes":{}}'))
     sync.require(prior.get("schema") == 1 and isinstance(prior.get("files"), dict)
                  and isinstance(prior.get("source_hashes"), dict), "INVALID_EXPORT_INVENTORY")
@@ -1060,9 +1193,9 @@ def render(source, baseline, sync, image_reader=None):
         source_hashes[name] = hashed
         # On the first run, do not replace newer repo tooling/docs with the old live checkout.
         previous = prior["source_hashes"].get(name)
-        if name in baseline and previous is None and not name.startswith("data/"):
+        if name in baseline and previous is None and not name.startswith("data/") and name != SERVICE_RESOURCES:
             continue
-        if name in baseline and previous == hashed and not name.startswith("data/"):
+        if name in baseline and previous == hashed and not name.startswith("data/") and name != SERVICE_RESOURCES:
             continue
         outputs[name] = safe
         owned[name] = sync.digest(safe)
@@ -1095,7 +1228,26 @@ def render(source, baseline, sync, image_reader=None):
             required.append(name)
             refs.append({"SERVICE": service, "REFERENCE": name, "TYPE": "ENV_FILE", "SOURCE": name,
                          "RESTORE_METHOD": method, "RESOLVED": True})
+        for item in managed["configuration_files"]:
+            if item["path"].split("/")[1] == service:
+                public.append(item["path"]); required.append(item["path"])
+                refs.append({"SERVICE": service, "REFERENCE": item["path"], "TYPE": "CONFIGURATION_FILE",
+                             "SOURCE": item["path"], "RESTORE_METHOD": "TRACKED_PUBLIC",
+                             "SHA256": item["sha256"], "MODE": item["mode"], "RESOLVED": True})
         for kind, name, target, mode in mounts(row, sync):
+            resource = managed_by_target.get((service, target))
+            if resource is not None:
+                recovery = resource["recovery"]["method"]
+                method = {"stopped_archive": "ENCRYPTED_SERVICE_STATE", "external": "EXTERNAL_PREREQUISITE"}.get(recovery)
+                if method is not None or kind == "volume":
+                    reference = {"SERVICE": service, "REFERENCE": target, "TYPE": "VOLUME_MOUNT" if kind == "volume" else "BIND_MOUNT",
+                                 "SOURCE": name, "RESTORE_METHOD": method or "COMPOSE_RECREATE", "MODE": mode,
+                                 "RESOURCE_ID": resource["id"], "RESOLVED": True}
+                    if recovery == "stopped_archive":
+                        reference["RECOVERY_ASSET"] = "services-state.tar.gz.age"
+                        required.append("volume:" + name if kind == "volume" else name)
+                    refs.append(reference)
+                    continue
             if kind == "bind" and not name.startswith("/"):
                 sync.relative(name)
                 path = source / name; sync.safe_path(path)
@@ -1117,10 +1269,33 @@ def render(source, baseline, sync, image_reader=None):
             elif kind == "bind":
                 refs.append({"SERVICE": service, "REFERENCE": target, "TYPE": "HOST_PREREQUISITE", "SOURCE": name,
                              "RESTORE_METHOD": "HOST_PREREQUISITE", "RESOLVED": True})
+        for resource in managed["resources"]:
+            if resource["service"] != service or resource["type"] not in {"config", "tmpfs"}:
+                continue
+            method = "EXTERNAL_PREREQUISITE" if resource["recovery"]["method"] == "external" else "COMPOSE_RECREATE"
+            source_name = resource["source"]
+            if resource["type"] == "config" and source_name in {item["path"] for item in managed["configuration_files"]}:
+                public.append(source_name); required.append(source_name); method = "TRACKED_PUBLIC"
+            refs.append({"SERVICE": service, "REFERENCE": resource["target"], "TYPE": resource["type"].upper(),
+                         "SOURCE": source_name, "RESTORE_METHOD": method, "RESOURCE_ID": resource["id"], "RESOLVED": True})
         components[service] = copy.deepcopy(old_manifest.get("components", {}).get(service, {}))
+        obsolete_managed = {item["id"] for item in old_manifest.get("state_units", []) if item.get("resource_id")}
+        for field in ("STATE_UNIT_IDS", "REQUIRED_STATE"):
+            if field in components[service]:
+                components[service][field] = sorted(set(components[service][field]) - obsolete_managed)
+        if "RECOVERY_ASSETS" in components[service]:
+            components[service]["RECOVERY_ASSETS"] = [asset for asset in components[service]["RECOVERY_ASSETS"]
+                                                      if asset != "services-state.tar.gz.age"]
         private += old_manifest.get("components", {}).get(service, {}).get("GENERATED_FILES", [])
         components[service].update(PUBLIC_REPO_FILES=sorted(set(public)), GENERATED_FILES=sorted(set(private)),
                                    REQUIRED_BEFORE_COMPOSE_UP=sorted(set(required)))
+        service_units = service_state_units({"resources": [item for item in managed["resources"] if item["service"] == service]})
+        if service_units:
+            new_ids = {unit["id"] for unit in service_units}
+            for field in ("STATE_UNIT_IDS", "REQUIRED_STATE"):
+                components[service][field] = sorted(set(components[service].get(field, [])) | new_ids)
+            components[service]["RECOVERY_ASSETS"] = sorted(set(components[service].get("RECOVERY_ASSETS", [])) | {"services-state.tar.gz.age"})
+
     old_services = set(old_manifest.get("components", {}))
     removed = old_services - services
     removed_generated = {f for s in removed for f in old_manifest["components"][s].get("GENERATED_FILES", [])}
@@ -1203,7 +1378,10 @@ def render(source, baseline, sync, image_reader=None):
     override["services"] = {s: dict(override["services"].get(s, {}), image=locks[s]["image"], platform=locks[s]["platform"]) for s in compose["services"]}
     manifest = copy.deepcopy(old_manifest)
     manifest["components"], manifest["references"] = components, refs
-    manifest["state_units"] = [dict(r, services=[s for s in r["services"] if s in services]) for r in manifest["state_units"] if set(r["services"]) & services]
+    manifest["state_units"] = [dict(r, services=[s for s in r["services"] if s in services])
+                               for r in manifest["state_units"] if set(r["services"]) & services
+                               and not r.get("resource_id")]
+    manifest["state_units"].extend(service_state_units(managed))
     for old_dir in old_manifest["quick_redeploy"]["empty_directories"]:
         if any(old_dir["path"] == name or old_dir["path"].startswith(name + "/") for name in directories):
             directories.setdefault(old_dir["path"], old_dir)
@@ -1217,6 +1395,8 @@ def render(source, baseline, sync, image_reader=None):
               "private_env_targets": sorted(env_targets), "private_env_targets_from_restored_agent": unknown,
               "unclassified_files_excluded": skipped, "database_policy": "fresh_application_state_restore_infisical",
               "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup"}
+    if managed_sha is not None:
+        layout["service_resources_inventory"] = {"path": SERVICE_RESOURCES, "sha256": managed_sha}
     for name, value in {"config/image-lock.json": locks, "config/compose.dr.yaml": override,
                         "config/dr-render-plan.json": plan, "config/dr-manifest.yaml": manifest, LAYOUT: layout}.items():
         outputs[name] = guard.scan((json.dumps(value, indent=2, ensure_ascii=False) + "\n").encode(), name, assignments=False)
