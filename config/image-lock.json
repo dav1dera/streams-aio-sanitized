@@ -35,7 +35,7 @@
     "configured_image": "favonia/cloudflare-ddns:latest"
   },
   "aiometadata": {
-    "image": "ghcr.io/cedya77/aiometadata@sha256:6bdb7482c9e848e5c5894fa04bcf8580e73ca578ddd47d2a51f337b4a8fa3a85",
+    "image": "ghcr.io/cedya77/aiometadata@sha256:4b2c433d7aa369da53bc9b204f9373153f31eff421c03134190a4abd640e43fb",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/cedya77/aiometadata:latest"
   },
@@ -95,7 +95,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:16d9e5122f70a331bc2abe4f7f744246bc2f61f909230a608d4aa91871d1e7da",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:77c8171bd4f2aa2c17100456f051a83b821542db63862bd45d6dd7c651b87394",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
@@ -135,7 +135,7 @@
     "configured_image": "g0ldyy/comet:latest"
   },
   "stremthru": {
-    "image": "muniftanjim/stremthru@sha256:3db9d5f373759fdbab97366ad6a106288eb753e9a07c9ec0f0e096acc8553321",
+    "image": "muniftanjim/stremthru@sha256:947cfcb2601c67f2f21eb11bd1ea1e555889cec9e0b347cefd0c63754b9c641a",
     "platform": "linux/amd64",
     "configured_image": "muniftanjim/stremthru:latest"
   },
