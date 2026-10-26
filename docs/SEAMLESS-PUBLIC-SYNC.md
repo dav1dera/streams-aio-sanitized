@@ -19,6 +19,13 @@ discovery policy. Without it, the previous strict fixed-schema policy remains.
 | `.env`, `.secrets/**`, `.generated/**`, credentials, identities | Never published; only read privately when needed to recognize leaks/bindings |
 | Other `data/<service>/**`, databases, caches, logs, archives, certificates, keys, backups | Excluded, including state files with unfamiliar names or no extension |
 
+Managed public configuration keeps the exact declared content hash and canonical
+mode in the resource inventory. A host POSIX access ACL may widen only the group
+mask: export accepts that difference only with a valid extended ACL whose mask
+matches the observed group bits, without removing declared group access. Owner,
+other and special mode bits still match exactly. This does not apply to private
+files, and export never changes a file or its ACL.
+
 The public file types are Markdown, CSS, shell/Python/JavaScript/TypeScript, JSON,
 YAML, TOML, INI/conf/cfg, plain text, SQL declarations, examples and templates.
 Text-like names still fail if the contents are binary, database/archive headers,

@@ -2,11 +2,126 @@
 import copy
 import hashlib
 import json
+import os
+from pathlib import Path
+import shutil
+import stat
+import struct
+import subprocess
+import tempfile
+from types import SimpleNamespace
 import unittest
+from unittest import mock
 
 import test_public_export as fixtures
 
 sync, export = fixtures.sync, fixtures.export
+
+
+UNDEFINED_ID = 0xffffffff
+
+
+def access_acl(*, owner=6, group=4, mask=7, other=4, named=((2, 7, 12345),)):
+    entries = [(1, owner, UNDEFINED_ID), *named, (4, group, UNDEFINED_ID),
+               (16, mask, UNDEFINED_ID), (32, other, UNDEFINED_ID)]
+    return struct.pack('<I', 2) + b''.join(struct.pack('<HHI', *entry) for entry in entries)
+
+
+class PublicConfigurationModeTests(unittest.TestCase):
+    def matches(self, observed=0o674, declared=0o644, acl=None, failure=None):
+        target = mock.Mock()
+        target.stat.return_value = SimpleNamespace(st_mode=stat.S_IFREG | observed)
+        with mock.patch.object(export.os, 'getxattr', create=True,
+                               return_value=access_acl() if acl is None else acl,
+                               side_effect=failure) as read_acl:
+            result = export.public_configuration_mode_matches(target, declared)
+        return result, read_acl
+
+    def test_exact_mode_does_not_need_acl_support(self):
+        result, read_acl = self.matches(observed=0o644, failure=OSError('unsupported'))
+        self.assertTrue(result)
+        read_acl.assert_not_called()
+
+    def test_only_extended_acl_mask_widening_is_accepted(self):
+        for acl in (access_acl(), access_acl(group=7),
+                    access_acl(named=((8, 7, 12345),)),
+                    access_acl(named=((2, 7, 12345), (8, 6, 12345)))):
+            with self.subTest(acl=acl):
+                result, read_acl = self.matches(acl=acl)
+                self.assertTrue(result)
+                self.assertEqual(read_acl.call_args.args[1], 'system.posix_acl_access')
+                self.assertEqual(read_acl.call_args.kwargs, {'follow_symlinks': False})
+
+    def test_owning_group_keeps_declared_access_even_with_a_wide_mask(self):
+        for owning_group in range(8):
+            with self.subTest(owning_group=owning_group):
+                result, _ = self.matches(acl=access_acl(group=owning_group, mask=7))
+                self.assertEqual(result, bool(owning_group & 4))
+
+    def test_mode_changes_outside_group_and_lost_group_access_are_refused(self):
+        for observed in (0o774, 0o670, 0o604, 0o4674):
+            with self.subTest(observed=oct(observed)):
+                result, read_acl = self.matches(observed=observed)
+                self.assertFalse(result)
+                read_acl.assert_not_called()
+
+    def test_group_difference_without_access_acl_is_refused(self):
+        for failure in (OSError('no ACL'), AttributeError('no getxattr'), TypeError('unsupported')):
+            with self.subTest(failure=type(failure).__name__):
+                self.assertFalse(self.matches(failure=failure)[0])
+
+    def test_invalid_or_inconsistent_acl_is_refused(self):
+        simple = struct.pack('<I', 2) + b''.join(struct.pack('<HHI', *entry) for entry in
+            ((1, 6, UNDEFINED_ID), (4, 7, UNDEFINED_ID), (32, 4, UNDEFINED_ID)))
+        invalid = [b'', b'\x02\x00\x00', access_acl()[:-1],
+                   struct.pack('<I', 3) + access_acl()[4:], simple,
+                   access_acl(mask=6), access_acl(owner=7), access_acl(other=0),
+                   access_acl(named=()), access_acl(named=((2, 7, UNDEFINED_ID),)),
+                   access_acl(named=((2, 7, 12345), (2, 4, 12345))),
+                   access_acl(named=((64, 7, 12345),)),
+                   access_acl(named=((2, 8, 12345),)),
+                   access_acl() + struct.pack('<HHI', 4, 4, UNDEFINED_ID),
+                   access_acl().replace(struct.pack('<HHI', 4, 4, UNDEFINED_ID),
+                                        struct.pack('<HHI', 4, 4, 1))]
+        for acl in invalid:
+            with self.subTest(acl=acl):
+                self.assertFalse(self.matches(acl=acl)[0])
+
+    @unittest.skipUnless(os.name == 'posix' and hasattr(os, 'getxattr') and shutil.which('setfacl'),
+                         'Linux POSIX ACL tools required')
+    def test_real_inherited_acl_mask_widening_preserves_file_and_acl(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            named_uid = os.getuid() + 1
+            subprocess.run(['setfacl', '-d', '-m',
+                'u::rwx,u:' + str(named_uid) + ':rwx,g::rwx,m::rwx,o::r-x', str(folder)],
+                check=True, capture_output=True)
+            target = folder / 'settings.yaml'
+            target.write_bytes(b'title: Public dashboard\n')
+            target.chmod(0o644)
+            subprocess.run(['setfacl', '-m', 'u:' + str(named_uid) + ':rwx', str(target)],
+                           check=True, capture_output=True)
+            self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o674)
+            before_data = target.read_bytes()
+            before_acl = os.getxattr(target, 'system.posix_acl_access')
+            group_obj = [permissions for tag, permissions, _ in
+                         struct.iter_unpack('<HHI', before_acl[4:]) if tag == 4]
+            self.assertEqual(group_obj, [7])
+            self.assertTrue(export.public_configuration_mode_matches(target, 0o644))
+            self.assertEqual(target.read_bytes(), before_data)
+            self.assertEqual(os.getxattr(target, 'system.posix_acl_access'), before_acl)
+            subprocess.run(['setfacl', '-m', 'g::---,m::rwx', str(target)],
+                           check=True, capture_output=True)
+            self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o674)
+            self.assertFalse(export.public_configuration_mode_matches(target, 0o644))
+            subprocess.run(['setfacl', '-m', 'g::rwx', str(target)],
+                           check=True, capture_output=True)
+            self.assertTrue(export.public_configuration_mode_matches(target, 0o644))
+            target.chmod(0o604)
+            self.assertFalse(export.public_configuration_mode_matches(target, 0o644))
+            subprocess.run(['setfacl', '-b', str(target)], check=True, capture_output=True)
+            target.chmod(0o674)
+            self.assertFalse(export.public_configuration_mode_matches(target, 0o644))
 
 
 class PublicServiceResourcesTests(unittest.TestCase):
@@ -82,6 +197,28 @@ class PublicServiceResourcesTests(unittest.TestCase):
                          [(name, sync.digest(content), 0o644)])
         self.apply(result)
         self.assertEqual(self.render(), {})
+
+    @unittest.skipUnless(os.name == 'posix' and hasattr(os, 'getxattr') and shutil.which('setfacl'),
+                         'Linux POSIX ACL tools required')
+    def test_public_acl_mask_does_not_change_exported_inventory_or_hash(self):
+        _, inventory, name = self.managed()
+        target = self.source / name
+        target.chmod(0o644)
+        subprocess.run(['setfacl', '-m', 'u:' + str(os.getuid() + 1) + ':rwx', str(target)],
+                       check=True, capture_output=True)
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o674)
+        result = self.render()
+        self.assertEqual(result[export.SERVICE_RESOURCES], inventory)
+        self.assertEqual(result[name], b'title: Synthetic dashboard\n')
+        references = [row for row in sync.loads(result['config/dr-manifest.yaml'])['references']
+                      if row['TYPE'] == 'CONFIGURATION_FILE' and row['SOURCE'] == name]
+        self.assertEqual([(row['MODE'], row['SHA256']) for row in references],
+                         [(0o644, sync.digest(result[name]))])
+        self.apply(result)
+        self.assertEqual(self.render(), {})
+        target.write_bytes(b'title: Changed despite valid ACL\n')
+        with self.assertRaisesRegex(sync.Refused, 'SERVICE_CONFIGURATION_HASH_MISMATCH'):
+            self.render()
 
     def test_stylesheet_still_refuses_known_private_values(self):
         secret = next(iter(sync.env_values((self.source / '.secrets/comet.env').read_bytes()).values()))
