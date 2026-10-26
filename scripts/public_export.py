@@ -10,6 +10,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import stat
+import struct
 
 INVENTORY = "config/public-sync-inventory.json"
 LAYOUT = "config/public-stack-layout.json"
@@ -1110,6 +1111,52 @@ def service_inventory(value, compose, sync):
     return value
 
 
+
+def public_configuration_mode_matches(target, declared_mode):
+    """Allow only a widened POSIX ACL mask on an explicit public config file.
+
+    With an extended ACL, stat's group bits represent ACL_MASK, not GROUP_OBJ.
+    The local public-file access watcher may widen that mask after installation;
+    the reviewed portable mode and the file's content hash remain unchanged.
+    """
+    if type(declared_mode) is not int or not 0 <= declared_mode <= 0o777:
+        return False
+    observed = target.stat()
+    current = stat.S_IMODE(observed.st_mode)
+    if not stat.S_ISREG(observed.st_mode):
+        return False
+    if current == declared_mode:
+        return True
+    if current & ~0o070 != declared_mode & ~0o070:
+        return False
+    group, declared_group = (current >> 3) & 7, (declared_mode >> 3) & 7
+    if group & declared_group != declared_group:
+        return False
+    try:
+        raw = os.getxattr(target, 'system.posix_acl_access', follow_symlinks=False)
+    except (AttributeError, OSError, TypeError):
+        return False
+    if (not isinstance(raw, bytes) or len(raw) < 4 or len(raw) > 65536
+            or (len(raw) - 4) % 8 or struct.unpack_from('<I', raw)[0] != 2):
+        return False
+    basic, named = {}, set()
+    for tag, permissions, qualifier in struct.iter_unpack('<HHI', raw[4:]):
+        if permissions & ~7 or tag not in {1, 2, 4, 8, 16, 32}:
+            return False
+        if tag in {2, 8}:
+            identity = tag, qualifier
+            if qualifier == 0xffffffff or identity in named:
+                return False
+            named.add(identity)
+        else:
+            if qualifier != 0xffffffff or tag in basic:
+                return False
+            basic[tag] = permissions
+    return (bool(named) and set(basic) == {1, 4, 16, 32}
+            and basic[1] == (current >> 6) & 7
+            and basic[16] == group and basic[32] == current & 7)
+
+
 def service_state_units(value):
     return [{"id": "service-" + row["id"], "resource_id": row["id"], "services": [row["service"]],
              "path_or_type": ("volume:" if row["type"] == "volume" else "") + row["source"],
@@ -1168,7 +1215,7 @@ def render(source, baseline, sync, image_reader=None):
             data = read(name)
             sync.require(sync.digest(data) == item["sha256"], "SERVICE_CONFIGURATION_HASH_MISMATCH", name)
             if os.name != "nt":
-                sync.require(stat.S_IMODE((source / name).stat().st_mode) == item["mode"],
+                sync.require(public_configuration_mode_matches(source / name, item["mode"]),
                              "SERVICE_CONFIGURATION_MODE_MISMATCH", name)
             guard.scan(data, name)
     managed_by_target = {(row["service"], row["target"]): row for row in managed["resources"]}

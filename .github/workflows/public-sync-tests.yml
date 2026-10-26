@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install POSIX ACL test tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y acl
       - run: python3 -m pip install -r scripts/requirements-public-sync.txt
       - run: python3 -B -m unittest discover -s tests -p 'test_public_*.py' -v
       - run: python3 -m py_compile scripts/sync-public-stack.py scripts/public_export.py scripts/install-public-sync-policy.py scripts/install-local-guides.py
