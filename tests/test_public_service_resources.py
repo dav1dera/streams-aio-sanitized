@@ -16,9 +16,8 @@ class PublicServiceResourcesTests(unittest.TestCase):
     compose = fixtures.PublicExportTests.compose
     apply = fixtures.PublicExportTests.apply
 
-    def managed(self):
-        content = b'title: Synthetic dashboard\n'
-        name = 'data/added/public/config/settings.yaml'
+    def managed(self, *, filename='settings.yaml', content=b'title: Synthetic dashboard\n'):
+        name = 'data/added/public/config/' + filename
         self.write(name, content)
         self.write('data/added/.env', b'PORT=8080\n')
         self.write('data/added/state/runtime.db', b'private application data never published')
@@ -67,6 +66,38 @@ class PublicServiceResourcesTests(unittest.TestCase):
         self.assertFalse(any(row['path'] == 'data/added/state' for row in layout['empty_directories']))
         self.apply(result)
         self.assertEqual(self.render(), {})
+
+    def test_dashboard_stylesheet_is_published_with_its_exact_recovery_hash(self):
+        content = (b'/* Public dashboard background and compact cards. */\n'
+                   b'body { background: url("data:image/png;base64,aW1hZ2U="); }\n'
+                   b'.service-icon { width: 24px; }\n')
+        _, inventory, name = self.managed(filename='custom.css', content=content)
+        result = self.render()
+        self.assertEqual(result[name], content)
+        self.assertEqual(result[export.SERVICE_RESOURCES], inventory)
+        manifest = sync.loads(result['config/dr-manifest.yaml'])
+        references = [row for row in manifest['references']
+                      if row['SERVICE'] == 'added' and row['TYPE'] == 'CONFIGURATION_FILE']
+        self.assertEqual([(row['SOURCE'], row['SHA256'], row['MODE']) for row in references],
+                         [(name, sync.digest(content), 0o644)])
+        self.apply(result)
+        self.assertEqual(self.render(), {})
+
+    def test_stylesheet_still_refuses_known_private_values(self):
+        secret = next(iter(sync.env_values((self.source / '.secrets/comet.env').read_bytes()).values()))
+        content = ('/* ' + secret + ' */\nbody { color: white; }\n').encode()
+        self.managed(filename='custom.css', content=content)
+        with self.assertRaisesRegex(sync.Refused, 'PRIVATE_VALUE_IN_PUBLIC_FILE') as error:
+            self.render()
+        self.assertNotIn(secret, str(error.exception))
+
+    def test_stylesheet_still_refuses_binary_content_and_credential_patterns(self):
+        for content, code in ((b'body { color: white; }\x00', 'BINARY_FILE_REFUSED'),
+                              (b'/* ghp_' + b'a' * 36 + b' */\n', 'CREDENTIAL_PATTERN_REFUSED')):
+            with self.subTest(code=code):
+                self.managed(filename='custom.css', content=content)
+                with self.assertRaisesRegex(sync.Refused, code):
+                    self.render()
 
     def test_stale_mount_and_runtime_archive_are_closed(self):
         value, _, _ = self.managed()

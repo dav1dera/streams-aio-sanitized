@@ -26,7 +26,7 @@ PRIVATE_DIRS = {".git", ".secrets", ".generated", ".private-dr", ".ssh", ".gnupg
                 "backups", "backup", "containers-backup", "Aiostreams-Stremio-Backups"}
 PRIVATE_SUFFIX = re.compile(r"\.(?:db(?:-.*)?|sqlite.*|sqlitedb|mdb|rdb|aof|dump|bak|backup|before|old|log|pem|key|crt|cer|p12|pfx|jks|kdb|age|zip|gz|tgz|tar|7z|rar|wal|swp|swo|tmp|pid|sock)$", re.I)
 PRIVATE_NAME = re.compile(r"(?:^|[-_.])(?:secret|secrets|credential|credentials|token|tokens|password|passwd|private|session|sessions|cookie|cookies|backup)(?:[-_.]|$)", re.I)
-TEXT_SUFFIXES = {".md", ".txt", ".sh", ".py", ".js", ".mjs", ".ts", ".json", ".yaml", ".yml",
+TEXT_SUFFIXES = {".md", ".txt", ".sh", ".py", ".css", ".js", ".mjs", ".ts", ".json", ".yaml", ".yml",
                  ".toml", ".ini", ".conf", ".cfg", ".sql", ".example", ".template"}
 SENSITIVE_KEY = re.compile(r"(?:^|[_-])(?:password|passwd|passphrase|secret|token|apikey|api_key|authkey|auth_key|cookie|credential|credentials|private_key|client_secret|authorization|connection_string)(?:$|[_-])", re.I)
 SAFE_KEY_END = re.compile(r"(?:enabled|disabled|enable|disable|required|optional|secure|httponly|samesite|refresh|max_age|login|ttl|timeout|length|algorithm|method|mode|type|expiry|expiration|duration|interval|name|header_name|file|path)$", re.I)

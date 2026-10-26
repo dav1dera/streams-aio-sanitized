@@ -19,7 +19,7 @@ discovery policy. Without it, the previous strict fixed-schema policy remains.
 | `.env`, `.secrets/**`, `.generated/**`, credentials, identities | Never published; only read privately when needed to recognize leaks/bindings |
 | Other `data/<service>/**`, databases, caches, logs, archives, certificates, keys, backups | Excluded, including state files with unfamiliar names or no extension |
 
-The public file types are Markdown, shell/Python/JavaScript/TypeScript, JSON,
+The public file types are Markdown, CSS, shell/Python/JavaScript/TypeScript, JSON,
 YAML, TOML, INI/conf/cfg, plain text, SQL declarations, examples and templates.
 Text-like names still fail if the contents are binary, database/archive headers,
 SQL dump headers, private keys, recognized credential patterns, literal
