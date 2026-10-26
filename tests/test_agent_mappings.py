@@ -104,6 +104,32 @@ class MappingTests(unittest.TestCase):
         self.assertEqual(m.extract(generic(body, '/shared')),
                          {'folders': [], 'overrides': {'BUILTIN_JACKETT_API_KEY': {'path': '/shared', 'key': 'JACKETT_API_KEY'}}})
 
+    def test_raw_listsecrets_maps_only_explicit_keys_including_mixed_case(self):
+        options = json.dumps('{"expandSecretReferences":false}')
+        text = ('{{ range listSecrets "synthetic-project" "prod" "/demo" ' + options + ' }}'
+                '{{ if eq .Key "ApiToken" }}ApiToken=\'{{ .Value }}\'\n{{ end }}'
+                '{{ if eq .Key "_SECOND" }}DESTINATION=\'{{ .Value }}\'\n{{ end }}{{ end }}')
+        self.assertEqual(m.extract(text), {'folders': [], 'overrides': {
+            'ApiToken': {'path': '/demo', 'key': 'ApiToken'},
+            'DESTINATION': {'path': '/demo', 'key': '_SECOND'}}})
+        self.assertEqual(m.extract(text.replace('listSecrets', 'secret', 1)), m.extract(text))
+
+    def test_listsecrets_without_options_keeps_legacy_collection_mapping(self):
+        text = generic('{{ .Key }}={{ .Value }}\n').replace('range secret', 'range listSecrets', 1)
+        self.assertEqual(m.extract(text), {'folders': ['/aiometadata'], 'overrides': {}})
+
+    def test_collection_options_are_closed_and_duplicate_keys_are_refused(self):
+        for number, raw in enumerate(('{}', '{"expandSecretReferences":true}', '{"expandSecretReferences":0}',
+                    '{"expandSecretReferences":"false"}', '{"recursive":false}',
+                    '{"expandSecretReferences":false,"recursive":false}',
+                    '{"expandSecretReferences":false,"expandSecretReferences":false}',
+                    '[["expandSecretReferences",false]]', 'false', 'invalid-json')):
+            with self.subTest(option_number=number):
+                text = ('{{ range listSecrets "synthetic-project" "prod" "/demo" '
+                        + json.dumps(raw) + ' }}{{ .Key }}={{ .Value }}\n{{ end }}')
+                with self.assertRaisesRegex(dr.Refused, '^UNSUPPORTED_SECRET_OPTIONS$'):
+                    m.extract(text)
+
     def test_unknown_expression_refused_even_in_branch(self):
         for text in ('{{ unsupportedFunction .Value }}',
                      generic('{{ if eq .Key "FIRST_KEY" }}{{ unknown .Value }}{{ else }}{{ .Key }}={{ .Value }}\n{{ end }}')):

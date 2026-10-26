@@ -34,6 +34,24 @@ credential assignments, or known private values. Additional source Git ignore
 rules can exclude more files; negation cannot override the exporter's private
 path/type floor. The runtime tree is not recursively inspected for public files.
 
+Honey migration retains discarded names and descriptions in the private corpus.
+For explicitly managed read-only YAML, the exporter can project only the lexical
+span of a direct, single-line plain or quoted public software card-title key;
+block, multiline and aliased keys retain the strict check. Its identity must
+follow a previously published Compose image repository or the same aligned card's
+published catalog icon. This permits a title such as Proxmox Backup Server even
+when Backup Server was a discarded Honey description. Body values, comments,
+other fields and unmanaged files remain checked; a genuine private ENV value or
+explicit binding always keeps the strict check. Live image/icon changes do not
+establish provenance.
+
+The GUI calls `preflight(...)` against an in-memory prospective overlay before
+installation. Existing private inputs stay read-through; missing future private
+targets receive key-only memory placeholders. No source files are copied or
+written, and image lock proofs remain the responsibility of the actual Docker
+image check and final publication. `PUBLIC_ONBOARDING_PREFLIGHT=1` identifies this
+capability to compatible GUI versions.
+
 Public examples may use the existing `INFISICAL:/folder/KEY` notation, canonical
 `@@INFISICAL:/folder/KEY@@` markers or `${VARIABLE}` references. Credential fields
 accept a complete reference, never a reference with an additional literal value.

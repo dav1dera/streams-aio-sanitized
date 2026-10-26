@@ -106,6 +106,11 @@ class AgentTemplateTransformation(unittest.TestCase):
         self.assertEqual(t.transform_template(original, {"/other/PORT": "3000"}), original)
         self.assertEqual(t.transform_template(original, {}), original)
 
+    def test_legacy_mixed_case_credential_is_untouched_by_unrelated_local_value(self):
+        credential = one("/shared", "ApiToken") + one("/shared", "_SECOND")
+        result = t.transform_template(credential + one("/ordinary", "PORT"), {"/ordinary/PORT": "3000"})
+        self.assertTrue(result.startswith(credential), 'LEGACY_AGENT_CREDENTIAL_CHANGED')
+
     def test_single_value_keeps_body_literals(self):
         original = one("/ordinary", "HOST", "prefix:'{{ .Value }}'\n")
         result = t.transform_template(original, {"/ordinary/HOST": "example.invalid"})
@@ -186,6 +191,35 @@ class AgentTemplateTransformation(unittest.TestCase):
         result = t.transform_template(original, {"/ordinary/PORT": "3000"}, s)
         self.assertIn('with listSecrets "p" "prod" "/ordinary"', result)
         self.assertIn('if eq .Key "PORT"', result)
+
+    def test_raw_collection_keeps_option_and_unselected_credentials_during_transform(self):
+        options = json.dumps('{"expandSecretReferences":false}')
+        original = ('{{ range listSecrets "p" "prod" "/ordinary" ' + options + ' }}'
+                    '{{ if eq .Key "PORT" }}PORT=\'{{ .Value }}\'\n{{ end }}'
+                    '{{ if eq .Key "ApiToken" }}ApiToken=\'{{ .Value }}\'\n{{ end }}{{ end }}')
+        result = t.transform_template(original, {"/ordinary/PORT": "3000"}, s)
+        self.assertIn('range listSecrets "p" "prod" "/ordinary" ' + options, result)
+        self.assertIn('{{ if eq .Key "ApiToken" }}ApiToken=\'{{ .Value }}\'', result)
+        values = assignments(render_fixture(result, {'/ordinary': [
+            {'Key': 'PORT', 'Value': 'unused-runtime-port'},
+            {'Key': 'ApiToken', 'Value': 'synthetic-$cash-${UNEXPANDED}-\u00e9'},
+            {'Key': 'UNSELECTED', 'Value': 'unselected-canary'}]}))
+        self.assertTrue(values == {'PORT': "'3000'", 'ApiToken': "'synthetic-$cash-${UNEXPANDED}-\u00e9'"},
+                        'RAW_AGENT_TRANSFORM_CHANGED_SELECTED_ASSIGNMENTS')
+        self.assertEqual(t.transform_template(original, {'/other/PORT': '3001'}, s), original)
+
+    def test_raw_collection_rejects_unknown_options_before_transforming(self):
+        invalid = ('{}', '{"expandSecretReferences":true}', '{"expandSecretReferences":0}',
+                   '{"expandSecretReferences":"false"}', '{"recursive":false}',
+                   '{"expandSecretReferences":false,"recursive":false}',
+                   '{"expandSecretReferences":false,"expandSecretReferences":false}',
+                   '[["expandSecretReferences",false]]', 'false', 'invalid-json')
+        for number, raw in enumerate(invalid):
+            with self.subTest(option_number=number):
+                text = ('{{ range listSecrets "p" "prod" "/ordinary" ' + json.dumps(raw)
+                        + ' }}{{ .Key }}={{ .Value }}\n{{ end }}')
+                with self.assertRaisesRegex(t.TransformRefused, '^LOCAL_TEMPLATE_TRANSFORM_REFUSED$'):
+                    t.transform_template(text, {'/ordinary/PORT': '3000'}, s)
 
     def test_matching_collection_requires_explicit_reviewed_parser(self):
         original = '{{ range secret "p" "prod" "/ordinary" }}{{ .Key }}={{ .Value }}\n{{ end }}'
