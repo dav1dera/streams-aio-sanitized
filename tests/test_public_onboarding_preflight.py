@@ -120,6 +120,32 @@ class ProspectivePublicExportTests(unittest.TestCase):
         with self.assertRaisesRegex(sync.Refused, 'PRIVATE_VALUE_IN_PUBLIC_FILE docs/new.md'):
             self.check(self.candidate())
 
+    def test_only_direct_single_line_scalar_title_spans_are_projected(self):
+        self.software_honey()
+        for title in ('Proxmox Backup Server', "'Proxmox Backup Server'", '"Proxmox Backup Server"'):
+            with self.subTest(title=title):
+                data = ('- ' + title + ': {href: "#"}\n').encode()
+                self.assertEqual(self.check(self.candidate(data))['status'], 'PASS')
+        unsafe = (
+            b'- ? >- # Backup Server\n      Proxmox Backup Server\n  : {href: "#"}\n',
+            b'- ? |- # Backup Server\n      Proxmox Backup Server\n  : {href: "#"}\n',
+            b'- ? Proxmox\n      Backup Server\n  : {href: "#"}\n',
+            b'- ? "Proxmox\n      Backup Server"\n  : {href: "#"}\n',
+            b"- ? 'Proxmox\n      Backup Server'\n  : {href: \"#\"}\n",
+            b'- Proxmox Backup Server: # Backup Server\n    href: "#"\n',
+        )
+        for data in unsafe:
+            with self.subTest(data=data):
+                with self.assertRaisesRegex(sync.Refused, 'PRIVATE_VALUE_IN_PUBLIC_FILE'):
+                    self.check(self.candidate(data))
+
+    def test_alias_title_does_not_project_its_original_non_title_value(self):
+        self.software_honey()
+        data = (b'private: &title Proxmox Backup Server\n'
+                b'cards: {*title: {href: "#"}}\n')
+        with self.assertRaisesRegex(sync.Refused, 'PRIVATE_VALUE_IN_PUBLIC_FILE'):
+            self.check(self.candidate(data))
+
     def test_personal_prefix_suffix_and_partial_caption_do_not_get_projected(self):
         self.software_honey()
         for label in ('Personal Proxmox Backup Server', 'Proxmox Backup Server Personal', 'Backup Server'):

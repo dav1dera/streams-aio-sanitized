@@ -36,8 +36,9 @@ path/type floor. The runtime tree is not recursively inspected for public files.
 
 Honey migration retains discarded names and descriptions in the private corpus.
 For explicitly managed read-only YAML, the exporter can project only the lexical
-span of a complete public software card-title key: its identity must follow a
-previously published Compose image repository or the same aligned card's
+span of a direct, single-line plain or quoted public software card-title key;
+block, multiline and aliased keys retain the strict check. Its identity must
+follow a previously published Compose image repository or the same aligned card's
 published catalog icon. This permits a title such as Proxmox Backup Server even
 when Backup Server was a discarded Honey description. Body values, comments,
 other fields and unmanaged files remain checked; a genuine private ENV value or

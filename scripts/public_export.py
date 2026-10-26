@@ -593,6 +593,14 @@ class Guard:
         try:
             self.sync.yaml_load(text)
             node = self.sync.yaml.compose(text, Loader=self.sync.UniqueLoader)
+            # Only a direct single-line scalar has a span containing the title
+            # alone. Block scalars include header comments; composed aliases
+            # point back to an anchored value elsewhere in the document.
+            title_spans = {(token.start_mark.index, token.end_mark.index)
+                           for token in self.sync.yaml.scan(text)
+                           if isinstance(token, self.sync.yaml.tokens.ScalarToken)
+                           and token.style in (None, "'", '"')
+                           and token.start_mark.line == token.end_mark.line}
         except Exception:
             return text
         spans = []
@@ -601,6 +609,7 @@ class Guard:
                 for key, value in row.value:
                     if (isinstance(key, self.sync.yaml.nodes.ScalarNode)
                             and key.tag == "tag:yaml.org,2002:str"
+                            and (key.start_mark.index, key.end_mark.index) in title_spans
                             and software_key(key.value) in proven
                             and isinstance(value, self.sync.yaml.nodes.MappingNode)
                             and any(field.value in {"href", "icon", "widget", "container", "server"}
