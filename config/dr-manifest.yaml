@@ -227,9 +227,9 @@
         "npm-generated"
       ],
       "STATE_UNIT_IDS": [
+        "npm-generated",
         "npm-routing",
-        "npm-tls",
-        "npm-generated"
+        "npm-tls"
       ],
       "REQUIRED_STATE": [
         "npm-routing"
@@ -301,9 +301,9 @@
         "aiometadata-caches"
       ],
       "STATE_UNIT_IDS": [
-        "aiometadata-user-config",
+        "aiometadata-caches",
         "aiometadata-oauth",
-        "aiometadata-caches"
+        "aiometadata-user-config"
       ],
       "REQUIRED_STATE": [],
       "PRIVATE_DR_PAYLOAD": [
@@ -383,8 +383,8 @@
         "aiostreams-caches"
       ],
       "STATE_UNIT_IDS": [
-        "aiostreams-user-config",
-        "aiostreams-caches"
+        "aiostreams-caches",
+        "aiostreams-user-config"
       ],
       "REQUIRED_STATE": [],
       "PRIVATE_DR_PAYLOAD": [
@@ -473,11 +473,11 @@
         "aiomanager-state"
       ],
       "STATE_UNIT_IDS": [
+        "aiomanager-state",
+        "comet-cache-db",
         "postgres-cluster",
         "postgres-companion",
-        "comet-cache-db",
-        "stremthru-cache",
-        "aiomanager-state"
+        "stremthru-cache"
       ],
       "REQUIRED_STATE": []
     },
@@ -988,8 +988,8 @@
       ],
       "STATE_UNIT_IDS": [
         "comet-cache-db",
-        "cometnet-node",
-        "cometnet-cache"
+        "cometnet-cache",
+        "cometnet-node"
       ],
       "REQUIRED_STATE": []
     },
@@ -1034,9 +1034,9 @@
         "redis-data"
       ],
       "STATE_UNIT_IDS": [
+        "redis-data",
         "stremthru-cache",
-        "stremthru-user-runtime",
-        "redis-data"
+        "stremthru-user-runtime"
       ],
       "REQUIRED_STATE": []
     },
@@ -1127,8 +1127,8 @@
         "seanime-media"
       ],
       "STATE_UNIT_IDS": [
-        "seanime-preferences",
-        "seanime-media"
+        "seanime-media",
+        "seanime-preferences"
       ],
       "REQUIRED_STATE": []
     },
@@ -1185,8 +1185,8 @@
         "seanime-shared-media"
       ],
       "STATE_UNIT_IDS": [
-        "seanime-shared-preferences",
-        "seanime-shared-media"
+        "seanime-shared-media",
+        "seanime-shared-preferences"
       ],
       "REQUIRED_STATE": []
     }
