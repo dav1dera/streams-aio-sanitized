@@ -827,6 +827,117 @@ services:
     - wud.watch.digest=true
     profiles: [all, gluetun]
 
+  # 📦 Service
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v2.7.0
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+    - 3002:3000
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: 192.168.178.11:3002,localhost:3002,127.0.0.1:3002,localhost:3000,127.0.0.1:3000
+      TZ: Europe/Rome
+      HOSTNAME: 0.0.0.0
+      LOG_TARGETS: both
+    volumes:
+    - type: bind
+      source: data/homepage/public
+      target: /app/config
+      read_only: true
+    - type: bind
+      source: data/homepage/logs
+      target: /app/logs
+      read_only: false
+    networks:
+    - homepage-frontend
+    - homepage-monitoring
+    depends_on:
+    - homepage-docker-proxy
+    - homepage-glances
+    env_file:
+    - ./data/homepage/.env
+
+  # 📦 Service
+  homepage-glances:
+    image: nicolargo/glances:4.5.8
+    container_name: homepage-glances
+    restart: unless-stopped
+    pid: host
+    environment:
+      GLANCES_OPT: -w -t 5 --bind 0.0.0.0 --port 61208
+      DOCKER_HOST: tcp://homepage-docker-proxy:2375
+      XDG_CACHE_HOME: /app/logs
+    volumes:
+    - type: bind
+      source: data/homepage-glances/public/glances.conf
+      target: /etc/glances/glances.conf
+      read_only: true
+    - type: bind
+      source: data/homepage-glances/logs
+      target: /app/logs
+      read_only: false
+    networks:
+    - homepage-monitoring
+    depends_on:
+    - homepage-docker-proxy
+    healthcheck:
+      test:
+      - CMD
+      - python3
+      - -c
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:61208/api/4/cpu', timeout=3).read()
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    env_file:
+    - ./data/homepage-glances/.env
+
+  # 📦 Service
+  homepage-docker-proxy:
+    image: ghcr.io/tecnativa/docker-socket-proxy:v0.5.0
+    container_name: homepage-docker-proxy
+    restart: unless-stopped
+    environment:
+      CONTAINERS: '1'
+      IMAGES: '1'
+      INFO: '1'
+      EVENTS: '1'
+      VERSION: '1'
+      PING: '1'
+      POST: '0'
+      SERVICES: '0'
+      TASKS: '0'
+      VOLUMES: '0'
+      NETWORKS: '0'
+      AUTH: '0'
+    volumes:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+      read_only: true
+    - type: tmpfs
+      target: /var/lib/haproxy
+      tmpfs:
+        size: 1048576
+        mode: 493
+      read_only: false
+    networks:
+    - homepage-monitoring
+    healthcheck:
+      test:
+      - CMD
+      - wget
+      - -q
+      - -O-
+      - http://127.0.0.1:2375/_ping
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    env_file:
+    - ./data/homepage-docker-proxy/.env
+
 # 📦 volumes
 volumes:
   portainer-data: null
@@ -849,3 +960,6 @@ networks:
     ipam:
       config:
       - subnet: 172.19.0.0/24
+  homepage-frontend: {}
+  homepage-monitoring:
+    internal: true

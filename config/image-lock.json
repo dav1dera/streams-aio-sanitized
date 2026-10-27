@@ -35,7 +35,7 @@
     "configured_image": "favonia/cloudflare-ddns:latest"
   },
   "aiometadata": {
-    "image": "ghcr.io/cedya77/aiometadata@sha256:4b2c433d7aa369da53bc9b204f9373153f31eff421c03134190a4abd640e43fb",
+    "image": "ghcr.io/cedya77/aiometadata@sha256:0474b7a1af12c24d5b02b374d46b19a7eb719e1bf5b5527107acdc368cb661ef",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/cedya77/aiometadata:latest"
   },
@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:5fed070e5e75f7a78325de7f08aba01ea10a6042b576cde30548f9ebdf1a616a",
+    "image": "ghcr.io/viren070/aiostreams@sha256:5f1e89e62346c8b3583b3e35747aea7654d40cf5c24976eb6db1c31be762b370",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -60,7 +60,7 @@
     "configured_image": "postgres:18-alpine"
   },
   "redis": {
-    "image": "redis@sha256:5c02d7c0f8d75af45958c0294a8004f2e14b42df98a1103e3a669aa7ec787be6",
+    "image": "redis@sha256:0a014ae5c04f55c82aaad2314de411c7a203de1c4312c3e526939226a0185dd9",
     "platform": "linux/amd64",
     "configured_image": "redis:latest"
   },
@@ -95,7 +95,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:77c8171bd4f2aa2c17100456f051a83b821542db63862bd45d6dd7c651b87394",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:a999bfce2e4e3555c0f8b187d349131f0ff92331b1c4a0338245a2862fa9bcd9",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
@@ -110,7 +110,7 @@
     "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
-    "image": "ghcr.io/sonicx161/aiomanager@sha256:bed162f2412b58295bb9c70cb6bf7b1284cda70213fdd8958a5a63be1d1eb823",
+    "image": "ghcr.io/sonicx161/aiomanager@sha256:9c470db0ea460d5899100086df55411b55e05ab448bc65e50aa3e18b1e9c2e90",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
@@ -140,7 +140,7 @@
     "configured_image": "muniftanjim/stremthru:latest"
   },
   "jackett": {
-    "image": "lscr.io/linuxserver/jackett@sha256:104a82c2f75892745d36b65a8c1244761e9f66678424ca547b203ff2ed708975",
+    "image": "lscr.io/linuxserver/jackett@sha256:402bfdc5f132dd89a9019d15a756079a7822843b465ee9e4e7c996f1ecb9bc49",
     "platform": "linux/amd64",
     "configured_image": "lscr.io/linuxserver/jackett:latest"
   },
@@ -153,5 +153,20 @@
     "image": "umagistr/seanime@sha256:99f9210c66eff284d3f4605d63ea129d0678eac5ec9ef74f0fee0a5c8ddf6871",
     "platform": "linux/amd64",
     "configured_image": "umagistr/seanime:latest"
+  },
+  "homepage": {
+    "image": "ghcr.io/gethomepage/homepage@sha256:19c5c09184458a41b7b5915e71463a39f36cd33540f41bdbed008791b8182d5f",
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/gethomepage/homepage:v2.7.0"
+  },
+  "homepage-glances": {
+    "image": "nicolargo/glances@sha256:32ccbc559baa624bd41419c9a1daf2c32b391dfbee106434186a52bccd164ac7",
+    "platform": "linux/amd64",
+    "configured_image": "nicolargo/glances:4.5.8"
+  },
+  "homepage-docker-proxy": {
+    "image": "ghcr.io/tecnativa/docker-socket-proxy@sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459",
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/tecnativa/docker-socket-proxy:v0.5.0"
   }
 }

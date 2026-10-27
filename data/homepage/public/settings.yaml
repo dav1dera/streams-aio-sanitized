@@ -1,0 +1,27 @@
+title: La mia Homepage
+description: Servizi, ricerca e risorse della VM
+theme: dark
+color: slate
+language: it
+headerStyle: clean
+fullWidth: true
+disableCollapse: true
+showStats: false
+statusStyle: dot
+useEqualHeights: true
+target: _blank
+hideVersion: false
+logpath: /app
+layout:
+  Sistema:
+    style: row
+    columns: 3
+  Media:
+    style: column
+  Gestione:
+    style: column
+  Rete:
+    style: column
+  Monitoraggio:
+    style: row
+    columns: 2

@@ -1,0 +1,184 @@
+# I 23 collegamenti provengono dal template pubblico Honey. # indica un URL da completare.
+- Sistema:
+  - CPU della VM:
+      widget:
+        type: glances
+        url: http://homepage-glances:61208
+        version: 4
+        metric: cpu
+        chart: true
+        refreshInterval: 5000
+        pointsLimit: 20
+  - Memoria della VM:
+      widget:
+        type: glances
+        url: http://homepage-glances:61208
+        version: 4
+        metric: memory
+        chart: true
+        refreshInterval: 5000
+        pointsLimit: 20
+  - Disco dello stack:
+      widget:
+        type: glances
+        url: http://homepage-glances:61208
+        version: 4
+        metric: fs:/
+        chart: false
+        refreshInterval: 5000
+        pointsLimit: 20
+- Media:
+  - AIOStreams:
+      icon: mdi-play-circle
+      href: http://192.168.178.11:4444/
+      server: docker-locale
+      container: aiostreams
+      showStats: false
+  - AIOMetadata:
+      icon: mdi-movie-search
+      href: http://192.168.178.11:1337/
+      server: docker-locale
+      container: aiometadata
+      showStats: false
+  - Comet:
+      icon: mdi-meteor
+      href: http://192.168.178.11:2020/
+      server: docker-locale
+      container: comet
+      showStats: false
+  - Jackett:
+      icon: mdi-magnify
+      href: http://192.168.178.11:9117
+      server: docker-locale
+      container: jackett
+      showStats: false
+  - MediaFlow Proxy:
+      icon: mdi-play-network
+      href: http://192.168.178.11:8888
+      server: docker-locale
+      container: mediaflow-proxy-light
+      showStats: false
+  - EasyProxy:
+      icon: mdi-transit-connection-variant
+      href: http://192.168.178.11:8760/
+      server: docker-locale
+      container: easyproxy
+      showStats: false
+  - StremThru:
+      icon: mdi-play-box-multiple
+      href: http://192.168.178.11:9090
+      server: docker-locale
+      container: stremthru
+      showStats: false
+  - Seanime:
+      icon: mdi-animation-play
+      href: '#'
+      server: docker-locale
+      container: seanime
+      showStats: false
+      description: Collegamento da completare
+  - Seanime Shared:
+      icon: mdi-account-group
+      href: '#'
+      server: docker-locale
+      container: seanime-shared
+      showStats: false
+      description: Collegamento da completare
+  - StreamViX:
+      icon: mdi-television-play
+      href: http://192.168.178.11:7860/
+      server: docker-locale
+      container: streamvix
+      showStats: false
+  - Tvvoo:
+      icon: mdi-television-classic
+      href: http://192.168.178.11:5000/
+      server: docker-locale
+      container: tvvoo
+      showStats: false
+- Gestione:
+  - Proxmox:
+      icon: mdi-server
+      href: https://192.168.178.2:8006/#
+      # API Proxmox non ancora collegate: nessun valore o token inventato.
+      # Dopo aver aggiunto le variabili reali tramite Infisical, rimuovi solo i # delle righe widget.
+      # widget:
+      #   type: proxmox
+      #   url: "{{HOMEPAGE_VAR_PROXMOX_URL}}"
+      #   username: "{{HOMEPAGE_VAR_PROXMOX_TOKEN_ID}}"
+      #   password: "{{HOMEPAGE_VAR_PROXMOX_TOKEN_SECRET}}"
+      #   fields: ["vms", "lxc", "resources.cpu", "resources.mem"]
+  - Proxmox Backup Server:
+      icon: mdi-backup-restore
+      href: https://192.168.178.100:8007/#
+  - WUD:
+      icon: mdi-update
+      href: http://192.168.178.11:3001/
+      server: docker-locale
+      container: wud
+      showStats: false
+  - Infisical:
+      icon: mdi-key-chain
+      href: '#'
+      description: Collegamento da completare
+  - Portainer:
+      icon: mdi-docker
+      href: http://192.168.178.11:9000
+      server: docker-locale
+      container: portainer
+      showStats: false
+  - AIOManager:
+      icon: mdi-view-dashboard
+      href: http://192.168.178.11:1610/
+      server: docker-locale
+      container: aiomanager
+      showStats: false
+  - Headplane:
+      icon: mdi-lan-connect
+      href: http://192.168.178.11:3000/
+      server: docker-locale
+      container: headplane
+      showStats: false
+  - Nginx Proxy Manager:
+      icon: mdi-routes
+      href: http://192.168.178.11:81
+      server: docker-locale
+      container: nginx-proxy-manager
+      showStats: false
+  - Servizio Honey 23:
+      icon: mdi-server-network
+      href: http://192.168.178.25:8080/
+      description: Nome originale Honey da confermare
+- Rete:
+  - AdGuard Home:
+      icon: mdi-shield-check
+      href: http://192.168.178.12:90/
+  - DNSCrypt Proxy:
+      icon: mdi-dns
+      href: http://192.168.178.11:8280
+      server: docker-locale
+      container: dnscrypt-proxy
+      showStats: false
+  - Link Honey 22:
+      icon: mdi-link-variant
+      href: '#'
+      description: Nome originale Honey da confermare
+- Monitoraggio:
+  - Container · CPU e RAM:
+      widget:
+        type: glances
+        url: http://homepage-glances:61208
+        version: 4
+        metric: containers
+        chart: false
+        refreshInterval: 5000
+        pointsLimit: 20
+  - Processi della VM:
+      widget:
+        type: glances
+        url: http://homepage-glances:61208
+        version: 4
+        metric: process
+        chart: false
+        refreshInterval: 5000
+        pointsLimit: 20

@@ -14,6 +14,9 @@
     "gost",
     "headplane",
     "headscale",
+    "homepage",
+    "homepage-docker-proxy",
+    "homepage-glances",
     "honey",
     "jackett",
     "mediaflow-proxy-light",
@@ -183,6 +186,12 @@
       "uid": 1000,
       "gid": 1000,
       "mode": "0775"
+    },
+    {
+      "path": "data/homepage/public",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0770"
     }
   ],
   "root_env_variables_from_restored_agent": [],
@@ -208,5 +217,9 @@
   "private_env_targets_from_restored_agent": [],
   "unclassified_files_excluded": 25,
   "database_policy": "fresh_application_state_restore_infisical",
-  "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup"
+  "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup",
+  "service_resources_inventory": {
+    "path": "config/service-resources.json",
+    "sha256": "3b9290dea0498bb879716277a694e86ddd3b96947ab9f2675cc496b1db657f7f"
+  }
 }
