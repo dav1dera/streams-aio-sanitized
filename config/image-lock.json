@@ -35,7 +35,7 @@
     "configured_image": "favonia/cloudflare-ddns:latest"
   },
   "aiometadata": {
-    "image": "ghcr.io/cedya77/aiometadata@sha256:0474b7a1af12c24d5b02b374d46b19a7eb719e1bf5b5527107acdc368cb661ef",
+    "image": "ghcr.io/cedya77/aiometadata@sha256:9892f47d6cb706459921ffbea346deb32de8d23bf9b01460388a58a7471dc016",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/cedya77/aiometadata:latest"
   },
@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:5f1e89e62346c8b3583b3e35747aea7654d40cf5c24976eb6db1c31be762b370",
+    "image": "ghcr.io/viren070/aiostreams@sha256:43f9927dbe7d29547d4b2e7adf4bd78df0a79ec442e13d5022aca3ea18f6fbfe",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -60,7 +60,7 @@
     "configured_image": "postgres:18-alpine"
   },
   "redis": {
-    "image": "redis@sha256:0a014ae5c04f55c82aaad2314de411c7a203de1c4312c3e526939226a0185dd9",
+    "image": "redis@sha256:39cd96e5b51a2e6f67f6756e80e7d482905f713b3395763464f82ec5b217f60a",
     "platform": "linux/amd64",
     "configured_image": "redis:latest"
   },
@@ -85,7 +85,7 @@
     "configured_image": "ghcr.io/ccbkkb/microwarp:latest"
   },
   "gost": {
-    "image": "gogost/gost@sha256:c3f849542469bc6027cd38d9a7ef86e8efbcc1176551a3ace8df85ef90a9c5b9",
+    "image": "gogost/gost@sha256:25648f4aeb4f3a0511e941449229f815802e38ba14394bc5f644629cce0f7a3c",
     "platform": "linux/amd64",
     "configured_image": "gogost/gost:latest"
   },
@@ -95,7 +95,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:a999bfce2e4e3555c0f8b187d349131f0ff92331b1c4a0338245a2862fa9bcd9",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:9102bccad421b93519261fd302f359e913096f1cfd77a2c6780f687f79069854",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
