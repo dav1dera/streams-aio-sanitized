@@ -1,7 +1,7 @@
 {
   "services": {
     "tailscale": {
-      "image": "tailscale/tailscale@sha256:b11583ad2e93e4671128538c88cf11f460444a5d7e449311dd1933a400ab849d",
+      "image": "tailscale/tailscale@sha256:ed6480b33c6eb67c9cbd203ed42b9fb57e361986725b6856def71b7a3d9e276c",
       "platform": "linux/amd64"
     },
     "portainer": {
@@ -29,7 +29,7 @@
       "platform": "linux/amd64"
     },
     "aiometadata": {
-      "image": "ghcr.io/cedya77/aiometadata@sha256:9892f47d6cb706459921ffbea346deb32de8d23bf9b01460388a58a7471dc016",
+      "image": "ghcr.io/cedya77/aiometadata@sha256:8a24bd90711e42a817baa20594cba3e08bbd340d859c6c5c9222be6f5f3eafd8",
       "platform": "linux/amd64"
     },
     "mediaflow-proxy-light": {
@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:43f9927dbe7d29547d4b2e7adf4bd78df0a79ec442e13d5022aca3ea18f6fbfe",
+      "image": "ghcr.io/viren070/aiostreams@sha256:0b6ec50c9f4ed6b39d1340c86f6843a719e2034b6d135443b7fdf6c525a1201f",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
