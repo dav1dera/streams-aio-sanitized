@@ -1205,11 +1205,25 @@ class PublicExportTests(unittest.TestCase):
         for path in sorted(ROOT.rglob("*")):
             if not path.is_file(): continue
             name = path.relative_to(ROOT).as_posix()
-            if export.allowed(name) and not name.startswith("data/") and name != "docker-compose.yml":
+            if (export.allowed(name) and name != "docker-compose.yml"
+                    and (not name.startswith("data/") or name not in self.public)):
                 data = path.read_bytes()
                 self.public[name] = data
-                self.write(name, data)
                 names.append(name)
+        # Build after importing the full public inventory: declared config files
+        # must exist before bind mounts are synthesized as fixture directories.
+        # Existing ENV/template fixtures still generate synthetic private values.
+        self.source = self.root / "complete-public-tree"
+        self.source.mkdir()
+        self.write = fixture(self.source, self.public)
+        for name in names:
+            self.write(name, self.public[name])
+        resources = sync.loads(self.public.get(export.SERVICE_RESOURCES, b"{}"))
+        for row in resources.get("configuration_files", []):
+            name = sync.relative(row["path"])
+            self.assertIn(name, self.public)
+            self.assertTrue(export.allowed(name))
+            (self.source / name).chmod(row["mode"])
         guard = export.Guard(self.source, self.public, sync, lambda name: sync.read_file(self.source, name))
         for name in names:
             with self.subTest(name=name):
