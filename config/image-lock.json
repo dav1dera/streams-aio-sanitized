@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:0b6ec50c9f4ed6b39d1340c86f6843a719e2034b6d135443b7fdf6c525a1201f",
+    "image": "ghcr.io/viren070/aiostreams@sha256:fecbcd61a917b06b34568a3f97474fb24294011dde115fb43b63e8375491ba44",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -100,7 +100,7 @@
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
   "streamvix": {
-    "image": "qwertyuiop8899/streamvix@sha256:c7c2c69c8607f2468887b59c6f10a533432cbf8e7c9d0385afaffc5cfe8bdec4",
+    "image": "qwertyuiop8899/streamvix@sha256:9b3d4863f529a2e117352eeeaa19cefbc7c7572af70fac5577e9d56465775859",
     "platform": "linux/amd64",
     "configured_image": "qwertyuiop8899/streamvix:latest"
   },
