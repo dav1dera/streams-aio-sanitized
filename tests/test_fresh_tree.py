@@ -81,7 +81,7 @@ marker=target/'.generated/dr-render-complete.json';marker.write_text('{}')
 call(args+['render','--target',str(target),'--synthetic'],target,1);need(not(target/'.env').exists(),'MARKER_GUARD_PARTIAL_WRITES');marker.unlink()
 call(args+['render','--target',str(target),'--synthetic'],target)
 call(args+['prepare-state','--target',str(target),'--synthetic'],target)
-# Synthetic stand-in for the ONE required encrypted-runtime backup artifact.
+# Synthetic NPM backup fixture; declared generic state is restored below.
 # No database is read or copied from the running deployment.
 import sqlite3
 with sqlite3.connect(target/'data/npm/data/database.sqlite') as db:
@@ -100,7 +100,22 @@ call(importer+['import','--target',str(target),'--payload',str(payload_path),'--
 before={service:(target/f'data/{service}/data/db.sqlite').read_bytes() for service in ('aiostreams','aiometadata')}
 call(importer+['import','--target',str(target),'--payload',str(payload_path),'--synthetic'],target,1)
 need(all(before[service]==(target/f'data/{service}/data/db.sqlite').read_bytes() for service in before),'EXISTING_AIO_DB_CHANGED')
-call(args+['preflight','--target',str(target)],target)
+# Generic service data is restored from an invented archive through the real
+# pinned verifier. Merely creating its directories must not satisfy readiness.
+from fresh_service_state import snapshot as service_snapshot, configuration_files, synthetic_archive, restore_synthetic, verified_preflight
+import argparse
+manifest=json.loads((target/'config/dr-manifest.yaml').read_text())
+resource_model=json.loads(call(['docker','compose','--profile','all','-f','docker-compose.yml','-f','config/compose.dr.yaml','config','--format','json'],target))
+service_archive=service_evidence=None
+service_commit=call(['git','rev-parse','HEAD'],ROOT).decode().strip()
+inventory=target/service_snapshot.INVENTORY
+if inventory.exists():configuration_files(target,service_snapshot.inventory(target),apply_modes=True)
+if inventory.exists() and service_snapshot.selected(service_snapshot.inventory(target)):
+ service_archive=base/'services-state.synthetic.tar.gz'
+ synthetic_archive(target,service_archive,resource_model,service_commit)
+ service_evidence=restore_synthetic(target,service_archive,resource_model,service_commit,lambda command,code:call(command,target))
+verified_preflight(dr,argparse.Namespace(target=str(target),mode='fresh',synthetic=False),manifest,
+ resource_model,service_archive,service_evidence,service_commit,lambda command,code:call(command,target))
 call(['docker','compose','--profile','all','config','--quiet'],target)
 parsed=json.loads(call(['docker','compose','--profile','all','config','--format','json'],target))
 need(all(not v.get('external',False) for v in parsed['volumes'].values()),'EXTERNAL_VOLUME_GATE')
@@ -141,7 +156,9 @@ slot=target/manifest['quick_redeploy']['empty_directories'][0]['path']
 need(not any(slot.iterdir()),'SYNTHETIC_DIRECTORY_NOT_EMPTY');slot.rmdir();slot.symlink_to(base,target_is_directory=True)
 call(args+['prepare-state','--target',str(target),'--synthetic'],target,1);slot.unlink();slot.mkdir()
 result={'STRUCTURAL_HARNESS':'PASS','COMPOSE_SYNTHETIC_ALL_REAL_TEMPLATES':'PASS','RENDER_GUARDS':'PASS','SCRAM_BOOTSTRAP_TESTS':'PASS','STATE_DIRECTORY_IDEMPOTENCE':'PASS','OPTIONAL_BACKUP_GATES':0,'PRIVATE_RUNTIME_COPIED':False,'REAL_INFISICAL_VALUES_USED':False,'APP_RUNTIME_STARTUP_TESTED':False,'synthetic_stubs':len(missing),'directory':str(target),'actual_public_tree':actual,'public_files':len(files)}
-actual['FRESH_DEPLOY_TEST']='PASS';actual['scope']='Public archive + synthetic Infisical + synthetic NPM backup + synthetic PRIVATE_DR_PAYLOAD; no running applications or real credentials.'
+actual['FRESH_DEPLOY_TEST']='PASS';actual['scope']='Public archive + synthetic Infisical + synthetic NPM/generic-service backups + synthetic PRIVATE_DR_PAYLOAD; no running applications or real credentials.'
 result['AIO_PRIVATE_DR_IMPORT']='PASS';result['OAUTH_ALLOWLIST_FAIL_CLOSED']='PASS';result['QUICK_REDEPLOY_WITH_MINIMAL_REQUIRED_BACKUP']='PASS';result['actual_public_tree']=actual
+result['GENERIC_SERVICE_STATE_ARCHIVE_RESTORE']='PASS';result['generic_resources_verified']=len(service_evidence['resources']) if service_evidence else 0
 (EVID/'fresh-harness-test.json').write_text(json.dumps(result,indent=2));(EVID/'fresh-harness-test.json').chmod(0o600)
 print('FRESH_DEPLOY_TEST PASS');print('COMPOSE_SYNTHETIC_ALL_REAL_TEMPLATES PASS');print('AIO_PRIVATE_DR_IMPORT PASS');print('SCRAM_BOOTSTRAP_TESTS PASS');print('EMPTY_STATE_PREPARATION PASS');print('OPTIONAL_BACKUP_GATES 0');print('QUICK_REDEPLOY_WITH_MINIMAL_REQUIRED_BACKUP PASS');print('EVIDENCE',EVID/'fresh-harness-test.json')
+print('GENERIC_SERVICE_STATE_ARCHIVE_RESTORE PASS')

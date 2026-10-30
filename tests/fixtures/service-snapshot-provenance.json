@@ -1,0 +1,8 @@
+{
+  "repository": "dav1dera/streams-aio-recovery-gui",
+  "commit": "5ed90393ca6ba1241594a37631c8bc9e3816855d",
+  "path": "remote/service_snapshot.py",
+  "sha256": "75ab3fdedaa47c84d69654bbb9674898e7123ad30108438952a33dfce2df9e5e",
+  "fixture": "pinned_service_snapshot.py",
+  "scope": "Immutable test fixture of the reviewed state archive protocol, not an application image pin. Updates require explicit review; runtime image locks remain read from the current public inventory."
+}
