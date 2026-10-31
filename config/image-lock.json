@@ -15,7 +15,7 @@
     "configured_image": "klutchell/dnscrypt-proxy:latest"
   },
   "headscale": {
-    "image": "headscale/headscale@sha256:780ed2f9e85719a2211277433f2c8afb45105d0d25031949a6848a485f9e216d",
+    "image": "headscale/headscale@sha256:11f81665e842809db9fe3006a38c56a66e968baa5abd4bac498e86445572b970",
     "platform": "linux/amd64",
     "configured_image": "headscale/headscale:stable"
   },
@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:fecbcd61a917b06b34568a3f97474fb24294011dde115fb43b63e8375491ba44",
+    "image": "ghcr.io/viren070/aiostreams@sha256:ea9c8dab4e14bc29256d9b1a2cd4d069624e046f948c5b2d9270c48921832de2",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
