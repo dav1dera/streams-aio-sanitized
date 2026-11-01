@@ -56,7 +56,7 @@
       "platform": "linux/amd64"
     },
     "wud": {
-      "image": "getwud/wud@sha256:27bdcde384246f3a1b2c88bcd62827248e6cb1d107b600404c27e3ebe0ec6169",
+      "image": "getwud/wud@sha256:609f285ff706ceaed6d7b31c2622ab4d1f91dbd99db43fe247c1ef79dc920e72",
       "platform": "linux/amd64"
     },
     "honey": {
