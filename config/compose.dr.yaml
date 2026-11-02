@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:ea9c8dab4e14bc29256d9b1a2cd4d069624e046f948c5b2d9270c48921832de2",
+      "image": "ghcr.io/viren070/aiostreams@sha256:6ecf7cae5c07f231662cf7679cde7fbdf3edb6577e82aac1cdf36a223db219f0",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
