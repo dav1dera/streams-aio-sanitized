@@ -1922,7 +1922,7 @@
       "TYPE": "CONFIGURATION_FILE",
       "SOURCE": "data/homepage/public/settings.yaml",
       "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "c6ce1f7c93cc23c56632e64b847e654f4234f579026a7267705b84e515de3a12",
+      "SHA256": "b6ea7f595c1fad422067d5f8036c8966a3ee27e465c6513b8cab0688030491cb",
       "MODE": 420,
       "RESOLVED": true
     },
@@ -1932,7 +1932,7 @@
       "TYPE": "CONFIGURATION_FILE",
       "SOURCE": "data/homepage/public/services.yaml",
       "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "a437a4d4d84048669180a1d6ce288cb91d606c5563743846bef1ed63899000a6",
+      "SHA256": "bbcd15d391337520fdbbd594e795939ebc661e0000ecffa91da775eb38cadff6",
       "MODE": 420,
       "RESOLVED": true
     },
@@ -1992,7 +1992,7 @@
       "TYPE": "CONFIGURATION_FILE",
       "SOURCE": "data/homepage/public/custom.css",
       "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "f21a10d9f7198ebbb7ad9e211847dc0517ef98f2cd7838ff1c290279395a0c22",
+      "SHA256": "8f2cc536129453850a44eb2e96ed50d345b3356ebb772ab4d5652e53353b0984",
       "MODE": 420,
       "RESOLVED": true
     },

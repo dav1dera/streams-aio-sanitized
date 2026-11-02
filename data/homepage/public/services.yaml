@@ -1,4 +1,3 @@
-# Tutti i collegamenti originali sono conservati; le metriche provengono dalla VM.
 - Sistema:
   - CPU della VM:
       widget:
@@ -27,6 +26,50 @@
         chart: false
         refreshInterval: 5000
         pointsLimit: 20
+- Prestazioni:
+  - Carico medio della VM:
+      widget:
+        type: customapi
+        url: http://homepage-glances:61208/api/4/load
+        refreshInterval: 5000
+        mappings:
+        - field: min1
+          label: 1 min
+          format: float
+        - field: min5
+          label: 5 min
+          format: float
+        - field: min15
+          label: 15 min
+          format: float
+        - field: cpucore
+          label: vCPU
+          format: number
+  - Memoria swap:
+      widget:
+        type: customapi
+        url: http://homepage-glances:61208/api/4/memswap
+        refreshInterval: 5000
+        mappings:
+        - field: used
+          label: Usata
+          format: bytes
+        - field: total
+          label: Totale
+          format: bytes
+        - field: percent
+          label: Utilizzo
+          format: float
+          suffix: '%'
+  - Attivita del disco:
+      widget:
+        type: glances
+        url: http://homepage-glances:61208
+        version: 4
+        chart: true
+        refreshInterval: 5000
+        pointsLimit: 30
+        metric: disk:sda
 - Streaming e cataloghi:
   - AIOStreams:
       icon: mdi-play-circle
@@ -85,18 +128,16 @@
   - Anime:
     - Seanime:
         icon: mdi-animation-play
-        href: '#'
+        href: http://192.168.178.11/seanime
         server: docker-locale
         container: seanime
         showStats: false
-        description: Collegamento da completare
     - Seanime Shared:
         icon: mdi-account-group
-        href: '#'
+        href: http://192.168.178.11/seanime-shared
         server: docker-locale
         container: seanime-shared
         showStats: false
-        description: Collegamento da completare
 - Infrastruttura:
   - Proxmox:
       icon: mdi-server
@@ -161,6 +202,16 @@
           chart: true
           refreshInterval: 5000
           pointsLimit: 20
+  - Processi della VM:
+    - Processi CPU e RAM:
+        widget:
+          type: glances
+          url: http://homepage-glances:61208
+          version: 4
+          chart: true
+          refreshInterval: 5000
+          pointsLimit: 30
+          metric: process
   - Da completare:
     - Link Honey 22:
         icon: mdi-link-variant
