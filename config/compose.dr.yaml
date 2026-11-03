@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:6ecf7cae5c07f231662cf7679cde7fbdf3edb6577e82aac1cdf36a223db219f0",
+      "image": "ghcr.io/viren070/aiostreams@sha256:5439ec0b7aba6645d7aae22439915e629ac36385c18f10780e8b74a58776b348",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -72,7 +72,7 @@
       "platform": "linux/amd64"
     },
     "gost": {
-      "image": "gogost/gost@sha256:25648f4aeb4f3a0511e941449229f815802e38ba14394bc5f644629cce0f7a3c",
+      "image": "gogost/gost@sha256:f266f957c6e4f8d433ed23202a5745fa4969d08f3f0ef034fb9357345e16ad67",
       "platform": "linux/amd64"
     },
     "oauth2-proxy": {
