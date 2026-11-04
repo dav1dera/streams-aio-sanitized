@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:5439ec0b7aba6645d7aae22439915e629ac36385c18f10780e8b74a58776b348",
+    "image": "ghcr.io/viren070/aiostreams@sha256:337ba32fc94ac406ef621d1cbe31a3634ff1e49ce8c2e41d22f9db518724a54d",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
