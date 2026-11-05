@@ -1992,7 +1992,7 @@
       "TYPE": "CONFIGURATION_FILE",
       "SOURCE": "data/homepage/public/custom.css",
       "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "900b48fa51b5e4c9954e729ab02c4d3d7eee5db79f4bea3190d211278bd34619",
+      "SHA256": "b2eb6eb3bbaaeecb45908c4a83a14ddb42c5c79dff415c074c2416a5472b8e4a",
       "MODE": 420,
       "RESOLVED": true
     },
