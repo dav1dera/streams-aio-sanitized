@@ -29,9 +29,6 @@ layout:
     style: column
     Consumo container:
       style: column
-    Da completare:
-      style: column
-      initiallyCollapsed: true
     Processi della VM:
       style: column
 background:

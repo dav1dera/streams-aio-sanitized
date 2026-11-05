@@ -211,8 +211,3 @@
           refreshInterval: 5000
           pointsLimit: 30
           metric: process
-  - Da completare:
-    - Link Honey 22:
-        icon: mdi-link-variant
-        href: '#'
-        description: Nome originale Honey da confermare
