@@ -153,8 +153,7 @@
       showStats: false
   - Infisical:
       icon: mdi-key-chain
-      href: '#'
-      description: Collegamento da completare
+      href: http://192.168.178.11/infisical
   - Portainer:
       icon: mdi-docker
       href: http://192.168.178.11:9000
