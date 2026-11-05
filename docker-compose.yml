@@ -834,11 +834,6 @@ services:
     restart: unless-stopped
     ports:
     - 3002:3000
-    environment:
-      HOMEPAGE_ALLOWED_HOSTS: 192.168.178.11:3002,localhost:3002,127.0.0.1:3002,localhost:3000,127.0.0.1:3000
-      TZ: Europe/Rome
-      HOSTNAME: 0.0.0.0
-      LOG_TARGETS: both
     volumes:
     - type: bind
       source: data/homepage/public
@@ -863,10 +858,6 @@ services:
     container_name: homepage-glances
     restart: unless-stopped
     pid: host
-    environment:
-      GLANCES_OPT: -w -t 5 --bind 0.0.0.0 --port 61208
-      DOCKER_HOST: tcp://homepage-docker-proxy:2375
-      XDG_CACHE_HOME: /app/logs
     volumes:
     - type: bind
       source: data/homepage-glances/public/glances.conf
@@ -898,19 +889,6 @@ services:
     image: ghcr.io/tecnativa/docker-socket-proxy:v0.5.0
     container_name: homepage-docker-proxy
     restart: unless-stopped
-    environment:
-      CONTAINERS: '1'
-      IMAGES: '1'
-      INFO: '1'
-      EVENTS: '1'
-      VERSION: '1'
-      PING: '1'
-      POST: '0'
-      SERVICES: '0'
-      TASKS: '0'
-      VOLUMES: '0'
-      NETWORKS: '0'
-      AUTH: '0'
     volumes:
     - type: bind
       source: /var/run/docker.sock
