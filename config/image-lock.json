@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:6956f48f159ed2c4b89144613119fcf091dcd82f5f3578f0a9ed1b6c4b8cadcf",
+    "image": "ghcr.io/viren070/aiostreams@sha256:00aac0043e77cd489145f384de75b9bf9674a292e9f7c446d91f0839c406f5d7",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -55,12 +55,12 @@
     "configured_image": "edoburu/pgbouncer:latest"
   },
   "postgres": {
-    "image": "postgres@sha256:83148c0bc09eac4d598b70a61e1404d0212b76c95c504bfd6c81a4c59ec91792",
+    "image": "postgres@sha256:123b17998ccaf47e53b502e8c6a1e79afd8f579c6f3eec83c563da026f957395",
     "platform": "linux/amd64",
     "configured_image": "postgres:18-alpine"
   },
   "redis": {
-    "image": "redis@sha256:39cd96e5b51a2e6f67f6756e80e7d482905f713b3395763464f82ec5b217f60a",
+    "image": "redis@sha256:f245f4c83b84a9e9a0588da1c9456e579455310f0945d5db52cd2ba27f2000cc",
     "platform": "linux/amd64",
     "configured_image": "redis:latest"
   },
@@ -90,12 +90,12 @@
     "configured_image": "gogost/gost:latest"
   },
   "oauth2-proxy": {
-    "image": "quay.io/oauth2-proxy/oauth2-proxy@sha256:8498b0d0ef0a7b29686414000a08aee467f02d0299c9ed1e006a8f33fc017916",
+    "image": "quay.io/oauth2-proxy/oauth2-proxy@sha256:c3415e8660af553f5e18f5d90db050614c02493c0ac6260ac59442f6d9b12048",
     "platform": "linux/amd64",
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:9102bccad421b93519261fd302f359e913096f1cfd77a2c6780f687f79069854",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:dbd53fbdb2207cb247dd5383bafa6da3f54979b83fe9427ca99c03040d9c0b05",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
