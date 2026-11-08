@@ -938,12 +938,6 @@ networks:
     ipam:
       config:
       - subnet: 172.19.0.0/24
-  homepage-frontend:
-    ipam:
-      config:
-      - subnet: 172.20.0.0/24
+  homepage-frontend: {}
   homepage-monitoring:
     internal: true
-    ipam:
-      config:
-      - subnet: 172.20.1.0/24
