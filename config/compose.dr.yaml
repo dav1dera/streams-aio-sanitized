@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:227ade52e96cc9dd69760932986dd0f2531883ba83c6d25da263284d8cbaa246",
+      "image": "ghcr.io/viren070/aiostreams@sha256:aa24a85544f64871fbc61e0053f5cb1013360f012206a6262e0ca8038f59d106",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -56,7 +56,7 @@
       "platform": "linux/amd64"
     },
     "wud": {
-      "image": "getwud/wud@sha256:609f285ff706ceaed6d7b31c2622ab4d1f91dbd99db43fe247c1ef79dc920e72",
+      "image": "getwud/wud@sha256:5a45a94c2c3e9c26e052c62bbc5bef9f945e3f7826dc446b5c71586a1238ed40",
       "platform": "linux/amd64"
     },
     "honey": {
@@ -80,7 +80,7 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:dbd53fbdb2207cb247dd5383bafa6da3f54979b83fe9427ca99c03040d9c0b05",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:c97fa6a9154f25c122d90e14639333e1bbcb28c2df1009a9efc379ae2539fa6f",
       "platform": "linux/amd64"
     },
     "streamvix": {
@@ -92,7 +92,7 @@
       "platform": "linux/amd64"
     },
     "aiomanager": {
-      "image": "ghcr.io/sonicx161/aiomanager@sha256:9c470db0ea460d5899100086df55411b55e05ab448bc65e50aa3e18b1e9c2e90",
+      "image": "ghcr.io/sonicx161/aiomanager@sha256:ea06fd15d55887cbf8cc33411b423e666353eb7439b47f0af49a79ae01f1dfee",
       "platform": "linux/amd64"
     },
     "deunhealth": {
