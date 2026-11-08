@@ -1932,7 +1932,7 @@
       "TYPE": "CONFIGURATION_FILE",
       "SOURCE": "data/homepage/public/services.yaml",
       "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "e0c4b156ac89a9446f48796a1897b40ae4067b119ad59ef23772a56e095a0e7b",
+      "SHA256": "74290f0102e34f618f74139f0727424ee7fc9686f187c8d2e9209f4878659d3e",
       "MODE": 420,
       "RESOLVED": true
     },

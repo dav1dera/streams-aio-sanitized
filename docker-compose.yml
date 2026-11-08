@@ -854,7 +854,7 @@ services:
 
   # 📦 Service
   homepage-glances:
-    image: nicolargo/glances:4.5.8
+    image: nicolargo/glances:4.5.9
     container_name: homepage-glances
     restart: unless-stopped
     pid: host
@@ -938,6 +938,12 @@ networks:
     ipam:
       config:
       - subnet: 172.19.0.0/24
-  homepage-frontend: {}
+  homepage-frontend:
+    ipam:
+      config:
+      - subnet: 172.20.0.0/24
   homepage-monitoring:
+    ipam:
+      config:
+      - subnet: 172.20.1.0/24
     internal: true

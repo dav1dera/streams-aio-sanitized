@@ -80,7 +80,7 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:c97fa6a9154f25c122d90e14639333e1bbcb28c2df1009a9efc379ae2539fa6f",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:4925976faf4a7d0acf3cb750aa16202ee92c960a0d458e3faf2131181bc44fba",
       "platform": "linux/amd64"
     },
     "streamvix": {
@@ -119,7 +119,7 @@
       "platform": "linux/amd64"
     },
     "jackett": {
-      "image": "lscr.io/linuxserver/jackett@sha256:402bfdc5f132dd89a9019d15a756079a7822843b465ee9e4e7c996f1ecb9bc49",
+      "image": "lscr.io/linuxserver/jackett@sha256:3af37ff2ca5f14da5529b9e2018e384735daf1bf08b99350e1211be863eeae20",
       "platform": "linux/amd64"
     },
     "seanime": {
@@ -135,7 +135,7 @@
       "platform": "linux/amd64"
     },
     "homepage-glances": {
-      "image": "nicolargo/glances@sha256:32ccbc559baa624bd41419c9a1daf2c32b391dfbee106434186a52bccd164ac7",
+      "image": "nicolargo/glances@sha256:1d994d181732cfbf68b7c5826a1f71b89624e3eaaa2fe28b28048b2f61b200d7",
       "platform": "linux/amd64"
     },
     "homepage-docker-proxy": {

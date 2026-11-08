@@ -162,7 +162,7 @@
       showStats: false
   - Headplane:
       icon: mdi-lan-connect
-      href: http://192.168.178.11:3000/
+      href: "http://192.168.178.11/headplane"
       server: docker-locale
       container: headplane
       showStats: false
