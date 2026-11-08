@@ -624,6 +624,11 @@ services:
     - homepage-glances
     env_file:
     - ./data/homepage/.env
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
+    profiles: [all]
 
   # 📦 Service
   homepage-glances:
@@ -656,6 +661,11 @@ services:
       start_period: 30s
     env_file:
     - ./data/homepage-glances/.env
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
+    profiles: [all]
 
   # 📦 Service
   homepage-docker-proxy:
@@ -688,6 +698,11 @@ services:
       start_period: 15s
     env_file:
     - ./data/homepage-docker-proxy/.env
+    labels:
+    - deunhealth.restart.on.unhealthy=true
+    - wud.tag.include=^$${raw}$$
+    - wud.watch.digest=true
+    profiles: [all]
 
   # 🩺 Deunhealth - Automatically restart unhealthy containers
   deunhealth:
