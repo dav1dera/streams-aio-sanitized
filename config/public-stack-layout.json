@@ -128,6 +128,12 @@
       "mode": "0775"
     },
     {
+      "path": "data/homepage/public",
+      "uid": 1000,
+      "gid": 1000,
+      "mode": "0770"
+    },
+    {
       "path": "data/comet/data",
       "uid": 1000,
       "gid": 1000,
@@ -186,12 +192,6 @@
       "uid": 1000,
       "gid": 1000,
       "mode": "0775"
-    },
-    {
-      "path": "data/homepage/public",
-      "uid": 1000,
-      "gid": 1000,
-      "mode": "0770"
     }
   ],
   "root_env_variables_from_restored_agent": [],

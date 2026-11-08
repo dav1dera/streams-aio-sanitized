@@ -832,6 +832,74 @@
       ],
       "REQUIRED_STATE": []
     },
+    "homepage": {
+      "PUBLIC_REPO_FILES": [
+        "data/homepage/.env",
+        "data/homepage/public/bookmarks.yaml",
+        "data/homepage/public/custom.css",
+        "data/homepage/public/custom.js",
+        "data/homepage/public/docker.yaml",
+        "data/homepage/public/kubernetes.yaml",
+        "data/homepage/public/proxmox.yaml",
+        "data/homepage/public/services.yaml",
+        "data/homepage/public/settings.yaml",
+        "data/homepage/public/widgets.yaml"
+      ],
+      "GENERATED_FILES": [],
+      "REQUIRED_BEFORE_COMPOSE_UP": [
+        "data/homepage/.env",
+        "data/homepage/logs",
+        "data/homepage/public",
+        "data/homepage/public/bookmarks.yaml",
+        "data/homepage/public/custom.css",
+        "data/homepage/public/custom.js",
+        "data/homepage/public/docker.yaml",
+        "data/homepage/public/kubernetes.yaml",
+        "data/homepage/public/proxmox.yaml",
+        "data/homepage/public/services.yaml",
+        "data/homepage/public/settings.yaml",
+        "data/homepage/public/widgets.yaml"
+      ],
+      "STATE_UNIT_IDS": [
+        "service-70b761a22b78faf70ecb"
+      ],
+      "REQUIRED_STATE": [
+        "service-70b761a22b78faf70ecb"
+      ],
+      "RECOVERY_ASSETS": [
+        "services-state.tar.gz.age"
+      ]
+    },
+    "homepage-glances": {
+      "PUBLIC_REPO_FILES": [
+        "data/homepage-glances/.env",
+        "data/homepage-glances/public/glances.conf"
+      ],
+      "GENERATED_FILES": [],
+      "REQUIRED_BEFORE_COMPOSE_UP": [
+        "data/homepage-glances/.env",
+        "data/homepage-glances/logs",
+        "data/homepage-glances/public/glances.conf"
+      ],
+      "STATE_UNIT_IDS": [
+        "service-ae762fc3997412dd484f"
+      ],
+      "REQUIRED_STATE": [
+        "service-ae762fc3997412dd484f"
+      ],
+      "RECOVERY_ASSETS": [
+        "services-state.tar.gz.age"
+      ]
+    },
+    "homepage-docker-proxy": {
+      "PUBLIC_REPO_FILES": [
+        "data/homepage-docker-proxy/.env"
+      ],
+      "GENERATED_FILES": [],
+      "REQUIRED_BEFORE_COMPOSE_UP": [
+        "data/homepage-docker-proxy/.env"
+      ]
+    },
     "deunhealth": {
       "PUBLIC_REPO_FILES": [
         "data/deunhealth/.env"
@@ -1189,74 +1257,6 @@
         "seanime-shared-preferences"
       ],
       "REQUIRED_STATE": []
-    },
-    "homepage": {
-      "PUBLIC_REPO_FILES": [
-        "data/homepage/.env",
-        "data/homepage/public/bookmarks.yaml",
-        "data/homepage/public/custom.css",
-        "data/homepage/public/custom.js",
-        "data/homepage/public/docker.yaml",
-        "data/homepage/public/kubernetes.yaml",
-        "data/homepage/public/proxmox.yaml",
-        "data/homepage/public/services.yaml",
-        "data/homepage/public/settings.yaml",
-        "data/homepage/public/widgets.yaml"
-      ],
-      "GENERATED_FILES": [],
-      "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/homepage/.env",
-        "data/homepage/logs",
-        "data/homepage/public",
-        "data/homepage/public/bookmarks.yaml",
-        "data/homepage/public/custom.css",
-        "data/homepage/public/custom.js",
-        "data/homepage/public/docker.yaml",
-        "data/homepage/public/kubernetes.yaml",
-        "data/homepage/public/proxmox.yaml",
-        "data/homepage/public/services.yaml",
-        "data/homepage/public/settings.yaml",
-        "data/homepage/public/widgets.yaml"
-      ],
-      "STATE_UNIT_IDS": [
-        "service-70b761a22b78faf70ecb"
-      ],
-      "REQUIRED_STATE": [
-        "service-70b761a22b78faf70ecb"
-      ],
-      "RECOVERY_ASSETS": [
-        "services-state.tar.gz.age"
-      ]
-    },
-    "homepage-glances": {
-      "PUBLIC_REPO_FILES": [
-        "data/homepage-glances/.env",
-        "data/homepage-glances/public/glances.conf"
-      ],
-      "GENERATED_FILES": [],
-      "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/homepage-glances/.env",
-        "data/homepage-glances/logs",
-        "data/homepage-glances/public/glances.conf"
-      ],
-      "STATE_UNIT_IDS": [
-        "service-ae762fc3997412dd484f"
-      ],
-      "REQUIRED_STATE": [
-        "service-ae762fc3997412dd484f"
-      ],
-      "RECOVERY_ASSETS": [
-        "services-state.tar.gz.age"
-      ]
-    },
-    "homepage-docker-proxy": {
-      "PUBLIC_REPO_FILES": [
-        "data/homepage-docker-proxy/.env"
-      ],
-      "GENERATED_FILES": [],
-      "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/homepage-docker-proxy/.env"
-      ]
     }
   },
   "references": [
@@ -1722,6 +1722,187 @@
       "RESOLVED": true
     },
     {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/.env",
+      "TYPE": "ENV_FILE",
+      "SOURCE": "data/homepage/.env",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/public/settings.yaml",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage/public/settings.yaml",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "956a6e7cf3449e8bf6959d3a44c69b9f8028f4648540c76c5440ab071a92bce3",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/public/services.yaml",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage/public/services.yaml",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "74290f0102e34f618f74139f0727424ee7fc9686f187c8d2e9209f4878659d3e",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/public/widgets.yaml",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage/public/widgets.yaml",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "ee6344c1018189a791d3e0b750ec2f120e65b790e130b68b399e4949d0b5b342",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/public/docker.yaml",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage/public/docker.yaml",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "e2c0cd89858ec843830918b4c7ffb00f1c5aaa2b97f60b6b636a6aab62b814e8",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/public/bookmarks.yaml",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage/public/bookmarks.yaml",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "9b77e88dc6fbcbcf0c603be41789eb9e39de5f3b748eb49e37b81722a343866a",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/public/kubernetes.yaml",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage/public/kubernetes.yaml",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "65916ac6de48b05779e97d9cf4c38a3417d23f4b19946b6d28433aeb911ca19c",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/public/proxmox.yaml",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage/public/proxmox.yaml",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "26006419614afdaf66668ee204aa8d921869c8b83ff3bd2d29e20e1c8b0e1bbc",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/public/custom.css",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage/public/custom.css",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "b2eb6eb3bbaaeecb45908c4a83a14ddb42c5c79dff415c074c2416a5472b8e4a",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "data/homepage/public/custom.js",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage/public/custom.js",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "ae68f162a260c307b29e2f5f3debcc00d2e21890229219970729371f5e030556",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "/app/config",
+      "TYPE": "BIND_MOUNT",
+      "SOURCE": "data/homepage/public",
+      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
+      "MODE": "ro",
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage",
+      "REFERENCE": "/app/logs",
+      "TYPE": "BIND_MOUNT",
+      "SOURCE": "data/homepage/logs",
+      "RESTORE_METHOD": "ENCRYPTED_SERVICE_STATE",
+      "MODE": "rw",
+      "RESOURCE_ID": "70b761a22b78faf70ecb",
+      "RESOLVED": true,
+      "RECOVERY_ASSET": "services-state.tar.gz.age"
+    },
+    {
+      "SERVICE": "homepage-glances",
+      "REFERENCE": "data/homepage-glances/.env",
+      "TYPE": "ENV_FILE",
+      "SOURCE": "data/homepage-glances/.env",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage-glances",
+      "REFERENCE": "data/homepage-glances/public/glances.conf",
+      "TYPE": "CONFIGURATION_FILE",
+      "SOURCE": "data/homepage-glances/public/glances.conf",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "SHA256": "86158b85d3c19285d48c79e8ddeca41f6efa679dfb93f185b92b616337a1516b",
+      "MODE": 420,
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage-glances",
+      "REFERENCE": "/etc/glances/glances.conf",
+      "TYPE": "BIND_MOUNT",
+      "SOURCE": "data/homepage-glances/public/glances.conf",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "MODE": "ro",
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage-glances",
+      "REFERENCE": "/app/logs",
+      "TYPE": "BIND_MOUNT",
+      "SOURCE": "data/homepage-glances/logs",
+      "RESTORE_METHOD": "ENCRYPTED_SERVICE_STATE",
+      "MODE": "rw",
+      "RESOURCE_ID": "ae762fc3997412dd484f",
+      "RESOLVED": true,
+      "RECOVERY_ASSET": "services-state.tar.gz.age"
+    },
+    {
+      "SERVICE": "homepage-docker-proxy",
+      "REFERENCE": "data/homepage-docker-proxy/.env",
+      "TYPE": "ENV_FILE",
+      "SOURCE": "data/homepage-docker-proxy/.env",
+      "RESTORE_METHOD": "TRACKED_PUBLIC",
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage-docker-proxy",
+      "REFERENCE": "/var/run/docker.sock",
+      "TYPE": "HOST_PREREQUISITE",
+      "SOURCE": "/var/run/docker.sock",
+      "RESTORE_METHOD": "HOST_PREREQUISITE",
+      "RESOLVED": true
+    },
+    {
+      "SERVICE": "homepage-docker-proxy",
+      "REFERENCE": "/var/lib/haproxy",
+      "TYPE": "TMPFS",
+      "SOURCE": "",
+      "RESTORE_METHOD": "COMPOSE_RECREATE",
+      "RESOURCE_ID": "f8a841a3349845fa3592",
+      "RESOLVED": true
+    },
+    {
       "SERVICE": "deunhealth",
       "REFERENCE": "data/deunhealth/.env",
       "TYPE": "ENV_FILE",
@@ -1906,187 +2087,6 @@
       "SOURCE": "data/seanime/data/shared/config",
       "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
       "MODE": "rw",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/.env",
-      "TYPE": "ENV_FILE",
-      "SOURCE": "data/homepage/.env",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/public/settings.yaml",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage/public/settings.yaml",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "956a6e7cf3449e8bf6959d3a44c69b9f8028f4648540c76c5440ab071a92bce3",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/public/services.yaml",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage/public/services.yaml",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "74290f0102e34f618f74139f0727424ee7fc9686f187c8d2e9209f4878659d3e",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/public/widgets.yaml",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage/public/widgets.yaml",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "ee6344c1018189a791d3e0b750ec2f120e65b790e130b68b399e4949d0b5b342",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/public/docker.yaml",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage/public/docker.yaml",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "e2c0cd89858ec843830918b4c7ffb00f1c5aaa2b97f60b6b636a6aab62b814e8",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/public/bookmarks.yaml",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage/public/bookmarks.yaml",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "9b77e88dc6fbcbcf0c603be41789eb9e39de5f3b748eb49e37b81722a343866a",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/public/kubernetes.yaml",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage/public/kubernetes.yaml",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "65916ac6de48b05779e97d9cf4c38a3417d23f4b19946b6d28433aeb911ca19c",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/public/proxmox.yaml",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage/public/proxmox.yaml",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "26006419614afdaf66668ee204aa8d921869c8b83ff3bd2d29e20e1c8b0e1bbc",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/public/custom.css",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage/public/custom.css",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "b2eb6eb3bbaaeecb45908c4a83a14ddb42c5c79dff415c074c2416a5472b8e4a",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "data/homepage/public/custom.js",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage/public/custom.js",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "ae68f162a260c307b29e2f5f3debcc00d2e21890229219970729371f5e030556",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "/app/config",
-      "TYPE": "BIND_MOUNT",
-      "SOURCE": "data/homepage/public",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "MODE": "ro",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage",
-      "REFERENCE": "/app/logs",
-      "TYPE": "BIND_MOUNT",
-      "SOURCE": "data/homepage/logs",
-      "RESTORE_METHOD": "ENCRYPTED_SERVICE_STATE",
-      "MODE": "rw",
-      "RESOURCE_ID": "70b761a22b78faf70ecb",
-      "RESOLVED": true,
-      "RECOVERY_ASSET": "services-state.tar.gz.age"
-    },
-    {
-      "SERVICE": "homepage-glances",
-      "REFERENCE": "data/homepage-glances/.env",
-      "TYPE": "ENV_FILE",
-      "SOURCE": "data/homepage-glances/.env",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage-glances",
-      "REFERENCE": "data/homepage-glances/public/glances.conf",
-      "TYPE": "CONFIGURATION_FILE",
-      "SOURCE": "data/homepage-glances/public/glances.conf",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "86158b85d3c19285d48c79e8ddeca41f6efa679dfb93f185b92b616337a1516b",
-      "MODE": 420,
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage-glances",
-      "REFERENCE": "/etc/glances/glances.conf",
-      "TYPE": "BIND_MOUNT",
-      "SOURCE": "data/homepage-glances/public/glances.conf",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "MODE": "ro",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage-glances",
-      "REFERENCE": "/app/logs",
-      "TYPE": "BIND_MOUNT",
-      "SOURCE": "data/homepage-glances/logs",
-      "RESTORE_METHOD": "ENCRYPTED_SERVICE_STATE",
-      "MODE": "rw",
-      "RESOURCE_ID": "ae762fc3997412dd484f",
-      "RESOLVED": true,
-      "RECOVERY_ASSET": "services-state.tar.gz.age"
-    },
-    {
-      "SERVICE": "homepage-docker-proxy",
-      "REFERENCE": "data/homepage-docker-proxy/.env",
-      "TYPE": "ENV_FILE",
-      "SOURCE": "data/homepage-docker-proxy/.env",
-      "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage-docker-proxy",
-      "REFERENCE": "/var/run/docker.sock",
-      "TYPE": "HOST_PREREQUISITE",
-      "SOURCE": "/var/run/docker.sock",
-      "RESTORE_METHOD": "HOST_PREREQUISITE",
-      "RESOLVED": true
-    },
-    {
-      "SERVICE": "homepage-docker-proxy",
-      "REFERENCE": "/var/lib/haproxy",
-      "TYPE": "TMPFS",
-      "SOURCE": "",
-      "RESTORE_METHOD": "COMPOSE_RECREATE",
-      "RESOURCE_ID": "f8a841a3349845fa3592",
       "RESOLVED": true
     }
   ],
@@ -2831,6 +2831,12 @@
         "mode": "0775"
       },
       {
+        "path": "data/homepage/public",
+        "uid": 1000,
+        "gid": 1000,
+        "mode": "0770"
+      },
+      {
         "path": "data/comet/data",
         "uid": 1000,
         "gid": 1000,
@@ -2889,12 +2895,6 @@
         "uid": 1000,
         "gid": 1000,
         "mode": "0775"
-      },
-      {
-        "path": "data/homepage/public",
-        "uid": 1000,
-        "gid": 1000,
-        "mode": "0770"
       }
     ],
     "zero_runtime_backup": "NOT_THE_SELECTED_TARGET",
