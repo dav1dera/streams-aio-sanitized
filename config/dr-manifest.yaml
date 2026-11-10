@@ -1692,7 +1692,7 @@
       "TYPE": "CONFIGURATION_FILE",
       "SOURCE": "data/homepage/public/services.yaml",
       "RESTORE_METHOD": "TRACKED_PUBLIC",
-      "SHA256": "74290f0102e34f618f74139f0727424ee7fc9686f187c8d2e9209f4878659d3e",
+      "SHA256": "fcac0afa0915bde94e0ca3628c200e67ef7fc1edcc16501255e5d14d34a7c5bb",
       "MODE": 420,
       "RESOLVED": true
     },

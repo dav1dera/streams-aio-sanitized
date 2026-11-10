@@ -174,7 +174,7 @@
       showStats: false
   - AIOManager:
       icon: mdi-view-dashboard
-      href: http://192.168.178.11:1610/
+      href: "https://aiomanager.self-stremiopi.org/"
       server: docker-locale
       container: aiomanager
       showStats: false

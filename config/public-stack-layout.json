@@ -213,6 +213,6 @@
   "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup",
   "service_resources_inventory": {
     "path": "config/service-resources.json",
-    "sha256": "52f802b595a98fa41612b9b342bce6135e9f5230c563e2c327f83cd601b8e520"
+    "sha256": "948629664c249e65e9152f7f37493472ca3f7129e8c7fbe5e102cb61b3ca3f21"
   }
 }
