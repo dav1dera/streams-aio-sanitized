@@ -297,19 +297,6 @@
       ]
     },
     {
-      "destination": "data/honey/data/config/config.json",
-      "template": "config/dr-templates/honey/data/config/config.json.template",
-      "format": "json",
-      "app_owned": true,
-      "mode": "0660",
-      "owner": "application-user:application-group",
-      "uid": 1000,
-      "gid": 1000,
-      "named_acl": [
-        "user:1000:rw-"
-      ]
-    },
-    {
       "destination": "data/jackett/data/Jackett/Indexers/animetosho-xyz.json",
       "template": "config/dr-templates/jackett/data/Jackett/Indexers/animetosho-xyz.json.template",
       "format": "json",
@@ -879,15 +866,6 @@
     "/headplane/HEADSCALE_API_KEY",
     "/headplane/OIDC_CLIENT_SECRET",
     "/headplane/SERVER_COOKIE_SECRET",
-    "/honey/SERVICES_10_ICON",
-    "/honey/SERVICES_11_ICON",
-    "/honey/SERVICES_12_HREF",
-    "/honey/SERVICES_4_ICON",
-    "/honey/SERVICES_5_HREF",
-    "/honey/SERVICES_6_HREF",
-    "/honey/SERVICES_6_ICON",
-    "/honey/SERVICES_8_HREF",
-    "/honey/SERVICES_9_HREF",
     "/jackett/ANIMETOSHO_XYZ_API_KEY",
     "/mediaflow-proxy-light/APP__PROXY__PROXY_URL",
     "/mediaflow-proxy-light/APP__PROXY__TRANSPORT_ROUTES",

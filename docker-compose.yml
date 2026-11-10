@@ -389,24 +389,6 @@ services:
     - wud.watch.digest=true
     profiles: [all]
 
-  # 🍯 Honey - Dashboard
-  honey:
-    image: ghcr.io/dani3l0/honey:latest
-    container_name: honey
-    restart: unless-stopped
-    volumes:
-    - ./data/honey/data/config:/app/dist/config
-    ports:
-    - 4173:4173
-    networks:
-      default:
-        ipv4_address: 172.18.0.16
-    labels:
-    - deunhealth.restart.on.unhealthy=true
-    - wud.tag.include=^$${raw}$$
-    - wud.watch.digest=true
-    profiles: [all]
-
   # 🎙️ TeamSpeak 6 - Voice communication server
   teamspeak:
     image: teamspeaksystems/teamspeak6-server:latest

@@ -17,7 +17,6 @@
     "homepage",
     "homepage-docker-proxy",
     "homepage-glances",
-    "honey",
     "jackett",
     "mediaflow-proxy-light",
     "microwarp",
@@ -107,12 +106,6 @@
       "path": "data/wud/data",
       "uid": 0,
       "gid": 0,
-      "mode": "0775"
-    },
-    {
-      "path": "data/honey/data/config",
-      "uid": 1000,
-      "gid": 1000,
       "mode": "0775"
     },
     {
@@ -215,7 +208,7 @@
     ".secrets/wud.env"
   ],
   "private_env_targets_from_restored_agent": [],
-  "unclassified_files_excluded": 25,
+  "unclassified_files_excluded": 24,
   "database_policy": "fresh_application_state_restore_infisical",
   "scope": "public declarations only; private Agent configuration is preserved by the encrypted DR backup",
   "service_resources_inventory": {

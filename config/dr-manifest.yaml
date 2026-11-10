@@ -522,50 +522,6 @@
         "data/wud/data"
       ]
     },
-    "honey": {
-      "PUBLIC_REPO_FILES": [],
-      "INFISICAL_PATHS": [
-        "/honey/NETWORK_DEFAULT_IPV4_ADDRESS",
-        "/honey/SERVICES_0_HREF",
-        "/honey/SERVICES_10_HREF",
-        "/honey/SERVICES_10_ICON",
-        "/honey/SERVICES_11_HREF",
-        "/honey/SERVICES_11_ICON",
-        "/honey/SERVICES_12_HREF",
-        "/honey/SERVICES_13_HREF",
-        "/honey/SERVICES_14_HREF",
-        "/honey/SERVICES_15_HREF",
-        "/honey/SERVICES_1_HREF",
-        "/honey/SERVICES_21_HREF",
-        "/honey/SERVICES_3_HREF",
-        "/honey/SERVICES_4_ICON",
-        "/honey/SERVICES_5_HREF",
-        "/honey/SERVICES_6_HREF",
-        "/honey/SERVICES_6_ICON",
-        "/honey/SERVICES_7_HREF",
-        "/honey/SERVICES_8_HREF",
-        "/honey/SERVICES_9_HREF"
-      ],
-      "GENERATED_FILES": [
-        "data/honey/data/config/config.json"
-      ],
-      "RUNTIME_STATE": [],
-      "RESTORE_ORDER": [
-        "Infisical inputs",
-        "one-shot declarative render",
-        "create empty writable directories",
-        "satisfy only explicitly required user configuration",
-        "compose creates named volumes",
-        "start dependencies",
-        "complete documented first-run enrollment"
-      ],
-      "REQUIRED_BEFORE_COMPOSE_UP": [
-        "data/honey/data/config"
-      ],
-      "OPTIONAL_STATE": [],
-      "STATE_UNIT_IDS": [],
-      "REQUIRED_STATE": []
-    },
     "teamspeak": {
       "PUBLIC_REPO_FILES": [
         "data/teamspeak/.env"
@@ -1598,15 +1554,6 @@
       "RESOLVED": true
     },
     {
-      "SERVICE": "honey",
-      "REFERENCE": "/app/dist/config",
-      "TYPE": "BIND_MOUNT",
-      "SOURCE": "data/honey/data/config",
-      "RESTORE_METHOD": "BOOTSTRAP_GENERATED",
-      "MODE": "rw",
-      "RESOLVED": true
-    },
-    {
       "SERVICE": "teamspeak",
       "REFERENCE": "data/teamspeak/.env",
       "TYPE": "ENV_FILE",
@@ -2179,7 +2126,6 @@
       "gluetun",
       "headscale",
       "homepage-docker-proxy",
-      "honey",
       "mediaflow-proxy-light",
       "microwarp",
       "portainer",
@@ -2810,12 +2756,6 @@
         "path": "data/wud/data",
         "uid": 0,
         "gid": 0,
-        "mode": "0775"
-      },
-      {
-        "path": "data/honey/data/config",
-        "uid": 1000,
-        "gid": 1000,
         "mode": "0775"
       },
       {

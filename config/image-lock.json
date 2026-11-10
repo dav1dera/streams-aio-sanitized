@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:aa24a85544f64871fbc61e0053f5cb1013360f012206a6262e0ca8038f59d106",
+    "image": "ghcr.io/viren070/aiostreams@sha256:62f23b32a0cd52261189757dbeab477f73e4ec8346b4f7af7243da3dbb10fe35",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -69,11 +69,6 @@
     "platform": "linux/amd64",
     "configured_image": "getwud/wud:latest"
   },
-  "honey": {
-    "image": "ghcr.io/dani3l0/honey@sha256:3a9bba2b1867bb1a802ee898378189a80dd75a1e2e17e389200e715acd5b6b06",
-    "platform": "linux/amd64",
-    "configured_image": "ghcr.io/dani3l0/honey:latest"
-  },
   "teamspeak": {
     "image": "teamspeaksystems/teamspeak6-server@sha256:d845f803aecf842c2df034c959c23ff2462357bacafb3807500885c5ec170fa1",
     "platform": "linux/amd64",
@@ -95,7 +90,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:4925976faf4a7d0acf3cb750aa16202ee92c960a0d458e3faf2131181bc44fba",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:a806b3986a49badc8400376caeaba9cfac0f2b28a7acaea36391ea4f3a85d35a",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
@@ -110,7 +105,7 @@
     "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
-    "image": "ghcr.io/sonicx161/aiomanager@sha256:ea06fd15d55887cbf8cc33411b423e666353eb7439b47f0af49a79ae01f1dfee",
+    "image": "ghcr.io/sonicx161/aiomanager@sha256:82f5f71a47fcf4e2c4ab59586448ba8ea333a2f5a64b609358ad2ff2bbaffe8d",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
@@ -135,7 +130,7 @@
     "configured_image": "qmcgaw/deunhealth:latest"
   },
   "gluetun": {
-    "image": "qmcgaw/gluetun@sha256:12df8b20528d4cd5e9b6e827d40f2886cf78e53e7e9afc750050648c31183793",
+    "image": "qmcgaw/gluetun@sha256:44a82caf5b866193bfdfe8ffffbb11b20ce8138a917466c2c9bff9a52861c1a5",
     "platform": "linux/amd64",
     "configured_image": "qmcgaw/gluetun:latest"
   },
