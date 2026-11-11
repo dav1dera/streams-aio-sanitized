@@ -90,7 +90,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:a806b3986a49badc8400376caeaba9cfac0f2b28a7acaea36391ea4f3a85d35a",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:f169600c86a5dd5e44056cf282cef7aeaf26d1a96a03ef40697ce426a66ac60f",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
@@ -105,7 +105,7 @@
     "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
-    "image": "ghcr.io/sonicx161/aiomanager@sha256:82f5f71a47fcf4e2c4ab59586448ba8ea333a2f5a64b609358ad2ff2bbaffe8d",
+    "image": "ghcr.io/sonicx161/aiomanager@sha256:be46aea6169afa676ffaa7c87c6f303dbeeef9689a4a7625445fa270309c89c4",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
@@ -135,12 +135,12 @@
     "configured_image": "qmcgaw/gluetun:latest"
   },
   "comet": {
-    "image": "g0ldyy/comet@sha256:dca62133336e02784d02aaad861381820674d1c8e3e98a03797610b81ee4defe",
+    "image": "g0ldyy/comet@sha256:31a41fa64ed2e174fe0bae915a168a0c77ae4bca17b7efb8fa3a31d7c9f164ea",
     "platform": "linux/amd64",
     "configured_image": "g0ldyy/comet:latest"
   },
   "cometnet": {
-    "image": "g0ldyy/comet@sha256:dca62133336e02784d02aaad861381820674d1c8e3e98a03797610b81ee4defe",
+    "image": "g0ldyy/comet@sha256:31a41fa64ed2e174fe0bae915a168a0c77ae4bca17b7efb8fa3a31d7c9f164ea",
     "platform": "linux/amd64",
     "configured_image": "g0ldyy/comet:latest"
   },
