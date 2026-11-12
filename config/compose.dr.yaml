@@ -21,7 +21,7 @@
       "platform": "linux/amd64"
     },
     "npm": {
-      "image": "jc21/nginx-proxy-manager@sha256:4393e642e233e5efd5adeb7f10918d4aaea71c9ed875b94190273fc8e87f9594",
+      "image": "jc21/nginx-proxy-manager@sha256:9cdfebbcbb6a70b84c538e6e39862c5d627171e5f4ea4bfda933f7643e3640a4",
       "platform": "linux/amd64"
     },
     "cloudflare-ddns": {
@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:62f23b32a0cd52261189757dbeab477f73e4ec8346b4f7af7243da3dbb10fe35",
+      "image": "ghcr.io/viren070/aiostreams@sha256:5b08665881a92b8b100ebac2bcbc686f8048905ea7f489ee507193e15da10c42",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -68,7 +68,7 @@
       "platform": "linux/amd64"
     },
     "gost": {
-      "image": "gogost/gost@sha256:f266f957c6e4f8d433ed23202a5745fa4969d08f3f0ef034fb9357345e16ad67",
+      "image": "gogost/gost@sha256:27f4bda42d13f00ef76044cc0fe2fd900e7b7a4e08f3ff67a2826138f9dc877c",
       "platform": "linux/amd64"
     },
     "oauth2-proxy": {
@@ -88,7 +88,7 @@
       "platform": "linux/amd64"
     },
     "aiomanager": {
-      "image": "ghcr.io/sonicx161/aiomanager@sha256:be46aea6169afa676ffaa7c87c6f303dbeeef9689a4a7625445fa270309c89c4",
+      "image": "ghcr.io/sonicx161/aiomanager@sha256:7445f7f682331e6ef20f6a15dbf107cca279d1cf38e88b572d5e30c362097be6",
       "platform": "linux/amd64"
     },
     "homepage": {
