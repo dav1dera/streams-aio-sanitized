@@ -1,6 +1,6 @@
 {
   "tailscale": {
-    "image": "tailscale/tailscale@sha256:ed6480b33c6eb67c9cbd203ed42b9fb57e361986725b6856def71b7a3d9e276c",
+    "image": "tailscale/tailscale@sha256:72c1e19e0aedca96b8533bbb0b4368564410ff20b17e53b804eb6c1f04a31be4",
     "platform": "linux/amd64",
     "configured_image": "tailscale/tailscale:latest"
   },
@@ -25,7 +25,7 @@
     "configured_image": "ghcr.io/tale/headplane:latest"
   },
   "npm": {
-    "image": "jc21/nginx-proxy-manager@sha256:9cdfebbcbb6a70b84c538e6e39862c5d627171e5f4ea4bfda933f7643e3640a4",
+    "image": "jc21/nginx-proxy-manager@sha256:91277490a919c792aa73b8d291af1ca84d32be74df988e543137976515763534",
     "platform": "linux/amd64",
     "configured_image": "jc21/nginx-proxy-manager:latest"
   },
@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:5b08665881a92b8b100ebac2bcbc686f8048905ea7f489ee507193e15da10c42",
+    "image": "ghcr.io/viren070/aiostreams@sha256:0a2f2253fe70903bf9be632f3687ac0104a337b2b3581ae1e4204895940d7d61",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -55,7 +55,7 @@
     "configured_image": "edoburu/pgbouncer:latest"
   },
   "postgres": {
-    "image": "postgres@sha256:123b17998ccaf47e53b502e8c6a1e79afd8f579c6f3eec83c563da026f957395",
+    "image": "postgres@sha256:1018733457011bf88d81db98cf43aac6d5150afc18787dbe204771fedf80ff95",
     "platform": "linux/amd64",
     "configured_image": "postgres:18-alpine"
   },
@@ -90,7 +90,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:f169600c86a5dd5e44056cf282cef7aeaf26d1a96a03ef40697ce426a66ac60f",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:09b37817774e8eec63817f47ef71c302b7c067f824b0afd72ad7af0efd9f4374",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
@@ -105,7 +105,7 @@
     "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
-    "image": "ghcr.io/sonicx161/aiomanager@sha256:7445f7f682331e6ef20f6a15dbf107cca279d1cf38e88b572d5e30c362097be6",
+    "image": "ghcr.io/sonicx161/aiomanager@sha256:7daa91036475a437d85e97ef180b03737f7395be327aa7c7d3fb881ee84757be",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
