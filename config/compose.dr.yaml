@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:0a2f2253fe70903bf9be632f3687ac0104a337b2b3581ae1e4204895940d7d61",
+      "image": "ghcr.io/viren070/aiostreams@sha256:920d1808a9264ef48719560d0d93d6c70cdd41f1380e905d7d2327d35e01fafe",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -76,7 +76,7 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:09b37817774e8eec63817f47ef71c302b7c067f824b0afd72ad7af0efd9f4374",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:0cee2b01b9772bc91049523caa14d43d4c06f6344faaf04000e20b2ba52da8cf",
       "platform": "linux/amd64"
     },
     "streamvix": {
@@ -88,7 +88,7 @@
       "platform": "linux/amd64"
     },
     "aiomanager": {
-      "image": "ghcr.io/sonicx161/aiomanager@sha256:7daa91036475a437d85e97ef180b03737f7395be327aa7c7d3fb881ee84757be",
+      "image": "ghcr.io/sonicx161/aiomanager@sha256:544cab26f04c2d17e64ffb8e302d91bb0b84a24174f8a7368461701a2bf9d844",
       "platform": "linux/amd64"
     },
     "homepage": {
@@ -127,7 +127,7 @@
       "platform": "linux/amd64"
     },
     "jackett": {
-      "image": "lscr.io/linuxserver/jackett@sha256:3af37ff2ca5f14da5529b9e2018e384735daf1bf08b99350e1211be863eeae20",
+      "image": "lscr.io/linuxserver/jackett@sha256:19802345fcc60a536802d29f36db073a77193fcd2f8fe3d067f604fc60a77352",
       "platform": "linux/amd64"
     },
     "seanime": {
