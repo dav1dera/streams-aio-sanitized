@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:920d1808a9264ef48719560d0d93d6c70cdd41f1380e905d7d2327d35e01fafe",
+    "image": "ghcr.io/viren070/aiostreams@sha256:a6f1498e30ff2eddd6625edf0830c32d9b6f81eba6c3977dbbd703cd02d86bb1",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -90,7 +90,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:0cee2b01b9772bc91049523caa14d43d4c06f6344faaf04000e20b2ba52da8cf",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:1f8a7ff102fc5a400ac64adf139d4b39bffad5ca3479a6d0bd4a897abb4af803",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
@@ -105,7 +105,7 @@
     "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
-    "image": "ghcr.io/sonicx161/aiomanager@sha256:544cab26f04c2d17e64ffb8e302d91bb0b84a24174f8a7368461701a2bf9d844",
+    "image": "ghcr.io/sonicx161/aiomanager@sha256:1a8f75424fc975ff3e222406808564a12191a573205de4dc5053760e07ce9af1",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
