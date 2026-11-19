@@ -5,7 +5,7 @@
       "platform": "linux/amd64"
     },
     "portainer": {
-      "image": "portainer/portainer-ce@sha256:3609c307943bca8e5c492f69ddd6965df177208b50678a4cff28391c8dd4e96e",
+      "image": "portainer/portainer-ce@sha256:18616fff2998f8ca0e8ebe7f028658ae1682859cf43f212f81a849c1093ad639",
       "platform": "linux/amd64"
     },
     "dnscrypt-proxy": {
@@ -21,7 +21,7 @@
       "platform": "linux/amd64"
     },
     "npm": {
-      "image": "jc21/nginx-proxy-manager@sha256:91277490a919c792aa73b8d291af1ca84d32be74df988e543137976515763534",
+      "image": "jc21/nginx-proxy-manager@sha256:04a9d0835560b9719ab577275f84fe1f713298a1c1e2bdefa034b87f10e062e1",
       "platform": "linux/amd64"
     },
     "cloudflare-ddns": {
@@ -29,7 +29,7 @@
       "platform": "linux/amd64"
     },
     "aiometadata": {
-      "image": "ghcr.io/cedya77/aiometadata@sha256:8a24bd90711e42a817baa20594cba3e08bbd340d859c6c5c9222be6f5f3eafd8",
+      "image": "ghcr.io/cedya77/aiometadata@sha256:c17e1aa7c670055e14dea99087cfe18ff07fa6ea4dfce9c3484830a718e066ce",
       "platform": "linux/amd64"
     },
     "mediaflow-proxy-light": {
@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:a6f1498e30ff2eddd6625edf0830c32d9b6f81eba6c3977dbbd703cd02d86bb1",
+      "image": "ghcr.io/viren070/aiostreams@sha256:84f170b793026bd8ac33db8e11ad6172df14989d57c3a43b9897a6b6068c5c2f",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -45,7 +45,7 @@
       "platform": "linux/amd64"
     },
     "postgres": {
-      "image": "postgres@sha256:1018733457011bf88d81db98cf43aac6d5150afc18787dbe204771fedf80ff95",
+      "image": "postgres@sha256:ff64c9e3bdf8e2120107d3559de8db314e8305f7e38c5105903c6295876738ff",
       "volumes": [
         "postgres-cluster:/var/lib/postgresql"
       ],
@@ -60,7 +60,7 @@
       "platform": "linux/amd64"
     },
     "teamspeak": {
-      "image": "teamspeaksystems/teamspeak6-server@sha256:d845f803aecf842c2df034c959c23ff2462357bacafb3807500885c5ec170fa1",
+      "image": "teamspeaksystems/teamspeak6-server@sha256:324c5a1e6d22e12b78f4342f7dbe215edcf4ca2fda6205c25ffb504e81463bc4",
       "platform": "linux/amd64"
     },
     "microwarp": {
@@ -76,7 +76,7 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:1f8a7ff102fc5a400ac64adf139d4b39bffad5ca3479a6d0bd4a897abb4af803",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:ed4fec602128318ccb74593b76b92dfc7a8e8313f601080f5dd6cd7bf136bdd8",
       "platform": "linux/amd64"
     },
     "streamvix": {
@@ -88,7 +88,7 @@
       "platform": "linux/amd64"
     },
     "aiomanager": {
-      "image": "ghcr.io/sonicx161/aiomanager@sha256:1a8f75424fc975ff3e222406808564a12191a573205de4dc5053760e07ce9af1",
+      "image": "ghcr.io/sonicx161/aiomanager@sha256:7bbe82aebba80e00742f5f0346c8829d4d32c494d774d792af8322f41fa9953c",
       "platform": "linux/amd64"
     },
     "homepage": {
@@ -112,11 +112,11 @@
       "platform": "linux/amd64"
     },
     "comet": {
-      "image": "g0ldyy/comet@sha256:31a41fa64ed2e174fe0bae915a168a0c77ae4bca17b7efb8fa3a31d7c9f164ea",
+      "image": "g0ldyy/comet@sha256:3dcb2b1802bcc45ea9c1f1206088985baa88a8321ab3cb3408976356bfa8bbb3",
       "platform": "linux/amd64"
     },
     "cometnet": {
-      "image": "g0ldyy/comet@sha256:31a41fa64ed2e174fe0bae915a168a0c77ae4bca17b7efb8fa3a31d7c9f164ea",
+      "image": "g0ldyy/comet@sha256:3dcb2b1802bcc45ea9c1f1206088985baa88a8321ab3cb3408976356bfa8bbb3",
       "platform": "linux/amd64"
     },
     "stremthru": {
