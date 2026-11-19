@@ -1,0 +1,93 @@
+{
+  "schema": 1,
+  "service": {
+    "image": "ghcr.io/dani3l0/honey:latest",
+    "container_name": "honey",
+    "restart": "unless-stopped",
+    "volumes": [
+      "./data/honey/data/config:/app/dist/config"
+    ],
+    "ports": [
+      "4173:4173"
+    ],
+    "networks": {
+      "default": {
+        "ipv4_address": "172.18.0.16"
+      }
+    },
+    "labels": [
+      "deunhealth.restart.on.unhealthy=true",
+      "wud.tag.include=^$${raw}$$",
+      "wud.watch.digest=true"
+    ],
+    "profiles": [
+      "all"
+    ]
+  },
+  "render_file": {
+    "destination": "data/honey/data/config/config.json",
+    "template": "config/dr-templates/honey/data/config/config.json.template",
+    "format": "json",
+    "app_owned": true,
+    "mode": "0660",
+    "owner": "application-user:application-group",
+    "uid": 1000,
+    "gid": 1000,
+    "named_acl": [
+      "user:1000:rw-"
+    ]
+  },
+  "image_lock": {
+    "image": "ghcr.io/dani3l0/honey@sha256:3a9bba2b1867bb1a802ee898378189a80dd75a1e2e17e389200e715acd5b6b06",
+    "platform": "linux/amd64",
+    "configured_image": "ghcr.io/dani3l0/honey:latest"
+  },
+  "recovery_override": {
+    "image": "ghcr.io/dani3l0/honey@sha256:3a9bba2b1867bb1a802ee898378189a80dd75a1e2e17e389200e715acd5b6b06",
+    "platform": "linux/amd64"
+  },
+  "manifest_component": {
+    "PUBLIC_REPO_FILES": [],
+    "INFISICAL_PATHS": [
+      "/honey/NETWORK_DEFAULT_IPV4_ADDRESS",
+      "/honey/SERVICES_0_HREF",
+      "/honey/SERVICES_10_HREF",
+      "/honey/SERVICES_10_ICON",
+      "/honey/SERVICES_11_HREF",
+      "/honey/SERVICES_11_ICON",
+      "/honey/SERVICES_12_HREF",
+      "/honey/SERVICES_13_HREF",
+      "/honey/SERVICES_14_HREF",
+      "/honey/SERVICES_15_HREF",
+      "/honey/SERVICES_1_HREF",
+      "/honey/SERVICES_21_HREF",
+      "/honey/SERVICES_3_HREF",
+      "/honey/SERVICES_4_ICON",
+      "/honey/SERVICES_5_HREF",
+      "/honey/SERVICES_6_HREF",
+      "/honey/SERVICES_6_ICON",
+      "/honey/SERVICES_7_HREF",
+      "/honey/SERVICES_8_HREF",
+      "/honey/SERVICES_9_HREF"
+    ],
+    "GENERATED_FILES": [
+      "data/honey/data/config/config.json"
+    ],
+    "RUNTIME_STATE": [],
+    "RESTORE_ORDER": [
+      "Infisical inputs",
+      "one-shot declarative render",
+      "create empty writable directories",
+      "satisfy only explicitly required user configuration",
+      "compose creates named volumes",
+      "start dependencies",
+      "complete documented first-run enrollment"
+    ],
+    "REQUIRED_BEFORE_COMPOSE_UP": [
+      "data/honey/data/config"
+    ],
+    "OPTIONAL_STATE": [],
+    "STATE_UNIT_IDS": [],
+    "REQUIRED_STATE": []
+  }
+}

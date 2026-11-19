@@ -14,7 +14,7 @@ import tempfile
 import unittest
 from unittest import mock
 
-from test_public_sync import baseline, sync, ROOT, FakeGitHub, BASE, COMMIT
+from test_public_sync import baseline, honey_baseline, sync, ROOT, FakeGitHub, BASE, COMMIT
 
 sys.path.insert(0, str(ROOT / "scripts"))
 import public_export as export
@@ -577,13 +577,14 @@ class PublicExportTests(unittest.TestCase):
         self.source = self.root / "live"
         self.source.mkdir()
         self.public = baseline()
+        for name in ("config/dr-manifest.yaml", ".gitignore"):
+            self.public[name] = (ROOT / name).read_bytes()
+        self.public = honey_baseline(self.public)
         self.honey_template = "config/dr-templates/honey/data/config/config.json.template"
         self.published_honey = self.public[self.honey_template]
         # Positional mutation tests exercise a fixed historical layout, not
         # whichever dashboard the automatic exporter most recently published.
         self.public[self.honey_template] = (ROOT / "tests/fixtures/honey-layout-22.json").read_bytes()
-        for name in ("config/dr-manifest.yaml", ".gitignore"):
-            self.public[name] = (ROOT / name).read_bytes()
         self.write = fixture(self.source, self.public)
         def images(source, compose, old):
             return {s: dict(old.get(s, {"image": "example/new@sha256:" + "a" * 64, "platform": "linux/amd64"}), configured_image=r["image"])
@@ -759,6 +760,17 @@ class PublicExportTests(unittest.TestCase):
         self.assertNotIn("jackett", sync.loads(changes["config/image-lock.json"]))
         self.assertNotIn("jackett", sync.loads(changes["config/dr-manifest.yaml"])["components"])
         self.assertTrue((self.source / "data/jackett/data/Jackett/ServerConfig.json").exists())
+
+    def test_honey_removal_roundtrip_does_not_need_its_retired_public_template(self):
+        self.compose(lambda rows: rows.pop("honey"))
+        changes = self.render()
+        self.assertIsNone(changes[self.honey_template])
+        self.assertNotIn("honey", sync.loads(changes["config/image-lock.json"]))
+        self.assertNotIn("honey", sync.loads(changes["config/dr-manifest.yaml"])["components"])
+        self.assertTrue((self.source / "data/honey/data/config/config.json").is_file())
+        self.apply(changes)
+        self.assertNotIn(self.honey_template, self.public)
+        self.assertEqual(self.render(), {})
 
     def test_removed_service_root_secret_reference_is_not_required_for_restore(self):
         old = sync.loads(self.public["config/dr-render-plan.json"])
@@ -1201,6 +1213,11 @@ class PublicExportTests(unittest.TestCase):
         self.assertIsNone(self.render()["docs/local-recovery.md"])
 
     def test_existing_public_examples_scripts_and_docs_pass_content_checks(self):
+        # Exercise the current deployment, without the optional Honey contract
+        # used by mutation tests. Its removal must remain a valid public tree.
+        self.public = baseline()
+        for name in ("config/dr-manifest.yaml", ".gitignore"):
+            self.public[name] = (ROOT / name).read_bytes()
         names = []
         for path in sorted(ROOT.rglob("*")):
             if not path.is_file(): continue
