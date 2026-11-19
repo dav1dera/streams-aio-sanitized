@@ -31,6 +31,57 @@ def baseline():
     return {p: (ROOT / p).read_bytes() for p in paths}
 
 
+HONEY_TEMPLATE = "config/dr-templates/honey/data/config/config.json.template"
+
+
+def honey_baseline(public):
+    """Add a complete test-only Honey contract, independent of the live stack.
+
+    The deployment can remove or replace Honey without deleting coverage of
+    its private bindings and anonymized labels. Never modify repository files.
+    """
+    public = copy.deepcopy(public)
+    contract = sync.loads((ROOT / "tests/fixtures/honey-contract.json").read_bytes())
+    compose_text = public["docker-compose.yml"].decode()
+    document = sync.yaml.compose(compose_text)
+    services = next(value for key, value in document.value if key.value == "services")
+    existing = next((index for index, (key, _) in enumerate(services.value) if key.value == "honey"), None)
+    if existing is None:
+        position = services.end_mark.index
+        beginning = compose_text.rfind('\n', 0, position) + 1
+        if not compose_text[beginning:position].strip():
+            position = beginning
+        finish = position
+    else:
+        position = compose_text.rfind('\n', 0, services.value[existing][0].start_mark.index) + 1
+        finish = services.value[existing + 1][0].start_mark.index if existing + 1 < len(services.value) else services.end_mark.index
+        beginning = compose_text.rfind('\n', 0, finish) + 1
+        if not compose_text[beginning:finish].strip():
+            finish = beginning
+    body = sync.yaml.safe_dump({"honey": contract["service"]}, sort_keys=False)
+    body = ''.join('  ' + line + '\n' for line in body.splitlines())
+    public["docker-compose.yml"] = (compose_text[:position] + body + '\n' + compose_text[finish:]).encode()
+    plan = sync.loads(public["config/dr-render-plan.json"])
+    plan["files"] = [row for row in plan["files"] if row["destination"] != contract["render_file"]["destination"]]
+    plan["files"].append(contract["render_file"])
+    public["config/dr-render-plan.json"] = (json.dumps(plan, indent=2) + '\n').encode()
+    public[HONEY_TEMPLATE] = (ROOT / "tests/fixtures/honey-published-layout.json").read_bytes()
+    locks = sync.loads(public["config/image-lock.json"])
+    locks["honey"] = contract["image_lock"]
+    public["config/image-lock.json"] = (json.dumps(locks, indent=2) + '\n').encode()
+    override = sync.loads(public["config/compose.dr.yaml"])
+    override["services"]["honey"] = contract["recovery_override"]
+    public["config/compose.dr.yaml"] = (json.dumps(override, indent=2) + '\n').encode()
+    overlays = sync.loads(public["config/private-config-overlays.json"])
+    public["config/private-config-overlays.json"] = (json.dumps(
+        [row for row in overlays if row["file"] != contract["render_file"]["destination"]], indent=2) + '\n').encode()
+    if "config/dr-manifest.yaml" in public:
+        manifest = sync.loads(public["config/dr-manifest.yaml"])
+        manifest["components"]["honey"] = contract["manifest_component"]
+        public["config/dr-manifest.yaml"] = (json.dumps(manifest, indent=2) + '\n').encode()
+    return public
+
+
 def live_fixture(root, public):
     def write(name, data):
         path = root / name
@@ -110,6 +161,21 @@ class PublicSyncTests(unittest.TestCase):
 
     def render(self, images=None):
         return sync.render(self.source, self.public, images or self.images)
+
+    def test_honey_fixture_is_complete_without_mutating_the_current_deployment_baseline(self):
+        original = copy.deepcopy(self.public)
+        with_honey = honey_baseline(self.public)
+        self.assertEqual(self.public, original)
+        self.assertEqual(honey_baseline(with_honey), with_honey)
+        contract = sync.loads((ROOT / "tests/fixtures/honey-contract.json").read_bytes())
+        compose = sync.yaml_load(with_honey["docker-compose.yml"])
+        self.assertEqual(compose["services"]["honey"], contract["service"])
+        compose["services"].pop("honey")
+        actual = sync.yaml_load(self.public["docker-compose.yml"])
+        actual["services"].pop("honey", None)
+        self.assertEqual(compose, actual)
+        live_fixture(self.source, with_honey)
+        self.assertTrue((self.source / contract["render_file"]["destination"]).is_file())
 
     def test_full_reviewed_corpus_masks_private_values_and_ignores_runtime(self):
         changes = self.render()
@@ -458,6 +524,8 @@ class PublicSyncTests(unittest.TestCase):
             self.assertNotIn(SECRET, str(error.exception))
 
     def test_honey_branding_stays_generic_while_public_ui_switches_follow_live(self):
+        self.public = honey_baseline(self.public)
+        live_fixture(self.source, self.public)
         name = "config/dr-templates/honey/data/config/config.json.template"
         old = sync.loads(self.public[name])
         path = self.source / "data/honey/data/config/config.json"
@@ -479,6 +547,8 @@ class PublicSyncTests(unittest.TestCase):
             self.assertNotIn(SECRET.encode(), changes[name])
 
     def test_honey_generic_fields_require_strings_and_other_fields_still_block(self):
+        self.public = honey_baseline(self.public)
+        live_fixture(self.source, self.public)
         path = self.source / "data/honey/data/config/config.json"
         original = sync.loads(path.read_bytes())
         mutations = [("desc", {SECRET: SECRET}), ("icon", [SECRET]),

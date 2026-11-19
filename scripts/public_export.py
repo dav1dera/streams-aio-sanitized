@@ -43,6 +43,13 @@ TOKEN_PATTERNS = (re.compile(r"(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0
                   re.compile(r"eyJ[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}\.[A-Za-z0-9_-]{15,}"),
                   re.compile(r"[a-zA-Z][a-zA-Z0-9+.-]*://[^\s/@:]+:[^\s/@]+@"),
                   re.compile(r"[?&](?:api_?key|token|password|secret|auth)=[^\s&#\"']+", re.I))
+# A complete symbolic URL value in runtime code is a reference, not a literal
+# credential. Limit this to identifiers/member access: defaults, calls, computed
+# expressions and literal suffixes must still pass the ordinary credential scan.
+RUNTIME_QUERY_REFERENCE = re.compile(
+    r"[?&](?:api_?key|token|password|secret|auth)="
+    r"\$\{[A-Za-z_$][A-Za-z0-9_$]*(?:\.[A-Za-z_$][A-Za-z0-9_$]*)*\}"
+    r"(?=$|[&#\s\"'`])", re.I)
 
 COMPOSE_SERVICE_HEADINGS = {
     "tailscale": "🔒 Tailscale multinode WireGuard solution",
@@ -683,12 +690,16 @@ class Guard:
             if sensitive(variable[1]):
                 self.sync.require(variable[0] in {"${" + variable[1] + "}", "${" + variable[1] + ":-}", "${" + variable[1] + "-}"},
                                   "PRIVATE_VARIABLE_DEFAULT_REFUSED", name)
+        query_public = VARIABLE.sub("", RUNTIME_QUERY_REFERENCE.sub("", public))
         public = VARIABLE.sub("", public)
         for index, rx in enumerate(TOKEN_PATTERNS):
             # A few reviewed extension fixtures contain public example URL tokens.
             # Only those exact occurrences in this same public file are grandfathered.
             prior = self.sync.MARKER.sub("", self.baseline.get(name, b"").decode())
-            matches = rx.findall(public)
+            # Do not exempt references from other token/private-value checks.
+            if index == 5:
+                prior = RUNTIME_QUERY_REFERENCE.sub("", prior)
+            matches = rx.findall(query_public if index == 5 else public)
             self.sync.require(all(index == 5 and matches.count(value) <= rx.findall(prior).count(value)
                                   for value in matches), "CREDENTIAL_PATTERN_REFUSED", name)
         self.sync.require("-- PostgreSQL database dump" not in text and "-- MySQL dump" not in text,
