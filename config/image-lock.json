@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:84f170b793026bd8ac33db8e11ad6172df14989d57c3a43b9897a6b6068c5c2f",
+    "image": "ghcr.io/viren070/aiostreams@sha256:5ecd79c9f74d2f6a86e36249eeefb227dfa8ed3d179f54ba0763c7bac8cadb53",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -90,7 +90,7 @@
     "configured_image": "quay.io/oauth2-proxy/oauth2-proxy:latest"
   },
   "easyproxy": {
-    "image": "ghcr.io/realbestia1/easyproxy@sha256:ed4fec602128318ccb74593b76b92dfc7a8e8313f601080f5dd6cd7bf136bdd8",
+    "image": "ghcr.io/realbestia1/easyproxy@sha256:cc55073bb904a802900d1189de79920e352962ccf320fa3ccf417a22dd68c6a4",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/realbestia1/easyproxy:latest"
   },
@@ -100,12 +100,12 @@
     "configured_image": "qwertyuiop8899/streamvix:latest"
   },
   "tvvoo": {
-    "image": "qwertyuiop8899/tvvoo@sha256:14def5d13ac2c6399f2abcf077e2635b859cfcdc835740cc4c39cf27ff90e46e",
+    "image": "qwertyuiop8899/tvvoo@sha256:954387ea423878b8d4d398265fe94949f63e43e7c6cd0c260ce870ec426dfeba",
     "platform": "linux/amd64",
     "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
-    "image": "ghcr.io/sonicx161/aiomanager@sha256:7bbe82aebba80e00742f5f0346c8829d4d32c494d774d792af8322f41fa9953c",
+    "image": "ghcr.io/sonicx161/aiomanager@sha256:8789729d879b5d3040031964de1d90b2bfa1198c2fba90a8be6a75b858a33dd1",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
@@ -150,7 +150,7 @@
     "configured_image": "muniftanjim/stremthru:latest"
   },
   "jackett": {
-    "image": "lscr.io/linuxserver/jackett@sha256:19802345fcc60a536802d29f36db073a77193fcd2f8fe3d067f604fc60a77352",
+    "image": "lscr.io/linuxserver/jackett@sha256:a2ab09d9469b549ead5fb1175e741467f1e89a700c7e9963f8a97b37b16d55c1",
     "platform": "linux/amd64",
     "configured_image": "lscr.io/linuxserver/jackett:latest"
   },
