@@ -37,7 +37,7 @@
       "platform": "linux/amd64"
     },
     "aiostreams": {
-      "image": "ghcr.io/viren070/aiostreams@sha256:5ecd79c9f74d2f6a86e36249eeefb227dfa8ed3d179f54ba0763c7bac8cadb53",
+      "image": "ghcr.io/viren070/aiostreams@sha256:4136119b630dee2b8bfef9b5feca33f011da213c14bf1b4587e15353d4feb283",
       "platform": "linux/amd64"
     },
     "pgbouncer": {
@@ -76,7 +76,7 @@
       "platform": "linux/amd64"
     },
     "easyproxy": {
-      "image": "ghcr.io/realbestia1/easyproxy@sha256:cc55073bb904a802900d1189de79920e352962ccf320fa3ccf417a22dd68c6a4",
+      "image": "ghcr.io/realbestia1/easyproxy@sha256:f6d4f23caf4f08a84b721748d820415341b9da407f22cd9cb9781317602adda9",
       "platform": "linux/amd64"
     },
     "streamvix": {
