@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:4136119b630dee2b8bfef9b5feca33f011da213c14bf1b4587e15353d4feb283",
+    "image": "ghcr.io/viren070/aiostreams@sha256:e9dd01e4e43c27fd2ab5acdc1f7ad5e1a9233c43458c390a80d36560befb531a",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -65,7 +65,7 @@
     "configured_image": "redis:latest"
   },
   "wud": {
-    "image": "getwud/wud@sha256:5a45a94c2c3e9c26e052c62bbc5bef9f945e3f7826dc446b5c71586a1238ed40",
+    "image": "getwud/wud@sha256:16513343243d3e220bc74f932e3c0774a93cdde5faf9f1b41cb6a9320783aa31",
     "platform": "linux/amd64",
     "configured_image": "getwud/wud:latest"
   },
@@ -105,7 +105,7 @@
     "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
-    "image": "ghcr.io/sonicx161/aiomanager@sha256:8789729d879b5d3040031964de1d90b2bfa1198c2fba90a8be6a75b858a33dd1",
+    "image": "ghcr.io/sonicx161/aiomanager@sha256:c610a9cba281639f0958ac58aad23260a871727d7cf9bed95dc05d9c2dff616f",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
@@ -155,12 +155,12 @@
     "configured_image": "lscr.io/linuxserver/jackett:latest"
   },
   "seanime": {
-    "image": "umagistr/seanime@sha256:99f9210c66eff284d3f4605d63ea129d0678eac5ec9ef74f0fee0a5c8ddf6871",
+    "image": "umagistr/seanime@sha256:efd6298e21aa63639b1f85500c9ebf995ecea989bbbaef3b11210f0e5e45eef5",
     "platform": "linux/amd64",
     "configured_image": "umagistr/seanime:latest"
   },
   "seanime-shared": {
-    "image": "umagistr/seanime@sha256:99f9210c66eff284d3f4605d63ea129d0678eac5ec9ef74f0fee0a5c8ddf6871",
+    "image": "umagistr/seanime@sha256:efd6298e21aa63639b1f85500c9ebf995ecea989bbbaef3b11210f0e5e45eef5",
     "platform": "linux/amd64",
     "configured_image": "umagistr/seanime:latest"
   }
