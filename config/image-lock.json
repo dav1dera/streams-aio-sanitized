@@ -45,7 +45,7 @@
     "configured_image": "ghcr.io/mhdzumair/mediaflow-proxy-light:latest"
   },
   "aiostreams": {
-    "image": "ghcr.io/viren070/aiostreams@sha256:c6fe6165f10521a3027f0077fb7f59a5238f7bd637371e67df54720a582be00e",
+    "image": "ghcr.io/viren070/aiostreams@sha256:d670bd86cc4e3316c1bbe9acf7be83f222af0a82df380cafcc99c896d3b5fea9",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/viren070/aiostreams:nightly"
   },
@@ -60,7 +60,7 @@
     "configured_image": "postgres:18-alpine"
   },
   "redis": {
-    "image": "redis@sha256:fdbe24d5cbe960326359fdde3fbcd98691ac74523dc9fe647c8a715b22630f7e",
+    "image": "redis@sha256:ca1cb6df9313d0186b68f19b60fc2802e0c76e8542b2c05650b560e7bbb3cc8f",
     "platform": "linux/amd64",
     "configured_image": "redis:latest"
   },
@@ -105,7 +105,7 @@
     "configured_image": "qwertyuiop8899/tvvoo:latest"
   },
   "aiomanager": {
-    "image": "ghcr.io/sonicx161/aiomanager@sha256:e7a8351ec15cb45c40f1d9eedb3d5ab49c1e358d10219e72821822e928d1d546",
+    "image": "ghcr.io/sonicx161/aiomanager@sha256:21111ccc6b668045028480d742caf91f737e6e039161149f99659db34d2c37d5",
     "platform": "linux/amd64",
     "configured_image": "ghcr.io/sonicx161/aiomanager:beta"
   },
