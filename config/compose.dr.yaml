@@ -29,7 +29,7 @@
       "platform": "linux/amd64"
     },
     "aiometadata": {
-      "image": "ghcr.io/cedya77/aiometadata@sha256:c17e1aa7c670055e14dea99087cfe18ff07fa6ea4dfce9c3484830a718e066ce",
+      "image": "ghcr.io/cedya77/aiometadata@sha256:89266fd5dfd85ba9074dedead302f2f6b720fcd00734f8581450f55b7aee83cb",
       "platform": "linux/amd64"
     },
     "mediaflow-proxy-light": {
@@ -68,7 +68,7 @@
       "platform": "linux/amd64"
     },
     "gost": {
-      "image": "gogost/gost@sha256:27f4bda42d13f00ef76044cc0fe2fd900e7b7a4e08f3ff67a2826138f9dc877c",
+      "image": "gogost/gost@sha256:53d164fa22ec7a91d1650ead76e050893b1496b522d67f0baad5575660dfca47",
       "platform": "linux/amd64"
     },
     "oauth2-proxy": {
@@ -88,7 +88,7 @@
       "platform": "linux/amd64"
     },
     "aiomanager": {
-      "image": "ghcr.io/sonicx161/aiomanager@sha256:207292a41d8bd71765b2a95d21d6478a00583f68cfbc7b20310c75bcde6ec497",
+      "image": "ghcr.io/sonicx161/aiomanager@sha256:9b59bb57f050af18239f3aa2980e4aaa4405760cfa48e42f770ddf985f3c30f4",
       "platform": "linux/amd64"
     },
     "homepage": {
